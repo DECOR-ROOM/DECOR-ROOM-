@@ -1,0 +1,28 @@
+# --- Pastas-template KROB (referência; NÃO fazem parte do deploy do site) ---
+paginas-krobcode-2-main/
+krob-tracking-stack-main/
+krob-whatsapp-tracking-v1/
+
+# --- Segredos / config local (nunca commitar) ---
+wrangler.toml
+wrangler.toml.audit
+.dev.vars
+.env
+.env.*
+
+# --- Artefatos Cloudflare ---
+.wrangler/
+.cloudflare/
+
+# --- Ruído de SO / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --- Node (caso adicione tooling) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

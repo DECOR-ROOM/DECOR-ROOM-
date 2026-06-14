@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracking Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --card: #ffffff;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --dim: #52525b;
+    --muted: #a1a1aa;
+    --accent-blue:   #2563eb;
+    --accent-green:  #16a34a;
+    --accent-amber:  #d97706;
+    --accent-red:    #dc2626;
+    --accent-purple: #7c3aed;
+  }
+  html, body { background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .mono { font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+  .kpi-label { color: var(--dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .kpi-value { font-size: 1.875rem; font-weight: 600; letter-spacing: -0.02em; }
+  .accent-blue   { color: var(--accent-blue);   }
+  .accent-green  { color: var(--accent-green);  }
+  .accent-amber  { color: var(--accent-amber);  }
+  .accent-red    { color: var(--accent-red);    }
+  .accent-purple { color: var(--accent-purple); }
+  .dash-tab { padding: 0.5rem 0.875rem; font-size: 0.875rem; border-bottom: 2px solid transparent; color: var(--dim); cursor: pointer; }
+  .dash-tab.active { color: var(--text); border-color: var(--accent-blue); }
+  .range-btn { padding: 0.375rem 0.75rem; font-size: 0.8125rem; border: 1px solid var(--border); background: var(--card); border-radius: 8px; cursor: pointer; color: var(--dim); }
+  .range-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .row-hover:hover { background: #fafafa; }
+  .fade-in { animation: fadeIn 0.35s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- Auth gate: pulls ?key= from URL, falls back to sessionStorage, prompts if missing -->
+<div id="app" class="hidden min-h-screen">
+
+  <header class="border-b border-[color:var(--border)] bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[color:var(--text)] text-white flex items-center justify-center font-bold">T</div>
+        <div>
+          <div class="font-semibold">Tracking Dashboard</div>
+          <div class="text-xs text-[color:var(--muted)]">Attribution &amp; performance for this deployment</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2" id="range-picker">
+        <button class="range-btn" data-days="7">7d</button>
+        <button class="range-btn active" data-days="30">30d</button>
+        <button class="range-btn" data-days="90">90d</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+
+    <!-- Revenue Overview -->
+    <section class="fade-in">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="card p-5">
+          <div class="kpi-label">Gross Revenue</div>
+          <div class="kpi-value mono accent-amber mt-1" id="kpi-revenue">—</div>
+          <div class="text-xs text-[color:var(--muted)] mt-1" id="kpi-revenue-sub">&nbsp;</div>
+        </div>
+        <div class="card p-5">
+          <div class="kpi-label">Sales</div>
+          <div class="kpi-value mono mt-1" id="kpi-sales">—</div>
+          <div class="text-xs text-[color:var(--muted)] mt-1">Paid transactions</div>
+        </div>
+        <div class="card p-5">
+          <div class="kpi-label">Average Order</div>
+          <div class="kpi-value mono accent-blue mt-1" id="kpi-aov">—</div>
+          <div class="text-xs text-[color:var(--muted)] mt-1">Gross / sales</div>
+        </div>
+        <div class="card p-5">
+          <div class="kpi-label">Leads</div>
+          <div class="kpi-value mono accent-green mt-1" id="kpi-leads">—</div>
+          <div class="text-xs text-[color:var(--muted)] mt-1">Non-bot, last window</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Revenue time series -->
+    <section class="card p-5 fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="font-semibold">Revenue over time</div>
+          <div class="text-xs text-[color:var(--muted)]">Daily gross revenue and sales count</div>
+        </div>
+      </div>
+      <div class="h-64"><canvas id="chart-revenue"></canvas></div>
+    </section>
+
+    <!-- Product cards + time series -->
+    <section class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 fade-in">
+      <div class="card p-5">
+        <div class="font-semibold mb-3">Products</div>
+        <div id="product-cards" class="space-y-2">
+          <div class="text-sm text-[color:var(--muted)]">Loading…</div>
+        </div>
+      </div>
+      <div class="card p-5">
+        <div class="font-semibold mb-3">Sales per product over time</div>
+        <div class="h-64"><canvas id="chart-products"></canvas></div>
+      </div>
+    </section>
+
+    <!-- Paid Traffic Attribution -->
+    <section class="card p-5 fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="font-semibold">Paid traffic attribution</div>
+          <div class="text-xs text-[color:var(--muted)]">
+            Sales grouped by the click identifier on the originating session.
+            Meta spend is synced from Meta Marketing API
+            <span id="attribution-sync-note" class="ml-1"></span>.
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="border border-[color:var(--border)] rounded-lg p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 rounded-full" style="background:var(--accent-blue)"></div>
+            <div class="text-sm font-semibold">Meta</div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3 mono">
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Sales</div>
+              <div class="text-xl" id="meta-sales">—</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Revenue</div>
+              <div class="text-xl" id="meta-revenue">—</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Spend</div>
+              <div class="text-xl" id="meta-spend">—</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">CPA</div>
+              <div class="text-xl" id="meta-cpa">—</div>
+            </div>
+            <div class="col-span-2">
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">ROAS</div>
+              <div class="text-2xl" id="meta-roas">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="border border-[color:var(--border)] rounded-lg p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 rounded-full" style="background:var(--accent-amber)"></div>
+            <div class="text-sm font-semibold">Google</div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3 mono">
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Sales</div>
+              <div class="text-xl" id="google-sales">—</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Revenue</div>
+              <div class="text-xl" id="google-revenue">—</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-[color:var(--muted)] mt-3 leading-snug">
+            Spend sync for Google Ads arrives in v1.1. Revenue above is from purchases with gclid/gbraid/wbraid captured on the session.
+          </div>
+        </div>
+        <div class="border border-[color:var(--border)] rounded-lg p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 rounded-full" style="background:var(--accent-green)"></div>
+            <div class="text-sm font-semibold">Organic</div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3 mono">
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Sales</div>
+              <div class="text-xl" id="organic-sales">—</div>
+            </div>
+            <div>
+              <div class="text-[11px] text-[color:var(--muted)] uppercase tracking-wider">Revenue</div>
+              <div class="text-xl" id="organic-revenue">—</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-[color:var(--muted)] mt-3 leading-snug">
+            No fbclid / gclid / wbraid / gbraid on the originating session.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UTM Breakdown -->
+    <section class="card p-5 fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-semibold">UTM breakdown</div>
+        <div class="text-xs text-[color:var(--muted)]">Grouped from purchase_log</div>
+      </div>
+      <div class="flex gap-1 border-b border-[color:var(--border)] mb-4 -mx-5 px-5" id="utm-tabs">
+        <div class="dash-tab active" data-dim="utm_source">source</div>
+        <div class="dash-tab" data-dim="utm_medium">medium</div>
+        <div class="dash-tab" data-dim="utm_campaign">campaign</div>
+        <div class="dash-tab" data-dim="utm_content">content</div>
+        <div class="dash-tab" data-dim="utm_term">term</div>
+      </div>
+      <div id="utm-filters" class="flex flex-wrap gap-2 mb-3"></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-xs uppercase tracking-wider text-[color:var(--dim)] border-b border-[color:var(--border)]">
+            <tr>
+              <th class="text-left py-2 pr-4">Value</th>
+              <th class="text-right py-2 pr-4">Sales</th>
+              <th class="text-right py-2 pr-4">Revenue</th>
+              <th class="text-right py-2">AOV</th>
+            </tr>
+          </thead>
+          <tbody id="utm-tbody" class="mono">
+            <tr><td colspan="4" class="py-6 text-center text-[color:var(--muted)]">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Leads with UTMs -->
+    <section class="card p-5 fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="font-semibold">Recent leads</div>
+          <div class="text-xs text-[color:var(--muted)]">Click a row to inspect the exact payload sent to Meta / GA4 and the response</div>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-xs uppercase tracking-wider text-[color:var(--dim)] border-b border-[color:var(--border)]">
+            <tr>
+              <th class="text-left py-2 pr-4">When</th>
+              <th class="text-left py-2 pr-4">Email</th>
+              <th class="text-left py-2 pr-4">Source</th>
+              <th class="text-left py-2 pr-4">Campaign</th>
+              <th class="text-left py-2 pr-4">Medium</th>
+              <th class="text-center py-2 pr-4">Meta</th>
+              <th class="text-center py-2">GA4</th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody">
+            <tr><td colspan="7" class="py-6 text-center text-[color:var(--muted)]">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Recent purchases -->
+    <section class="card p-5 fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="font-semibold">Recent purchases</div>
+          <div class="text-xs text-[color:var(--muted)]">Click a row to inspect the exact payload sent to Meta / GA4 / Google Ads and the response</div>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-xs uppercase tracking-wider text-[color:var(--dim)] border-b border-[color:var(--border)]">
+            <tr>
+              <th class="text-left py-2 pr-4">When</th>
+              <th class="text-left py-2 pr-4">Email</th>
+              <th class="text-left py-2 pr-4">Product</th>
+              <th class="text-right py-2 pr-4">Value</th>
+              <th class="text-center py-2 pr-4">Meta</th>
+              <th class="text-center py-2 pr-4">GA4</th>
+              <th class="text-center py-2">Google Ads</th>
+            </tr>
+          </thead>
+          <tbody id="purchases-tbody">
+            <tr><td colspan="7" class="py-6 text-center text-[color:var(--muted)]">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tracking Health -->
+    <section class="card p-5 fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="font-semibold">Tracking health</div>
+          <div class="text-xs text-[color:var(--muted)]">
+            First-party capture vs pixel. Shows how many events you would have lost without server-side tracking.
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mono">
+        <div>
+          <div class="kpi-label">Real events</div>
+          <div class="text-2xl" id="health-real">—</div>
+        </div>
+        <div>
+          <div class="kpi-label">ITP recovered</div>
+          <div class="text-2xl accent-blue" id="health-itp">—</div>
+        </div>
+        <div>
+          <div class="kpi-label">Adblock recovered</div>
+          <div class="text-2xl accent-green" id="health-adblock">—</div>
+        </div>
+        <div>
+          <div class="kpi-label">Bots filtered</div>
+          <div class="text-2xl accent-red" id="health-bots">—</div>
+        </div>
+      </div>
+      <div class="mt-5">
+        <div class="text-xs uppercase tracking-wider text-[color:var(--dim)] mb-2">fbp source breakdown</div>
+        <div class="flex flex-wrap gap-2 text-xs" id="health-fbp"></div>
+      </div>
+    </section>
+
+    <footer class="pt-4 pb-10 text-xs text-[color:var(--muted)] text-center">
+      Tracking Stack &middot; self-hosted on Cloudflare Pages
+    </footer>
+  </main>
+</div>
+
+<!-- Auth prompt shown when no key is set -->
+<div id="auth-gate" class="min-h-screen flex items-center justify-center hidden">
+  <div class="card p-6 max-w-sm w-full">
+    <div class="font-semibold mb-2">Dashboard key required</div>
+    <div class="text-sm text-[color:var(--dim)] mb-4">
+      Paste the <code>DASH_KEY</code> you set in Cloudflare environment variables.
+    </div>
+    <input id="auth-input" type="password" placeholder="DASH_KEY" class="w-full border border-[color:var(--border)] rounded-lg px-3 py-2 text-sm mb-3 font-mono">
+    <button id="auth-submit" class="w-full bg-[color:var(--text)] text-white rounded-lg py-2 text-sm font-semibold">Open dashboard</button>
+    <div id="auth-error" class="text-xs text-[color:var(--accent-red)] mt-2 hidden">Invalid key.</div>
+  </div>
+</div>
+
+<!-- Details modal: click any lead/purchase row to open -->
+<div id="details-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+  <div class="card w-full max-w-3xl max-h-[85vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border)] sticky top-0 bg-white">
+      <div>
+        <div id="modal-title" class="font-semibold">Event details</div>
+        <div id="modal-subtitle" class="text-xs text-[color:var(--muted)] mt-0.5"></div>
+      </div>
+      <button id="modal-close" class="text-[color:var(--dim)] hover:text-[color:var(--text)] text-2xl leading-none px-2" aria-label="Close">&times;</button>
+    </div>
+    <div id="modal-body" class="p-5 space-y-5"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const qs  = sel => document.querySelector(sel);
+  const qsa = sel => document.querySelectorAll(sel);
+
+  // -------- Auth --------
+  const url = new URL(window.location.href);
+  let key = url.searchParams.get('key') || sessionStorage.getItem('dashKey') || '';
+  const authGate = qs('#auth-gate');
+  const app = qs('#app');
+
+  async function openDashboard() {
+    app.classList.remove('hidden');
+    authGate.classList.add('hidden');
+    sessionStorage.setItem('dashKey', key);
+    await loadAll(currentDays);
+  }
+
+  async function probeKey(k) {
+    try {
+      const r = await fetch(`/api/revenue?key=${encodeURIComponent(k)}&days=1`);
+      return r.ok;
+    } catch (_) { return false; }
+  }
+
+  (async function gate() {
+    if (key && await probeKey(key)) { return openDashboard(); }
+    authGate.classList.remove('hidden');
+    qs('#auth-submit').addEventListener('click', async () => {
+      key = qs('#auth-input').value.trim();
+      if (!key) return;
+      if (await probeKey(key)) { openDashboard(); }
+      else { qs('#auth-error').classList.remove('hidden'); }
+    });
+    qs('#auth-input').addEventListener('keydown', e => { if (e.key === 'Enter') qs('#auth-submit').click(); });
+  })();
+
+  // -------- State --------
+  let currentDays = 30;
+  let utmDimension = 'utm_source';
+  let utmFilters = {};
+  let revenueChart = null;
+  let productsChart = null;
+
+  // -------- Helpers --------
+  const fetchJson = path => fetch(`${path}${path.includes('?') ? '&' : '?'}key=${encodeURIComponent(key)}`).then(r => r.json());
+  const money = (n, cur = 'BRL') => new Intl.NumberFormat('en-US', { style: 'currency', currency: cur, maximumFractionDigits: 0 }).format(Number(n || 0));
+  const fmtInt = n => new Intl.NumberFormat('en-US').format(Number(n || 0));
+  const fmtDate = ts => new Date(Number(ts) * 1000).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  // -------- Data loaders --------
+  async function loadRevenue(days) {
+    const data = await fetchJson(`/api/revenue?days=${days}`);
+    qs('#kpi-revenue').textContent = money(data.gross, data.currency);
+    qs('#kpi-revenue-sub').textContent = `${data.days} days`;
+    qs('#kpi-sales').textContent = fmtInt(data.sales);
+    qs('#kpi-aov').textContent = money(data.aov, data.currency);
+    renderRevenueChart(data.time_series || []);
+  }
+
+  async function loadProducts(days) {
+    const data = await fetchJson(`/api/products?days=${days}`);
+    const container = qs('#product-cards');
+    if (!data.products || data.products.length === 0) {
+      container.innerHTML = '<div class="text-sm text-[color:var(--muted)]">No products yet.</div>';
+    } else {
+      container.innerHTML = data.products.map(p => `
+        <div class="border border-[color:var(--border)] rounded-lg p-3">
+          <div class="text-xs text-[color:var(--muted)] truncate">${escapeHtml(p.product_name || p.product_id)}</div>
+          <div class="mt-1 flex items-baseline justify-between">
+            <div class="mono text-lg accent-amber">${money(p.revenue, p.currency || 'BRL')}</div>
+            <div class="mono text-xs text-[color:var(--dim)]">${fmtInt(p.sales)} sales</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    renderProductsChart(data.time_series || []);
+  }
+
+  async function loadAttribution(days) {
+    const data = await fetchJson(`/api/attribution?days=${days}`);
+    qs('#meta-sales').textContent   = fmtInt(data.groups.meta.sales);
+    qs('#meta-revenue').textContent = money(data.groups.meta.revenue);
+    qs('#meta-spend').textContent   = data.meta_spend > 0 ? money(data.meta_spend) : '—';
+    qs('#meta-cpa').textContent     = data.meta_cpa != null ? money(data.meta_cpa) : '—';
+    qs('#meta-roas').textContent    = data.meta_roas != null ? data.meta_roas.toFixed(2) + 'x' : '—';
+    qs('#google-sales').textContent  = fmtInt(data.groups.google.sales);
+    qs('#google-revenue').textContent= money(data.groups.google.revenue);
+    qs('#organic-sales').textContent = fmtInt(data.groups.organic.sales);
+    qs('#organic-revenue').textContent = money(data.groups.organic.revenue);
+
+    const note = qs('#attribution-sync-note');
+    if (data.last_synced_at) {
+      const dt = new Date(data.last_synced_at * 1000);
+      note.textContent = `(last sync ${dt.toLocaleString()})`;
+    } else {
+      note.textContent = '(sync not configured yet — see docs/ad-spend-sync.md)';
+    }
+  }
+
+  async function loadUtm() {
+    const params = new URLSearchParams({ days: String(currentDays), dimension: utmDimension });
+    for (const [k, v] of Object.entries(utmFilters)) params.set(k, v);
+    const data = await fetchJson(`/api/utm-breakdown?${params.toString()}`);
+    renderUtmFilters();
+    const tbody = qs('#utm-tbody');
+    if (!data.rows || data.rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-[color:var(--muted)]">No purchases in this window.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.rows.map(r => `
+      <tr class="row-hover cursor-pointer border-b border-[color:var(--border)]" data-value="${escapeHtml(r.value)}">
+        <td class="py-2 pr-4 font-sans">${escapeHtml(r.value)}</td>
+        <td class="py-2 pr-4 text-right">${fmtInt(r.sales)}</td>
+        <td class="py-2 pr-4 text-right accent-amber">${money(r.revenue)}</td>
+        <td class="py-2 text-right text-[color:var(--dim)]">${money(r.aov)}</td>
+      </tr>
+    `).join('');
+    qsa('#utm-tbody tr[data-value]').forEach(row => {
+      row.addEventListener('click', () => {
+        const v = row.getAttribute('data-value');
+        if (v && v !== '(not set)') {
+          utmFilters[utmDimension] = v;
+          loadUtm();
+        }
+      });
+    });
+  }
+
+  function renderUtmFilters() {
+    const container = qs('#utm-filters');
+    const entries = Object.entries(utmFilters);
+    if (entries.length === 0) { container.innerHTML = ''; return; }
+    container.innerHTML = entries.map(([k, v]) => `
+      <button class="inline-flex items-center gap-1 bg-[color:var(--text)] text-white rounded-full px-3 py-1 text-xs" data-filter-key="${k}">
+        <span class="text-[color:var(--muted)]">${k}:</span> ${escapeHtml(v)} <span class="ml-1">&times;</span>
+      </button>
+    `).join('');
+    qsa('#utm-filters button[data-filter-key]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        delete utmFilters[btn.getAttribute('data-filter-key')];
+        loadUtm();
+      });
+    });
+  }
+
+  async function loadLeads(days) {
+    const data = await fetchJson(`/api/leads?days=${days}&limit=50`);
+    qs('#kpi-leads').textContent = fmtInt((data.leads || []).length);
+    const tbody = qs('#leads-tbody');
+    if (!data.leads || data.leads.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-[color:var(--muted)]">No leads in this window.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.leads.map((l, i) => `
+      <tr class="row-hover border-b border-[color:var(--border)] cursor-pointer" data-idx="${i}">
+        <td class="py-2 pr-4 text-[color:var(--dim)]">${fmtDate(l.timestamp)}</td>
+        <td class="py-2 pr-4 mono">${escapeHtml(l.raw_email || '—')}</td>
+        <td class="py-2 pr-4">${escapeHtml(l.utm_source || '(direct)')}</td>
+        <td class="py-2 pr-4 text-[color:var(--dim)]">${escapeHtml(l.utm_campaign || '—')}</td>
+        <td class="py-2 pr-4 text-[color:var(--dim)]">${escapeHtml(l.utm_medium || '—')}</td>
+        <td class="py-2 pr-4 text-center">${l.meta_response_ok ? '<span class="accent-green">✓</span>' : '<span class="accent-red">✕</span>'}</td>
+        <td class="py-2 text-center">${l.ga4_response_ok ? '<span class="accent-green">✓</span>' : '<span class="accent-red">✕</span>'}</td>
+      </tr>
+    `).join('');
+    qsa('#leads-tbody tr[data-idx]').forEach(row => {
+      row.addEventListener('click', () => {
+        openDetails('lead', data.leads[parseInt(row.getAttribute('data-idx'), 10)]);
+      });
+    });
+  }
+
+  async function loadPurchases() {
+    const data = await fetchJson('/api/purchases?limit=50');
+    const tbody = qs('#purchases-tbody');
+    const rows = data.rows || [];
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-[color:var(--muted)]">No purchases yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map((p, i) => `
+      <tr class="row-hover border-b border-[color:var(--border)] cursor-pointer" data-idx="${i}">
+        <td class="py-2 pr-4 text-[color:var(--dim)]">${fmtDate(p.created_at)}</td>
+        <td class="py-2 pr-4 mono">${escapeHtml(p.raw_email || '—')}</td>
+        <td class="py-2 pr-4">${escapeHtml(p.product_name || p.product_id || '—')}</td>
+        <td class="py-2 pr-4 text-right accent-amber mono">${money(p.value, p.currency || 'BRL')}</td>
+        <td class="py-2 pr-4 text-center">${p.meta_response_ok ? '<span class="accent-green">✓</span>' : '<span class="accent-red">✕</span>'}</td>
+        <td class="py-2 pr-4 text-center">${p.ga4_response_ok ? '<span class="accent-green">✓</span>' : '<span class="accent-red">✕</span>'}</td>
+        <td class="py-2 text-center">${renderGadsStatus(p)}</td>
+      </tr>
+    `).join('');
+    qsa('#purchases-tbody tr[data-idx]').forEach(row => {
+      row.addEventListener('click', () => {
+        openDetails('purchase', rows[parseInt(row.getAttribute('data-idx'), 10)]);
+      });
+    });
+  }
+
+  function renderGadsStatus(p) {
+    if (p.google_ads_response_ok) return '<span class="accent-green">✓</span>';
+    if (typeof p.google_ads_response_body === 'string' && p.google_ads_response_body.startsWith('skipped:')) {
+      return '<span class="text-[color:var(--muted)]">—</span>';
+    }
+    return '<span class="accent-red">✕</span>';
+  }
+
+  // -------- Details modal --------
+  function openDetails(kind, row) {
+    const title = qs('#modal-title');
+    const subtitle = qs('#modal-subtitle');
+    const body = qs('#modal-body');
+
+    if (kind === 'lead') {
+      title.textContent = 'Lead details';
+      subtitle.textContent = `${fmtDate(row.timestamp)} · ${row.raw_email || '(no email)'} · event_id ${row.event_id || '—'}`;
+    } else {
+      title.textContent = 'Purchase details';
+      subtitle.textContent = `${fmtDate(row.created_at)} · ${row.raw_email || '(no email)'} · ${money(row.value, row.currency || 'BRL')} · txn ${row.transaction_id || '—'}`;
+    }
+
+    const sections = [
+      renderPayloadSection('Meta CAPI', {
+        status_code: row.meta_status_code,
+        response_ok: row.meta_response_ok,
+        payload_sent: row.meta_payload_sent,
+        response_body: row.meta_response_body,
+      }),
+      renderPayloadSection('GA4 Measurement Protocol', {
+        status_code: row.ga4_status_code,
+        response_ok: row.ga4_response_ok,
+        payload_sent: row.ga4_payload_sent,
+        response_body: row.ga4_response_body,
+      }),
+    ];
+
+    if (kind === 'purchase') {
+      sections.push(renderPayloadSection('Google Ads', {
+        status_code: row.google_ads_status_code,
+        response_ok: row.google_ads_response_ok,
+        payload_sent: row.google_ads_payload_sent,
+        response_body: row.google_ads_response_body,
+      }));
+    }
+
+    body.innerHTML = sections.join('');
+    const modal = qs('#details-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function renderPayloadSection(sectionTitle, data) {
+    const hasAnything = data.payload_sent != null || (data.response_body && data.response_body.length);
+    let badge;
+    if (!hasAnything) {
+      badge = '<span class="text-[color:var(--muted)]">— not fired</span>';
+    } else if (data.response_ok === 1) {
+      badge = `<span class="accent-green">✓ accepted${data.status_code ? ` (HTTP ${data.status_code})` : ''}</span>`;
+    } else if (typeof data.response_body === 'string' && data.response_body.startsWith('skipped:')) {
+      badge = `<span class="text-[color:var(--muted)]">${escapeHtml(data.response_body)}</span>`;
+    } else {
+      badge = `<span class="accent-red">✕ failed${data.status_code ? ` (HTTP ${data.status_code})` : ''}</span>`;
+    }
+
+    return `
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="font-semibold text-sm">${sectionTitle}</div>
+          <div class="text-xs mono">${badge}</div>
+        </div>
+        <div class="mb-2">
+          <div class="text-xs uppercase tracking-wider text-[color:var(--dim)] mb-1">Payload sent</div>
+          <pre class="mono text-xs bg-[color:var(--bg)] border border-[color:var(--border)] rounded-lg p-3 overflow-x-auto whitespace-pre-wrap">${escapeHtml(formatJson(data.payload_sent) || '—')}</pre>
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-wider text-[color:var(--dim)] mb-1">Response body</div>
+          <pre class="mono text-xs bg-[color:var(--bg)] border border-[color:var(--border)] rounded-lg p-3 overflow-x-auto whitespace-pre-wrap">${escapeHtml(formatJson(data.response_body) || '—')}</pre>
+        </div>
+      </div>
+    `;
+  }
+
+  function formatJson(raw) {
+    if (raw == null || raw === '') return '';
+    if (typeof raw === 'object') return JSON.stringify(raw, null, 2);
+    try {
+      return JSON.stringify(JSON.parse(raw), null, 2);
+    } catch (_) {
+      return String(raw);
+    }
+  }
+
+  function closeModal() {
+    const modal = qs('#details-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  async function loadHealth() {
+    const data = await fetchJson(`/api/events?limit=1`);
+    const rec = data.recovery || {};
+    qs('#health-real').textContent    = fmtInt(rec.real_events);
+    qs('#health-itp').textContent     = fmtInt(rec.itp_recovered);
+    qs('#health-adblock').textContent = fmtInt(rec.adblock_recovered);
+    qs('#health-bots').textContent    = fmtInt((rec.total_events || 0) - (rec.real_events || 0));
+    const fbp = qs('#health-fbp');
+    fbp.innerHTML = [
+      ['pixel_js',         rec.fbp_from_pixel,      'blue'],
+      ['middleware_http',  rec.fbp_from_middleware, 'green'],
+      ['tracker_http',     rec.fbp_from_session,    'amber'],
+      ['none',             rec.fbp_none,            'red'],
+    ].map(([label, val, color]) => `
+      <span class="border border-[color:var(--border)] rounded-lg px-2 py-1">
+        <span class="accent-${color} mono font-semibold">${fmtInt(val)}</span>
+        <span class="text-[color:var(--muted)] ml-1">${label}</span>
+      </span>
+    `).join('');
+  }
+
+  // -------- Charts --------
+  function renderRevenueChart(series) {
+    const ctx = qs('#chart-revenue').getContext('2d');
+    if (revenueChart) revenueChart.destroy();
+    revenueChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: series.map(r => r.date),
+        datasets: [{
+          label: 'Revenue',
+          data: series.map(r => r.revenue),
+          borderColor: 'rgb(37, 99, 235)',
+          backgroundColor: 'rgba(37, 99, 235, 0.08)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 0,
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#a1a1aa', font: { size: 11 } } },
+          y: { grid: { color: '#f1f1f3' }, ticks: { color: '#a1a1aa', font: { size: 11 } } },
+        },
+      },
+    });
+  }
+
+  function renderProductsChart(series) {
+    const ctx = qs('#chart-products').getContext('2d');
+    if (productsChart) productsChart.destroy();
+    // Group by product_name
+    const byProduct = {};
+    const dates = new Set();
+    for (const row of series) {
+      if (!byProduct[row.product_name]) byProduct[row.product_name] = {};
+      byProduct[row.product_name][row.date] = Number(row.sales || 0);
+      dates.add(row.date);
+    }
+    const sortedDates = [...dates].sort();
+    const palette = ['rgb(37, 99, 235)', 'rgb(22, 163, 74)', 'rgb(217, 119, 6)', 'rgb(220, 38, 38)', 'rgb(124, 58, 237)'];
+    const datasets = Object.entries(byProduct).slice(0, 5).map(([name, bydate], i) => ({
+      label: name,
+      data: sortedDates.map(d => bydate[d] || 0),
+      borderColor: palette[i % palette.length],
+      backgroundColor: palette[i % palette.length] + '20',
+      tension: 0.35,
+      pointRadius: 0,
+      borderWidth: 2,
+    }));
+    productsChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: sortedDates, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#a1a1aa', font: { size: 11 } } },
+          y: { grid: { color: '#f1f1f3' }, ticks: { color: '#a1a1aa', font: { size: 11 }, precision: 0 } },
+        },
+      },
+    });
+  }
+
+  // -------- Load orchestration --------
+  async function loadAll(days) {
+    currentDays = days;
+    await Promise.all([
+      loadRevenue(days),
+      loadProducts(days),
+      loadAttribution(days),
+      loadUtm(),
+      loadLeads(days),
+      loadPurchases(),
+      loadHealth(),
+    ]);
+  }
+
+  // -------- UI bindings --------
+  qsa('#range-picker .range-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      qsa('#range-picker .range-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadAll(parseInt(btn.getAttribute('data-days'), 10));
+    });
+  });
+  qsa('#utm-tabs .dash-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      qsa('#utm-tabs .dash-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      utmDimension = tab.getAttribute('data-dim');
+      utmFilters = {};
+      loadUtm();
+    });
+  });
+
+  // Modal close bindings: × button, backdrop click, Escape key.
+  qs('#modal-close').addEventListener('click', closeModal);
+  qs('#details-modal').addEventListener('click', e => {
+    if (e.target.id === 'details-modal') closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !qs('#details-modal').classList.contains('hidden')) closeModal();
+  });
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+})();
+</script>
+</body>
+</html>

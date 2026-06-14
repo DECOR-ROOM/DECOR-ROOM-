@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Decor Room — Divisórias, Forros e Pisos para Galpões e Empresas</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Barlow',sans-serif;color:#1a1a1a;background:#fff;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,15,15,0.96);backdrop-filter:blur(8px);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:68px;border-bottom:none;position:fixed}
+.nav-cta{background:#C8A84B;color:#0f0f0f;padding:10px 22px;border-radius:4px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:-.02em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;transition:background .2s}
+.nav-cta:hover{background:#a88a38}
+
+/* HERO */
+.hero{min-height:100vh;background:#1a1a1a;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:96px}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(105deg,#0f0f0f 45%,#1e1e1e 100%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(200,168,75,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(200,168,75,0.06) 1px,transparent 1px);background-size:60px 60px}
+.hero-img{position:absolute;right:0;top:68px;bottom:0;width:52%;overflow:hidden}
+.hero-img img{width:100%;height:100%;object-fit:cover}
+.hero-content{position:relative;z-index:2;padding:60px 5%;max-width:52%}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);padding:6px 14px;border-radius:20px;margin-bottom:24px}
+.hero-badge span{font-size:11px;color:#C8A84B;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#C8A84B}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(38px,5vw,64px);font-weight:800;color:#fff;line-height:1.05;letter-spacing:-.01em;margin-bottom:20px}
+h1 em{color:#C8A84B;font-style:normal}
+.hero-sub{font-size:16px;color:rgba(255,255,255,0.62);line-height:1.65;max-width:480px;margin-bottom:28px}
+.hero-prods{display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap}
+.hp{display:flex;align-items:center;gap:7px}
+.hp-dot{width:7px;height:7px;border-radius:50%;background:#C8A84B}
+.hp-txt{font-size:12px;color:rgba(255,255,255,0.65);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.btn-gold{background:#C8A84B;color:#0f0f0f;padding:15px 30px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:-.02em;text-transform:uppercase;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-gold:hover{background:#a88a38;transform:translateY(-1px)}
+.btn-ghost{color:rgba(255,255,255,0.75);font-size:14px;font-weight:600;text-decoration:none;border-bottom:2px solid rgba(200,168,75,0.5);padding-bottom:2px;letter-spacing:.03em}
+.btn-ghost:hover{color:#fff;border-color:#C8A84B}
+
+/* CITIES BAR */
+.cities-bar{background:rgba(0,0,0,0.82);border-top:1px solid rgba(200,168,75,0.35);padding:18px 5%;display:flex;flex-direction:column;align-items:center;gap:10px}
+.cities-label{font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.18em;text-transform:uppercase}
+.cities-list{display:flex;flex-wrap:wrap;justify-content:center}
+.cities-list span{font-size:15px;font-weight:600;color:#C8A84B;letter-spacing:.04em;padding:0 14px;border-right:1px solid rgba(200,168,75,0.3)}
+.cities-list span:last-child{border-right:none}
+
+/* LOGOS CAROUSEL */
+.logos-sec{background:#f4f4f4;padding:36px 0;border-bottom:1px solid #e0e0e0}
+.logos-label{font-size:11px;color:#888;font-weight:600;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:20px}
+.logos-wrap{overflow:hidden;position:relative}
+.logos-wrap::before,.logos-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+.logos-wrap::before{left:0;background:linear-gradient(to right,#f4f4f4,transparent)}
+.logos-wrap::after{right:0;background:linear-gradient(to left,#f4f4f4,transparent)}
+.logos-track{display:flex;align-items:center;gap:40px;width:max-content;animation:lscroll 38s linear infinite;padding:0 20px}
+.logos-track:hover{animation-play-state:paused}
+.logos-track img{height:56px;width:auto;object-fit:contain;filter:none;opacity:1;flex-shrink:0;transition:opacity .2s}
+.logos-track img:hover{opacity:.7}
+@keyframes lscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* PRODUCTS */
+.prod-strip{display:grid;grid-template-columns:1fr 1fr;min-height:320px}
+.prod-img{position:relative;overflow:hidden}
+.prod-img img{width:100%;height:100%;object-fit:cover;display:block}
+.prod-img-overlay{position:absolute;inset:0}
+.prod-text-dark{background:#0f0f0f;display:flex;align-items:center;padding:44px 48px}
+.prod-text-light{background:#fff;display:flex;align-items:center;padding:44px 48px}
+.prod-num{font-size:11px;font-weight:700;color:#C8A84B;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+.prod-h2{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:800;line-height:1.05;margin-bottom:16px;letter-spacing:-.01em}
+.prod-h2-dark{color:#fff}
+.prod-h2-light{color:#0f0f0f}
+.prod-p-dark{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:26px}
+.prod-p-light{font-size:14px;color:#555;line-height:1.7;margin-bottom:26px}
+.prod-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:28px}
+.ptag-dark{font-size:11px;font-weight:600;color:#C8A84B;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.25);padding:4px 11px;border-radius:2px;text-transform:uppercase;letter-spacing:.04em}
+.ptag-light{font-size:11px;font-weight:600;color:#0f0f0f;background:#f5f0e5;border:1px solid #e0d4b0;padding:4px 11px;border-radius:2px;text-transform:uppercase;letter-spacing:.04em}
+
+/* BENEFITS */
+.benefits-sec{padding:90px 5%;background:#0f0f0f}
+.sec-tag{font-size:11px;font-weight:700;color:#C8A84B;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px;text-align:center}
+.sec-h2-dark{font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.01em;text-align:center;margin-bottom:56px}
+.sec-h2-dark em{color:#C8A84B;font-style:normal}
+.benefits-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:rgba(255,255,255,0.06)}
+.ben-card{background:#0f0f0f;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s}
+.ben-card:hover{background:#161616}
+.ben-card.highlight{background:#161410;border-top:2px solid #C8A84B}
+.ben-num{font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1}
+.ben-icon{width:46px;height:46px;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.25);border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px}
+.ben-line{width:30px;height:2px;background:#C8A84B;margin-bottom:16px}
+.ben-h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase}
+.ben-h3.gold{color:#C8A84B}
+.ben-p{font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65}
+.benefits-cta{text-align:center;margin-top:52px}
+
+/* HOW IT WORKS */
+.how-sec{padding:90px 5%;background:#fafafa}
+.sec-h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:800;color:#0f0f0f;line-height:1.1;letter-spacing:-.01em;text-align:center;margin-bottom:56px}
+.sec-h2 em{color:#C8A84B;font-style:normal}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;position:relative}
+.steps::before{content:'';position:absolute;top:31px;left:12.5%;right:12.5%;height:2px;background:none;border-top:2px dashed rgba(200,168,75,0.5);z-index:0}
+.step{text-align:center}
+.step-num{width:62px;height:62px;border-radius:50%;background:#C8A84B;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#0f0f0f;margin:0 auto 18px;position:relative;z-index:1}
+.step-title{font-size:15px;font-weight:700;color:#0f0f0f;margin-bottom:7px}
+.step-p{font-size:13px;color:#777;line-height:1.6}
+
+/* OBRAS GALLERY */
+.obras-sec{padding:90px 5% 80px;background:#f4f4f4}
+.sec-sub{font-size:15px;color:#777;line-height:1.6;margin-top:12px;text-align:center}
+.obras-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:48px}
+.ocard{position:relative;overflow:hidden;aspect-ratio:4/3;cursor:pointer;background:#111;border-radius:2px}
+.ocard img{width:100%;height:100%;object-fit:cover;transition:transform .4s;display:block}
+.ocard:hover img{transform:scale(1.06)}
+.ocard-dark{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.1) 55%,transparent 100%)}
+.ocard-logobg{position:absolute;top:10px;right:10px;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:rgba(255,255,255,0.09);letter-spacing:.03em;text-transform:uppercase;text-align:right;max-width:110px;line-height:1.2;pointer-events:none}
+.ocard-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);color:rgba(255,255,255,0.85);font-size:10px;font-weight:600;padding:3px 8px;border-radius:2px;letter-spacing:.05em}
+.ocard-info{position:absolute;bottom:0;left:0;right:0;padding:13px 12px}
+.ocard-city{font-size:10px;font-weight:700;color:#C8A84B;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.ocard-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#fff;margin-bottom:2px}
+.ocard-prod{font-size:11px;color:rgba(255,255,255,0.58)}
+.ocard-area{color:#C8A84B;font-weight:700;margin-left:5px}
+.ocard-zoom{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;font-size:0}
+.ocard-zoom::after{content:'⤢';font-size:26px;width:50px;height:50px;border-radius:50%;background:rgba(200,168,75,0.92);display:flex;align-items:center;justify-content:center;color:#000;line-height:50px;text-align:center}
+.ocard:hover .ocard-zoom{opacity:1}
+
+/* MODAL */
+.omodal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.96);align-items:center;justify-content:center;padding:16px}
+.omodal.active{display:flex}
+.omodal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:#fff;font-size:36px;cursor:pointer;line-height:1;z-index:10}
+.omodal-arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(200,168,75,0.9);border:none;color:#000;width:46px;height:46px;border-radius:50%;font-size:30px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;font-weight:700}
+.omodal-prev{left:14px}.omodal-next{right:14px}
+.omodal-box{max-width:980px;width:100%;display:flex;flex-direction:column;gap:12px}
+.omodal-imgwrap{width:100%;max-height:60vh;display:flex;align-items:center;justify-content:center;background:#111;border-radius:4px;overflow:hidden}
+.omodal-imgwrap img{max-width:100%;max-height:60vh;object-fit:contain}
+.omodal-meta{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.omodal-city{font-size:10px;font-weight:700;color:#C8A84B;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.omodal-emp{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#fff}
+.omodal-prod{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.omodal-area{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:#C8A84B}
+.omodal-cnt{font-size:11px;color:rgba(255,255,255,0.3);margin:3px 0}
+.omodal-dots{display:flex;gap:5px;justify-content:flex-end}
+.odot{width:7px;height:7px;border-radius:50%;border:none;cursor:pointer;padding:0}
+.omodal-thumbs{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px}
+.othumb{height:54px;width:82px;object-fit:cover;border-radius:3px;cursor:pointer;flex-shrink:0;transition:all .2s;border:2px solid transparent;opacity:.45}
+.othumb.on{border-color:#C8A84B;opacity:1}
+
+/* ABOUT */
+.about-sec{background:#1a1a1a;padding:90px 5%;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.about-tag{font-size:11px;color:#C8A84B;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px}
+.about-h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,3.5vw,42px);font-weight:800;color:#fff;line-height:1.1;margin-bottom:18px}
+.about-p{font-size:14px;color:rgba(255,255,255,0.58);line-height:1.7;margin-bottom:28px}
+.about-nums{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.anum{border-left:2px solid #C8A84B;padding-left:14px}
+.anum-n{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;color:#C8A84B;line-height:1}
+.anum-l{font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.about-diffs{display:flex;flex-direction:column;gap:14px}
+.adiff{display:flex;align-items:flex-start;gap:12px;padding:18px;background:rgba(255,255,255,0.04);border-radius:4px;border:1px solid rgba(255,255,255,0.06)}
+.adiff-icon{width:38px;height:38px;background:rgba(200,168,75,0.12);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.adiff-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
+.adiff-p{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5}
+
+/* TESTIMONIALS */
+.dep-sec{padding:90px 5%;background:#fff}
+.dep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.dep-card{padding:30px;border:1px solid #eee;border-radius:8px;position:relative}
+.dep-card::before{content:'"';font-size:72px;color:rgba(200,168,75,0.12);position:absolute;top:8px;left:18px;font-family:serif;line-height:1}
+.dep-txt{font-size:14px;color:#333;line-height:1.7;position:relative;z-index:1;margin-bottom:22px}
+.dep-author{display:flex;align-items:center;gap:11px}
+.dep-av{width:42px;height:42px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#888}
+.dep-name{font-size:13px;font-weight:600;color:#1a1a1a}
+.dep-role{font-size:11px;color:#999;margin-top:2px}
+
+/* FAQ */
+.faq-sec{padding:90px 5%;background:#fafafa}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:52px;max-width:940px;margin-left:auto;margin-right:auto}
+.faq-item{background:#fff;border:1px solid #eee;border-radius:8px;padding:22px 26px;cursor:pointer;transition:border-color .2s}
+.faq-item:hover{border-color:#C8A84B}
+.faq-q{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
+.faq-icon{color:#C8A84B;font-size:18px;flex-shrink:0}
+.faq-a{font-size:13px;color:#777;line-height:1.65}
+
+/* CTA FINAL */
+.cta-sec{background:#0f0f0f;padding:90px 5%;text-align:center;position:relative;overflow:hidden}
+.cta-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(200,168,75,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,168,75,0.04) 1px,transparent 1px);background-size:40px 40px}
+.cta-box{position:relative;z-index:1;max-width:660px;margin:0 auto}
+.cta-h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(34px,5vw,58px);font-weight:800;color:#fff;line-height:1.05;margin-bottom:18px}
+.cta-h2 em{color:#C8A84B;font-style:normal}
+.cta-sub{font-size:16px;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:36px}
+.btn-wa{background:#25D366;color:#fff;padding:17px 34px;border-radius:4px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;letter-spacing:.03em;text-transform:uppercase;transition:all .2s}
+.btn-wa:hover{background:#1ebe5a;transform:translateY(-2px)}
+.cta-seals{display:flex;justify-content:center;gap:36px;margin-top:44px;flex-wrap:wrap}
+.seal{display:flex;align-items:center;gap:7px;font-size:13px;color:rgba(255,255,255,0.45)}
+.seal-icon{color:#C8A84B}
+
+/* FOOTER */
+footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;gap:12px}
+.footer-txt{font-size:11px;color:rgba(255,255,255,0.28);text-align:center}
+.footer-cities{font-size:11px;color:rgba(255,255,255,0.22);max-width:360px;text-align:right;line-height:1.6}
+
+/* WHATSAPP FLOAT */
+.wa-float{position:fixed;bottom:26px;right:26px;z-index:200;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,0.4);text-decoration:none;transition:all .2s}
+.wa-float:hover{transform:scale(1.1)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-img{display:none}
+  .hero-content{max-width:100%;padding-right:5%}
+  .prod-strip{grid-template-columns:1fr}
+  .prod-img{height:260px}
+  .prod-text-dark,.prod-text-light{padding:40px 28px}
+  .benefits-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}.steps::before{display:none}
+  .obras-grid{grid-template-columns:repeat(2,1fr)}
+  .about-sec{grid-template-columns:1fr}
+  .dep-grid{grid-template-columns:1fr}
+  .faq-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}.footer-cities{text-align:center}
+}
+@media(max-width:500px){
+  .obras-grid{grid-template-columns:1fr}
+  .benefits-grid{grid-template-columns:1fr}
+  .cities-list span{font-size:13px;padding:0 8px}
+}
+</style>
+
+<style id="mobile-fixes">
+@media (max-width: 768px) {
+
+  /* ============================================
+     FIX 1 - NAV: esconder âncoras e ajustar botão
+  ============================================ */
+  nav > div[style*="position:absolute"] {
+    display: none !important;
+  }
+  nav {
+    padding: 0 16px !important;
+    height: 60px !important;
+  }
+  div[style*="top:68px"][style*="background:#C8A84B"] {
+    top: 60px !important;
+  }
+  nav img[alt="Decor Room"] {
+    height: 36px !important;
+  }
+  .nav-cta {
+    font-size: 11px !important;
+    padding: 8px 12px !important;
+    white-space: nowrap !important;
+    max-width: 160px !important;
+    overflow: hidden !important;
+  }
+
+  /* ============================================
+     FIX 2 - HERO: conteúdo ocupar 100% da largura
+  ============================================ */
+  .hero section, section.hero {
+    padding-top: 80px !important;
+    padding-bottom: 40px !important;
+  }
+  section.hero > div[style*="position:relative;z-index:1"] {
+    max-width: 100% !important;
+    padding: 80px 20px 40px !important;
+  }
+
+  /* ============================================
+     FIX 3 - PRODUTOS: imagem aparece em cima do texto
+     no mobile (inverter ordem para prod-strips pares)
+  ============================================ */
+  .prod-strip {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: unset !important;
+  }
+  .prod-img {
+    width: 100% !important;
+    height: 260px !important;
+    order: -1 !important;
+  }
+  .prod-text-dark, .prod-text-light {
+    width: 100% !important;
+    padding: 32px 20px !important;
+    order: 1 !important;
+  }
+
+  /* ============================================
+     FIX 4 - BENEFITS: 6 colunas → 2 colunas
+  ============================================ */
+  .benefits-grid, div[style*="grid-template-columns:repeat(6,1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2px !important;
+  }
+  .ben-card {
+    padding: 24px 16px !important;
+  }
+  .ben-card .ben-num {
+    font-size: 44px !important;
+  }
+
+  /* ============================================
+     FIX 5 - SOBRE: cards 2x2 → 1 coluna
+     (evitar texto muito apertado)
+  ============================================ */
+  #sobre div[style*="grid-template-columns:repeat(2,1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ============================================
+     FIX 6 - DEPOIMENTOS: 3 cards → 1 por vez
+     (já funciona, mas setas saem da tela)
+  ============================================ */
+  .rev-page {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  #depoimentos > div > div[style*="position:relative"] {
+    padding: 0 !important;
+  }
+  /* Setas no mobile: centralizadas verticalmente entre os 3 cards */
+  #depoimentos button[onclick*="changeRevPage(-1)"] {
+    left: 4px !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 22px !important;
+    opacity: 0.8 !important;
+  }
+  #depoimentos button[onclick*="changeRevPage(1)"] {
+    right: 4px !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 22px !important;
+    opacity: 0.8 !important;
+  }
+
+  /* ============================================
+     FIX 7 - CTA FINAL: contatos em coluna
+  ============================================ */
+  #contato div[style*="display:flex;align-items:center;justify-content:center;gap:40px"] {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: flex-start !important;
+    padding: 0 20px !important;
+  }
+  #contato div[style*="width:1px;height:36px"] {
+    display: none !important;
+  }
+
+  /* ============================================
+     FIX 8 - WHATSAPP FLOAT: não sair da tela
+  ============================================ */
+  .wa-float, a.wa-float {
+    right: 16px !important;
+    bottom: 20px !important;
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  /* ============================================
+     FIX 9 - GERAL: evitar overflow horizontal
+  ============================================ */
+  body, html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  section {
+    overflow-x: hidden !important;
+  }
+
+  /* ============================================
+     FIX 10 - LOGOS CARROSSEL: altura mínima
+  ============================================ */
+  .logos-track img {
+    height: 56px !important;
+    max-width: 140px !important;
+  }
+
+  /* ============================================
+     FIX 11 - OBRAS: 4 colunas → 2 colunas
+  ============================================ */
+  #obrasGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+}
+
+@media (max-width: 768px) {
+  /* Gold bar: full width, no overflow, colada no nav */
+  div[style*="top:68px"][style*="background:#C8A84B"] {
+    padding: 0 !important;
+  }
+  div[style*="top:68px"][style*="background:#C8A84B"] a {
+    padding: 0 !important;
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 11px !important;
+    letter-spacing: .08em !important;
+  }
+}
+
+  /* Setas depoimentos mobile - pequenas e nos cantos inferiores */
+  @media (max-width: 768px) {
+    #depoimentos button[onclick*="changeRevPage(-1)"] {
+      position: absolute !important;
+      left: 0px !important;
+      bottom: 56px !important;
+      top: auto !important;
+      transform: none !important;
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 22px !important;
+      background: rgba(200,168,75,0.85) !important;
+      opacity: 0.75 !important;
+    }
+    #depoimentos button[onclick*="changeRevPage(1)"] {
+      position: absolute !important;
+      right: 0px !important;
+      bottom: 56px !important;
+      top: auto !important;
+      transform: none !important;
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 22px !important;
+      background: rgba(200,168,75,0.85) !important;
+      opacity: 0.75 !important;
+    }
+    #depoimentos > div > div[style*="position:relative"] {
+      padding: 0 !important;
+    }
+  }
+</style>
+
+<!-- ============================================================= -->
+<!-- TRACKING (stack KROB) — Meta CAPI + GA4 + Google Ads          -->
+<!-- PREENCHA os 4 valores abaixo quando os IDs estiverem prontos. -->
+<!-- Detalhes e variáveis de ambiente do servidor: ver SETUP.md.   -->
+<!-- ============================================================= -->
+<script>
+  window.DECORROOM_TRACKING = {
+    META_PIXEL_ID:       '__META_PIXEL_ID__',  // Pixel numérico, ex: 1234567890123456
+    GA4_MEASUREMENT_ID:  'G-XXXXXXXXXX',        // GA4 Measurement ID
+    GOOGLE_ADS_ID:       'AW-XXXXXXXXXX',       // Google Ads ID (conversões)
+    GOOGLE_ADS_WA_LABEL: 'XXXXXXXXXXXXXXXX'     // Label da conversão "Clique WhatsApp"
+  };
+  // Helpers para ignorar placeholders ainda não preenchidos.
+  window.__trkSet = function (v, ph) { return !!v && v.indexOf(ph) !== 0; };
+</script>
+
+<link rel="preconnect" href="https://connect.facebook.net" crossorigin>
+
+<!-- GA4 + Google Ads (gtag.js servido first-party via /scripts/gtag.js) -->
+<script>
+  (function () {
+    var T = window.DECORROOM_TRACKING;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { dataLayer.push(arguments); };
+    gtag('js', new Date());
+    var ga  = window.__trkSet(T.GA4_MEASUREMENT_ID, 'G-X') ? T.GA4_MEASUREMENT_ID : null;
+    var ads = window.__trkSet(T.GOOGLE_ADS_ID, 'AW-X')     ? T.GOOGLE_ADS_ID     : null;
+    var primary = ga || ads;
+    if (primary) {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = '/scripts/gtag.js?id=' + encodeURIComponent(primary);
+      document.head.appendChild(s);
+      if (ga)  gtag('config', ga);
+      if (ads) gtag('config', ads);
+    }
+  })();
+</script>
+
+<!-- Meta Pixel + PageView dual-fire (pixel + /tracker CAPI, deduplicado por event_id) -->
+<script>
+  (function () {
+    var T = window.DECORROOM_TRACKING;
+    var pvEventId = (crypto.randomUUID && crypto.randomUUID()) ||
+      (Date.now() + '-' + Math.random().toString(36).slice(2));
+
+    if (window.__trkSet(T.META_PIXEL_ID, '__META')) {
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+      document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', T.META_PIXEL_ID);
+      fbq('track', 'PageView', {}, { eventID: pvEventId });
+    }
+
+    // Server-side PageView (Meta CAPI). Dispara mesmo sem o pixel client-side:
+    // o /tracker pula GA4/event_log para PageView e só relaya à Meta quando as
+    // variáveis META_* estiverem setadas no servidor.
+    fetch('/tracker', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        event_name: 'PageView',
+        event_id: pvEventId,
+        event_time: Math.floor(Date.now() / 1000),
+        event_source_url: window.location.href,
+        user_data: {}
+      })
+    }).catch(function () {});
+  })();
+</script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" style="display:flex;align-items:center;text-decoration:none">
+    <img src="images/img_eb9535305a62.webp" alt="Decor Room" style="height:48px;width:auto;object-fit:contain" loading="eager">
+  </a>
+  <a href="https://wa.me/554730481531?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20um%20orçamento" class="nav-cta" target="_blank">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Solicitar Orçamento
+  </a>
+</nav>
+<!-- BARRA DOURADA DE NAVEGAÇÃO -->
+<div style="background:#C8A84B;display:flex;align-items:center;justify-content:center;height:28px;position:fixed;top:68px;margin-top:0;left:0;right:0;z-index:99;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+  <a href="#produtos" style="padding:0 24px;height:100%;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:#0f0f0f;text-decoration:none;letter-spacing:.14em;text-transform:uppercase;border-right:1px solid rgba(0,0,0,0.12);transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,0.08)'" onmouseout="this.style.background='transparent'">PRODUTOS</a>
+  <a href="#obras" style="padding:0 24px;height:100%;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:#0f0f0f;text-decoration:none;letter-spacing:.14em;text-transform:uppercase;border-right:1px solid rgba(0,0,0,0.12);transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,0.08)'" onmouseout="this.style.background='transparent'">OBRAS</a>
+  <a href="#contato" style="padding:0 24px;height:100%;display:flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:#0f0f0f;text-decoration:none;letter-spacing:.14em;text-transform:uppercase;transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,0.08)'" onmouseout="this.style.background='transparent'">CONTATO</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" style="min-height:100vh;position:relative;display:flex;align-items:center;padding-top:96px;overflow:hidden">
+
+  <!-- Imagem de fundo cobrindo toda a tela -->
+  <div style="position:absolute;inset:0;z-index:0">
+<div id="hbg0" style="position:absolute;inset:0;opacity:1;transition:opacity 1.5s ease"><img src="images/img_93c18c823e0b.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="eager" fetchpriority="high"></div><div id="hbg1" style="position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease"><img src="images/img_efbbf7974be1.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="eager"></div><div id="hbg2" style="position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease"><img src="images/img_64841867e452.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div id="hbg3" style="position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease"><img src="images/img_5662b9f4f79e.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div id="hbg4" style="position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease"><img src="images/img_c0784aba36fe.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div id="hbg5" style="position:absolute;inset:0;opacity:0;transition:opacity 1.5s ease"><img src="images/img_0f9f0ca83aa5.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+    <!-- Overlay escuro para legibilidade do texto -->
+    <div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.65) 50%,rgba(0,0,0,0.35) 100%)"></div>
+    <!-- Grade sutil dourada -->
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(200,168,75,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,168,75,0.04) 1px,transparent 1px);background-size:60px 60px"></div>
+  </div>
+
+  <!-- Conteúdo por cima da imagem -->
+  <div style="position:relative;z-index:1;padding:60px 5%;max-width:720px">
+
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,5.5vw,66px);font-weight:800;color:#fff;line-height:1.05;letter-spacing:-.02em;text-transform:uppercase;margin-bottom:22px">
+      ESPECIALISTAS EM OBRAS PARA GALPÕES, EMPRESAS E AMBIENTES COMERCIAIS DE <em style="color:#C8A84B;font-style:normal">MÉDIO E GRANDE PORTE.</em>
+    </h1>
+
+    <p style="font-size:clamp(15px,1.6vw,18px);color:rgba(255,255,255,0.72);line-height:1.65;max-width:580px;margin-bottom:32px">
+      Soluções completas na criação de salas com divisórias modulares, drywall, forros modulares e pisos vinílicos, para empresas que precisam de execução profissional, agilidade e padrão corporativo.
+    </p>
+
+    <!-- Produtos -->
+    <div style="display:flex;gap:20px;margin-bottom:36px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:#C8A84B;flex-shrink:0"></div><span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;text-transform:uppercase;letter-spacing:.07em">Divisórias Eucatex</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:#C8A84B;flex-shrink:0"></div><span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;text-transform:uppercase;letter-spacing:.07em">Paredes Drywall</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:#C8A84B;flex-shrink:0"></div><span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;text-transform:uppercase;letter-spacing:.07em">Forros Modulares</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:7px;height:7px;border-radius:50%;background:#C8A84B;flex-shrink:0"></div><span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;text-transform:uppercase;letter-spacing:.07em">Pisos Vinílicos</span></div>
+    </div>
+
+    <!-- Botões -->
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <a href="https://wa.me/554730481531?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20um%20orçamento" class="btn-gold" target="_blank" style="display:inline-flex;align-items:center;gap:9px;background:#C8A84B;color:#0f0f0f;padding:16px 30px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:-.02em;text-transform:uppercase;transition:all .2s">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Solicitar Orçamento
+      </a>
+      <a href="#obras" style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:600;text-decoration:none;border-bottom:2px solid rgba(200,168,75,0.6);padding-bottom:2px;letter-spacing:.03em;transition:all .2s" onmouseover="this.style.color='#fff';this.style.borderColor='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.8)';this.style.borderColor='rgba(200,168,75,0.6)'">Ver obras realizadas ↓</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- CITIES -->
+<div class="cities-bar">
+  <div class="cities-label">Cidades atendidas</div>
+  <div class="cities-list">
+    <span>Itajaí</span><span>Balneário Camboriú</span><span>Navegantes</span><span>Camboriú</span><span>Penha</span><span>Piçarras</span><span>Barra Velha</span><span>Ilhota</span><span>Gaspar</span><span>Itapema</span>
+  </div>
+</div>
+
+<!-- LOGOS -->
+<section class="logos-sec">
+  <div class="logos-label">Empresas que confiam na Decor Room</div>
+  <div class="logos-wrap">
+    <div class="logos-track"><img src="images/img_e5c61d58bd34.webp" alt="POSTOS SIM" loading="lazy" decoding="async"><img src="images/img_bc5b4cc0e425.webp" alt="AHT COOLING SYSTEM" loading="lazy" decoding="async"><img src="images/img_c799e3ef69e0.webp" alt="MERCEDES-BENZ" loading="lazy" decoding="async"><img src="images/img_6eb65ccbbc75.webp" alt="RONI CHAVES" loading="lazy" decoding="async"><img src="images/img_e9051b047cf3.webp" alt="ZFLOG" loading="lazy" decoding="async"><img src="images/img_df0e4598a4d0.webp" alt="ALIAN#U00c7A IMOBILI#U00c1RIA" loading="lazy" decoding="async"><img src="images/img_8bc58f2b960e.webp" alt="MAERSK" loading="lazy" decoding="async"><img src="images/img_f81b6d1f3442.webp" alt="TIROL" loading="lazy" decoding="async"><img src="images/img_71457aa49303.webp" alt="WEG" loading="lazy" decoding="async"><img src="images/img_7be614d1569e.webp" alt="HYUNDAI" loading="lazy" decoding="async"><img src="images/img_285fa08cd280.webp" alt="MA HOSPITALAR" loading="lazy" decoding="async"><img src="images/img_517259b39fa4.webp" alt="ESTALEIRO NAVSHIP" loading="lazy" decoding="async"><img src="images/img_700bbe2467cf.webp" alt="MOSCA" loading="lazy" decoding="async"><img src="images/img_cd578c13451d.webp" alt="ZIKELI IND#U00daSTRIA MEC#U00c2NICA" loading="lazy" decoding="async"><img src="images/img_bf3811b72693.webp" alt="TRACK&FIELD" loading="lazy" decoding="async"><img src="images/img_96a2df29a67c.webp" alt="BANCO UNIPRIME" loading="lazy" decoding="async"><img src="images/img_5430a7f34b50.webp" alt="MAXSUL ENERGIA" loading="lazy" decoding="async"><img src="images/img_7b38d889b67f.webp" alt="OCEANIC AQUARIUM" loading="lazy" decoding="async"><img src="images/img_7be5af1dc483.webp" alt="ESTALEIRO THYSSENKRUPP" loading="lazy" decoding="async"><img src="images/img_ad2dca980658.webp" alt="AR TERMINAIS" loading="lazy" decoding="async"><img src="images/img_e4225228798c.webp" alt="CHC SA#U00daDE" loading="lazy" decoding="async"><img src="images/img_d6d9f6afc1a7.webp" alt="BRF" loading="lazy" decoding="async"><img src="images/img_a4f55c2a8b74.webp" alt="HONDA" loading="lazy" decoding="async"><img src="images/img_3b786609a07f.webp" alt="UNIVALI" loading="lazy" decoding="async"><img src="images/img_dc9c40830dc1.webp" alt="CONTILOG" loading="lazy" decoding="async"><img src="images/img_e5c61d58bd34.webp" alt="POSTOS SIM" loading="lazy" decoding="async"><img src="images/img_bc5b4cc0e425.webp" alt="AHT COOLING SYSTEM" loading="lazy" decoding="async"><img src="images/img_c799e3ef69e0.webp" alt="MERCEDES-BENZ" loading="lazy" decoding="async"><img src="images/img_6eb65ccbbc75.webp" alt="RONI CHAVES" loading="lazy" decoding="async"><img src="images/img_e9051b047cf3.webp" alt="ZFLOG" loading="lazy" decoding="async"><img src="images/img_df0e4598a4d0.webp" alt="ALIAN#U00c7A IMOBILI#U00c1RIA" loading="lazy" decoding="async"><img src="images/img_8bc58f2b960e.webp" alt="MAERSK" loading="lazy" decoding="async"><img src="images/img_f81b6d1f3442.webp" alt="TIROL" loading="lazy" decoding="async"><img src="images/img_71457aa49303.webp" alt="WEG" loading="lazy" decoding="async"><img src="images/img_7be614d1569e.webp" alt="HYUNDAI" loading="lazy" decoding="async"><img src="images/img_285fa08cd280.webp" alt="MA HOSPITALAR" loading="lazy" decoding="async"><img src="images/img_517259b39fa4.webp" alt="ESTALEIRO NAVSHIP" loading="lazy" decoding="async"><img src="images/img_700bbe2467cf.webp" alt="MOSCA" loading="lazy" decoding="async"><img src="images/img_cd578c13451d.webp" alt="ZIKELI IND#U00daSTRIA MEC#U00c2NICA" loading="lazy" decoding="async"><img src="images/img_bf3811b72693.webp" alt="TRACK&FIELD" loading="lazy" decoding="async"><img src="images/img_96a2df29a67c.webp" alt="BANCO UNIPRIME" loading="lazy" decoding="async"><img src="images/img_5430a7f34b50.webp" alt="MAXSUL ENERGIA" loading="lazy" decoding="async"><img src="images/img_7b38d889b67f.webp" alt="OCEANIC AQUARIUM" loading="lazy" decoding="async"><img src="images/img_7be5af1dc483.webp" alt="ESTALEIRO THYSSENKRUPP" loading="lazy" decoding="async"><img src="images/img_ad2dca980658.webp" alt="AR TERMINAIS" loading="lazy" decoding="async"><img src="images/img_e4225228798c.webp" alt="CHC SA#U00daDE" loading="lazy" decoding="async"><img src="images/img_d6d9f6afc1a7.webp" alt="BRF" loading="lazy" decoding="async"><img src="images/img_a4f55c2a8b74.webp" alt="HONDA" loading="lazy" decoding="async"><img src="images/img_3b786609a07f.webp" alt="UNIVALI" loading="lazy" decoding="async"><img src="images/img_dc9c40830dc1.webp" alt="CONTILOG" loading="lazy" decoding="async"></div>
+  </div>
+</section>
+
+<!-- PRODUTOS -->
+<section id="produtos">
+  <div class="prod-strip">
+    <div class="prod-img" style="position:relative"><div id="pc1" class="prod-carousel" style="position:relative;height:100%;overflow:hidden">
+      <div class="pslide" data-idx="0" style="position:absolute;inset:0;opacity:1;transition:opacity .6s ease"><img src="images/img_e0df9c5915e8.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="1" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_ff352586e948.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="2" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_4295f2a73c82.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="3" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_d6877d828596.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="4" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_def65c3f9004.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="5" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_e9ff11a42f4f.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <button onclick="prevSlide('pc1')" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8249;</button>
+      <button onclick="nextSlide('pc1')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8250;</button>
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5"><div class="pdot pdot-on" onclick="goSlide('pc1',0)"></div><div class="pdot " onclick="goSlide('pc1',1)"></div><div class="pdot " onclick="goSlide('pc1',2)"></div><div class="pdot " onclick="goSlide('pc1',3)"></div><div class="pdot " onclick="goSlide('pc1',4)"></div><div class="pdot " onclick="goSlide('pc1',5)"></div></div>
+    </div></div>
+    <div class="prod-text-dark">
+      <div>
+        <h2 class="prod-h2 prod-h2-dark">DIVISÓRIAS MODULARES<br><em style="font-size:0.6em;letter-spacing:.08em;line-height:1.2;display:block;margin-top:2px">EUCATEX</em></h2>
+        <p class="prod-p-dark">Crie salas, escritórios e ambientes separados dentro do seu galpão ou empresa sem obra pesada. Painéis modulares com portas, janelas de vidro, instalação rápida, limpa e desmontável.</p>
+        <div class="prod-tags"><span class="ptag-dark">Instalação rápida</span><span class="ptag-dark">Baixo transtorno</span><span class="ptag-dark">Com vidros e portas</span><span class="ptag-dark">Desmontável</span></div>
+        <a href="https://wa.me/554730481531?text=Interesse%20em%20divisórias" class="btn-gold" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#C8A84B;color:#0f0f0f;padding:14px 26px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase">SAIBA MAIS →</a>
+      </div>
+    </div>
+  </div>
+  <div class="prod-strip">
+    <div class="prod-text-light">
+      <div>
+        <h2 class="prod-h2 prod-h2-light">PAREDES DE GESSO<br><em style="font-size:0.6em;letter-spacing:.08em;line-height:1.2;display:block;margin-top:2px">DRYWALL</em></h2>
+        <p class="prod-p-light">Paredes em drywall podem ser feitas com diferentes espessuras, possuem possibilidade de isolamento acústico e inclusão de vidros e portas. Solução rápida e adaptável para diferentes projetos corporativos.</p>
+        <div class="prod-tags"><span class="ptag-light">Instalação rápida</span><span class="ptag-light">Flexível a projetos</span><span class="ptag-light">Acústica</span><span class="ptag-light">Baixo transtorno</span></div>
+        <a href="https://wa.me/554730481531?text=Interesse%20em%20drywall" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0f0f0f;color:#fff;padding:14px 26px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase">SAIBA MAIS →</a>
+      </div>
+    </div>
+    <div class="prod-img" style="position:relative"><div id="pc2" class="prod-carousel" style="position:relative;height:100%;overflow:hidden">
+      <div class="pslide" data-idx="0" style="position:absolute;inset:0;opacity:1;transition:opacity .6s ease"><img src="images/img_235767d8cb5f.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="1" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_980178d47a55.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="2" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_fe59b9ce7355.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="3" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_45b68451c626.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="4" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_74e2e6a40ad0.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="5" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_ad3827fbd6df.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <button onclick="prevSlide('pc2')" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8249;</button>
+      <button onclick="nextSlide('pc2')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8250;</button>
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5"><div class="pdot pdot-on" onclick="goSlide('pc2',0)"></div><div class="pdot " onclick="goSlide('pc2',1)"></div><div class="pdot " onclick="goSlide('pc2',2)"></div><div class="pdot " onclick="goSlide('pc2',3)"></div><div class="pdot " onclick="goSlide('pc2',4)"></div><div class="pdot " onclick="goSlide('pc2',5)"></div></div>
+    </div></div>
+  </div>
+  <div class="prod-strip">
+    <div class="prod-img" style="position:relative"><div id="pc3" class="prod-carousel" style="position:relative;height:100%;overflow:hidden">
+      <div class="pslide" data-idx="0" style="position:absolute;inset:0;opacity:1;transition:opacity .6s ease"><img src="images/img_7be2cccf667f.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="1" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_277426084a3e.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="2" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_1776ac3c6af4.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="3" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_a77f4ca1ba8d.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="4" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_eedec2806aec.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="5" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_612261619e36.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <button onclick="prevSlide('pc3')" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8249;</button>
+      <button onclick="nextSlide('pc3')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8250;</button>
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5"><div class="pdot pdot-on" onclick="goSlide('pc3',0)"></div><div class="pdot " onclick="goSlide('pc3',1)"></div><div class="pdot " onclick="goSlide('pc3',2)"></div><div class="pdot " onclick="goSlide('pc3',3)"></div><div class="pdot " onclick="goSlide('pc3',4)"></div><div class="pdot " onclick="goSlide('pc3',5)"></div></div>
+    </div></div>
+    <div class="prod-text-dark">
+      <div>
+        <h2 class="prod-h2 prod-h2-dark">FORROS MODULARES<br><em style="font-size:0.6em;letter-spacing:.08em;line-height:1.2;display:block;margin-top:2px">REMOVÍVEIS</em></h2>
+        <p class="prod-p-dark">Forros modulares são perfeitos para ambientes empresariais, removíveis e de fácil manutenção. Ajudam na eficiência acústica e térmica dos ambientes, além de entregar um visual corporativo moderno e profissional. Opções de placas: Gesso / EPS / Boreal / Mineral / PVC</p>
+        <div class="prod-tags"><span class="ptag-dark">Instalação rápida</span><span class="ptag-dark">Isolamento acústico</span><span class="ptag-dark">Vários modelos</span><span class="ptag-dark">Removíveis</span></div>
+        <a href="https://wa.me/554730481531?text=Interesse%20em%20forros" class="btn-gold" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#C8A84B;color:#0f0f0f;padding:14px 26px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase">SAIBA MAIS →</a>
+      </div>
+    </div>
+  </div>
+  <div class="prod-strip">
+    <div class="prod-text-light">
+      <div>
+        <h2 class="prod-h2 prod-h2-light">PISOS VINÍLICOS<br><em style="font-size:0.6em;letter-spacing:.08em;line-height:1.2;display:block;margin-top:2px">COMERCIAIS</em></h2>
+        <p class="prod-p-light">Pisos vinílicos criam ambientes corporativos modernos e aconchegantes, com fácil limpeza e manutenção. Disponíveis em réguas e placas que imitam madeira e cimento, possuem instalação rápida e sem sujeira.</p>
+        <div class="prod-tags"><span class="ptag-light">Sobre o piso atual</span><span class="ptag-light">Fácil manutenção</span><span class="ptag-light">Alta resistência</span><span class="ptag-light">Visualmente moderno</span></div>
+        <a href="https://wa.me/554730481531?text=Interesse%20em%20pisos" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0f0f0f;color:#fff;padding:14px 26px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase">SAIBA MAIS →</a>
+      </div>
+    </div>
+    <div class="prod-img" style="position:relative"><div id="pc4" class="prod-carousel" style="position:relative;height:100%;overflow:hidden">
+      <div class="pslide" data-idx="0" style="position:absolute;inset:0;opacity:1;transition:opacity .6s ease"><img src="images/img_f0f15343f5bc.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="1" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_11ab6323aa3f.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="2" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_cc74218b7489.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="3" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_2b178a608fc9.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="4" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_21ca08f2139b.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div><div class="pslide" data-idx="5" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease"><img src="images/img_b43420c40fca.webp" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <button onclick="prevSlide('pc4')" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8249;</button>
+      <button onclick="nextSlide('pc4')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:background .2s" onmouseover="this.style.background='rgba(200,168,75,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">&#8250;</button>
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5"><div class="pdot pdot-on" onclick="goSlide('pc4',0)"></div><div class="pdot " onclick="goSlide('pc4',1)"></div><div class="pdot " onclick="goSlide('pc4',2)"></div><div class="pdot " onclick="goSlide('pc4',3)"></div><div class="pdot " onclick="goSlide('pc4',4)"></div><div class="pdot " onclick="goSlide('pc4',5)"></div></div>
+    </div></div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits-sec" style="padding:90px 5%;background:#0f0f0f">
+  <div style="text-align:center;max-width:680px;margin:0 auto 56px">
+    <div style="font-size:11px;font-weight:700;color:#C8A84B;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px">Como funciona e por que escolher</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,4.5vw,52px);font-weight:800;color:#fff;line-height:1.05;letter-spacing:-.01em">POR QUE ESCOLHER A <em style="color:#C8A84B;font-style:normal">DECOR ROOM</em></h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:2px;background:rgba(255,255,255,0.06)">
+    
+    <div class="ben-card" style="background:#0f0f0f;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s" onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#0f0f0f'">
+      <div class="ben-num" style="font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1">01</div>
+      <div style="width:72px;height:72px;background:rgba(200,168,75,0.12);border:2px solid #C8A84B;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxwYXRoIGQ9Ik01MCAxMiBDMjggMTIgMTAgMjggMTAgNDggQzEwIDU2IDEzIDY0IDE4IDcwIEwxMyA4OCBMMzIgODMgQzM3IDg2IDQzIDg4IDUwIDg4IEM3MiA4OCA5MCA3MiA5MCA1MiBDOTAgMzIgNzIgMTIgNTAgMTIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgICAgPHBhdGggZD0iTTM0IDQyIEMzNCA0MiAzNyA0NiA0MCA1MCBDNDMgNTQgNDcgNTggNTIgNTggQzU1IDU4IDU4IDU2IDYwIDU0IEM2MiA1MiA2NCA1MCA2NCA1MCBMNzAgNTYgQzcwIDU2IDY2IDY0IDU4IDY2IEM1MCA2OCAzOCA2MCAzMiA1MiBDMjYgNDQgMjYgMzQgMzIgMzAgTDM4IDM2IFoiIGZpbGw9IiNDOEE4NEIiLz4KICAgIDwvc3ZnPg==" alt="" style="width:42px;height:42px;object-fit:contain" loading="lazy" decoding="async">
+      </div>
+      <div style="width:30px;height:2px;background:#C8A84B;margin-bottom:16px"></div>
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase">ENTRE EM CONTATO</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65">Entre em contato pelo WhatsApp. Nosso time responde rapidamente e coleta as informações iniciais do projeto.</p>
+    </div>
+    <div class="ben-card" style="background:#0f0f0f;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s" onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#0f0f0f'">
+      <div class="ben-num" style="font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1">02</div>
+      <div style="width:72px;height:72px;background:rgba(200,168,75,0.12);border:2px solid #C8A84B;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNSIvPgogICAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjQiLz4KICAgICAgPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTAiIGZpbGw9IiNDOEE4NEIiLz4KICAgICAgPGxpbmUgeDE9IjUwIiB5MT0iMiIgeDI9IjUwIiB5Mj0iMjIiIHN0cm9rZT0iI0M4QTg0QiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgICAgPGxpbmUgeDE9IjUwIiB5MT0iNzgiIHgyPSI1MCIgeTI9Ijk4IiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICAgIDxsaW5lIHgxPSIyIiB5MT0iNTAiIHgyPSIyMiIgeTI9IjUwIiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICAgIDxsaW5lIHgxPSI3OCIgeTE9IjUwIiB4Mj0iOTgiIHkyPSI1MCIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPC9zdmc+" alt="" style="width:42px;height:42px;object-fit:contain" loading="lazy" decoding="async">
+      </div>
+      <div style="width:30px;height:2px;background:#C8A84B;margin-bottom:16px"></div>
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase">IDENTIFICAMOS O PRODUTO IDEAL</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65">Analisamos o seu ambiente e indicamos a melhor solução em divisórias, drywall, forros e pisos para atender as necessidades da sua empresa.</p>
+    </div>
+    <div class="ben-card" style="background:#0f0f0f;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s" onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#0f0f0f'">
+      <div class="ben-num" style="font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1">03</div>
+      <div style="width:72px;height:72px;background:rgba(200,168,75,0.12);border:2px solid #C8A84B;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxwYXRoIGQ9Ik0yNSAxMCBMNjUgMTAgTDgwIDI1IEw4MCA5MCBMMjAgOTAgTDIwIDEwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0M4QTg0QiIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICAgIDxwYXRoIGQ9Ik02NSAxMCBMNjUgMjUgTDgwIDI1IiBmaWxsPSJub25lIiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICA8bGluZSB4MT0iMzMiIHkxPSI0MiIgeDI9IjY3IiB5Mj0iNDIiIHN0cm9rZT0iI0M4QTg0QiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgICAgPGxpbmUgeDE9IjMzIiB5MT0iNTUiIHgyPSI2NyIgeTI9IjU1IiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICAgIDxsaW5lIHgxPSIzMyIgeTE9IjY4IiB4Mj0iNTIiIHkyPSI2OCIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgICA8Y2lyY2xlIGN4PSI2MyIgY3k9Ijc0IiByPSIxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjQiLz4KICAgICAgPHBvbHlsaW5lIHBvaW50cz0iNTgsNzQgNjIsNzggNzAsNzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0M4QTg0QiIgc3Ryb2tlLXdpZHRoPSIzLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgPC9zdmc+" alt="" style="width:42px;height:42px;object-fit:contain" loading="lazy" decoding="async">
+      </div>
+      <div style="width:30px;height:2px;background:#C8A84B;margin-bottom:16px"></div>
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase">ORÇAMENTO E VISITA, CRIAMOS SEU PROJETO</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65">Realizamos visita técnica, desenvolvemos o projeto e entregamos um orçamento completo e detalhado sem nenhum custo para sua empresa.</p>
+    </div>
+    <div class="ben-card" style="background:#161410;border-top:2px solid #C8A84B;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s" >
+      <div class="ben-num" style="font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1">04</div>
+      <div style="width:72px;height:72px;background:rgba(200,168,75,0.12);border:2px solid #C8A84B;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxwYXRoIGQ9Ik01MCA4IEw4NSAyMiBMODUgNTIgQzg1IDcwIDY1IDg1IDUwIDkyIEMzNSA4NSAxNSA3MCAxNSA1MiBMMTUgMjIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgICAgPHBvbHlsaW5lIHBvaW50cz0iMzIsNTAgNDQsNjMgNjgsMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0M4QTg0QiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgIDwvc3ZnPg==" alt="" style="width:42px;height:42px;object-fit:contain" loading="lazy" decoding="async">
+      </div>
+      <div style="width:30px;height:2px;background:#C8A84B;margin-bottom:16px"></div>
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#C8A84B;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase">GARANTIA TOTAL NA EXECUÇÃO</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.65">Instalação por equipe especializada com acompanhamento técnico e compromisso total com prazo, acabamento e entrega impecável.</p>
+    </div>
+    <div class="ben-card" style="background:#0f0f0f;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s" onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#0f0f0f'">
+      <div class="ben-num" style="font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1">05</div>
+      <div style="width:72px;height:72px;background:rgba(200,168,75,0.12);border:2px solid #C8A84B;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxyZWN0IHg9IjEwIiB5PSIyNSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjUyIiByeD0iNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjUiLz4KICAgICAgPGxpbmUgeDE9IjEwIiB5MT0iNDIiIHgyPSI5MCIgeTI9IjQyIiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNiIvPgogICAgICA8cmVjdCB4PSIyMCIgeT0iNTUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxMCIgcng9IjIiIGZpbGw9IiNDOEE4NEIiLz4KICAgICAgPHJlY3QgeD0iNDgiIHk9IjU1IiB3aWR0aD0iMTIiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjQzhBODRCIi8+CiAgICAgIDxyZWN0IHg9IjY2IiB5PSI1NSIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI0M4QTg0QiIvPgogICAgPC9zdmc+" alt="" style="width:42px;height:42px;object-fit:contain" loading="lazy" decoding="async">
+      </div>
+      <div style="width:30px;height:2px;background:#C8A84B;margin-bottom:16px"></div>
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase">CONDIÇÕES DE PAGAMENTO FLEXÍVEL</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65">Trabalhamos com condições de pagamento flexíveis para facilitar a execução da sua obra corporativa com segurança e planejamento.</p>
+    </div>
+    <div class="ben-card" style="background:#0f0f0f;padding:38px 26px;position:relative;overflow:hidden;transition:background .3s" onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#0f0f0f'">
+      <div class="ben-num" style="font-family:'Barlow Condensed',sans-serif;font-size:68px;font-weight:800;color:rgba(200,168,75,0.07);position:absolute;top:8px;right:14px;line-height:1">06</div>
+      <div style="width:72px;height:72px;background:rgba(200,168,75,0.12);border:2px solid #C8A84B;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgICAgIDxwYXRoIGQ9Ik0yMCA1MiBDMjAgMzAgMzUgMTUgNTAgMTUgQzY1IDE1IDgwIDMwIDgwIDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICAgIDxyZWN0IHg9IjEwIiB5PSI1MCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjI2IiByeD0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjUiLz4KICAgICAgPHJlY3QgeD0iNzQiIHk9IjUwIiB3aWR0aD0iMTYiIGhlaWdodD0iMjYiIHJ4PSI2IiBmaWxsPSJub25lIiBzdHJva2U9IiNDOEE4NEIiIHN0cm9rZS13aWR0aD0iNSIvPgogICAgICA8cGF0aCBkPSJNODIgNzYgQzgyIDgyIDc2IDg4IDY4IDg4IEw1NiA4OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzhBODRCIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9Ijg4IiByPSI1IiBmaWxsPSIjQzhBODRCIi8+CiAgICA8L3N2Zz4=" alt="" style="width:42px;height:42px;object-fit:contain" loading="lazy" decoding="async">
+      </div>
+      <div style="width:30px;height:2px;background:#C8A84B;margin-bottom:16px"></div>
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase">SUPORTE, MANUTENÇÃO E PÓS-VENDA</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65">Nossa equipe oferece suporte técnico, manutenção e acompanhamento após a entrega, garantindo tranquilidade e segurança para sua empresa.</p>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:52px">
+    <a href="https://wa.me/554730481531?text=Olá,%20gostaria%20de%20um%20orçamento" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#C8A84B;color:#0f0f0f;padding:16px 36px;border-radius:4px;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Solicitar orçamento
+    </a>
+  </div>
+  <style>
+    @media(max-width:1024px){.ben-6-grid{grid-template-columns:repeat(3,1fr)!important}}
+    @media(max-width:600px){.ben-6-grid{grid-template-columns:repeat(2,1fr)!important}}
+  </style>
+</section>
+
+<!-- OBRAS -->
+<section id="obras" style="padding:90px 5% 80px;background:#f4f4f4">
+  <div style="text-align:center;max-width:620px;margin:0 auto">
+    <div style="font-size:11px;font-weight:700;color:#C8A84B;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px">Portfólio</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,4vw,48px);font-weight:800;color:#0f0f0f;line-height:1.1;letter-spacing:-.01em">VEJA ALGUMAS DE NOSSAS <span style="color:#C8A84B">OBRAS REALIZADAS</span></h2>
+    <p style="font-size:15px;color:#777;line-height:1.6;margin-top:6px">Clique em qualquer obra para ver mais fotos.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:48px" id="obrasGrid">
+    <div class="ocard" onclick="openObra(0)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_629c39a72142.webp" alt="POSTOS SIM" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_e5c61d58bd34.webp" alt="POSTOS SIM" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">620m² + 780m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(1)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_5d7cab468eab.webp" alt="AHT COOLING SYSTEM" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_bc5b4cc0e425.webp" alt="AHT COOLING SYSTEM" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall + Forro Modular + Piso Vinílico <span style="color:#C8A84B;font-weight:700;margin-left:4px">350m² + 210m² + 80m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(2)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_a1b4e287faa1.webp" alt="MERCEDES-BENZ" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_c799e3ef69e0.webp" alt="MERCEDES-BENZ" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Piso Vinílico <span style="color:#C8A84B;font-weight:700;margin-left:4px">650m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(3)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_8e9d1c5dda2d.webp" alt="RONI CHAVES" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_6eb65ccbbc75.webp" alt="RONI CHAVES" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular + Piso Vinílico <span style="color:#C8A84B;font-weight:700;margin-left:4px">380m² + 420m² + 260m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(4)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_88366ab86913.webp" alt="ZFLOG" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_e9051b047cf3.webp" alt="ZFLOG" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">240m² + 130m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(5)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_128f148609c3.webp" alt="ALIANÇA IMOBILIÁRIA" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_df0e4598a4d0.webp" alt="ALIAN#U00c7A IMOBILI#U00c1RIA" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">400m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(6)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_ecef20cb827c.webp" alt="MAERSK" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_8bc58f2b960e.webp" alt="MAERSK" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall <span style="color:#C8A84B;font-weight:700;margin-left:4px">380m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(7)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_d8b9dd07ea5c.webp" alt="TIROL" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_f81b6d1f3442.webp" alt="TIROL" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall <span style="color:#C8A84B;font-weight:700;margin-left:4px">180m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(8)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_1152f08921cb.webp" alt="WEG" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_71457aa49303.webp" alt="WEG" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">310m² + 260m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(9)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_f26288b6401d.webp" alt="HYUNDAI" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_7be614d1569e.webp" alt="HYUNDAI" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">120m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(10)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_736a0719cfce.webp" alt="MA HOSPITALAR" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_285fa08cd280.webp" alt="MA HOSPITALAR" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">550m² + 420m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(11)" style="cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" >
+  <img src="images/img_04e27e692ab7.webp" alt="ESTALEIRO NAVSHIP" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_517259b39fa4.webp" alt="ESTALEIRO NAVSHIP" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Drywall + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">380m² + 250m² + 380m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(12)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_589d66f4730c.webp" alt="MOSCA" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_700bbe2467cf.webp" alt="MOSCA" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular + Piso Vinílico <span style="color:#C8A84B;font-weight:700;margin-left:4px">320m² + 380m² + 180m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(13)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_ef72fa426035.webp" alt="ZIKELI INDÚSTRIA MECÂNICA" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_cd578c13451d.webp" alt="ZIKELI IND#U00daSTRIA MEC#U00c2NICA" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall <span style="color:#C8A84B;font-weight:700;margin-left:4px">160m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(14)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_3e694a671c04.webp" alt="TRACK&FIELD" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_bf3811b72693.webp" alt="TRACK&FIELD" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Piso Vinílico <span style="color:#C8A84B;font-weight:700;margin-left:4px">180m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(15)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_0699cb45c19c.webp" alt="BANCO UNIPRIME" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_96a2df29a67c.webp" alt="BANCO UNIPRIME" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall + Piso Vinílico + Carpetes <span style="color:#C8A84B;font-weight:700;margin-left:4px">150m² + 210m² + 80m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(16)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_f36384e92adc.webp" alt="MAXSUL ENERGIA" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_5430a7f34b50.webp" alt="MAXSUL ENERGIA" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Divisória Modular + Forro Modular + Forração <span style="color:#C8A84B;font-weight:700;margin-left:4px">150m² + 180m² + 180m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(17)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_a165fc44741d.webp" alt="OCEANIC AQUARIUM" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_7b38d889b67f.webp" alt="OCEANIC AQUARIUM" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall + Forro Modular + Piso Vinílico <span style="color:#C8A84B;font-weight:700;margin-left:4px">80m² + 280m² + 280m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(18)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_71fc5db9025e.webp" alt="ESTALEIRO THYSSENKRUPP" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_7be5af1dc483.webp" alt="ESTALEIRO THYSSENKRUPP" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">300m² + 360m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div><div class="ocard" onclick="openObra(19)" style="display:none;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;background:#111;border-radius:2px" data-extra="true">
+  <img src="images/img_2be4907e9fe7.webp" alt="AR TERMINAIS" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s" loading="lazy" decoding="async">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 50%,transparent 100%)"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1">
+    <img src="images/img_ad2dca980658.webp" alt="AR TERMINAIS" style="max-width:55%;max-height:45%;object-fit:contain;opacity:0.7;filter:brightness(0) invert(1)" loading="lazy" decoding="async">
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;z-index:2">
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:500;line-height:1.4">Parede Drywall + Divisória Modular + Forro Modular <span style="color:#C8A84B;font-weight:700;margin-left:4px">90m² + 150m² + 110m²</span></div>
+  </div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:3" class="ocard-zoom-icon">
+    <div style="width:46px;height:46px;border-radius:50%;background:rgba(200,168,75,0.9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#000">⤢</div>
+  </div>
+</div>
+  </div>
+  <div style="text-align:center;margin-top:40px">
+    <button onclick="toggleObras()" id="verMaisBtn" style="display:inline-flex;align-items:center;gap:10px;background:transparent;border:2px solid #C8A84B;color:#C8A84B;padding:14px 36px;border-radius:4px;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .3s" onmouseover="this.style.background='#C8A84B';this.style.color='#0f0f0f'" onmouseout="this.style.background='transparent';this.style.color='#C8A84B'">
+      <span id="verMaisTxt">VER MAIS OBRAS</span>
+      <span id="verMaisIcon" style="font-size:18px;transition:transform .3s">↓</span>
+    </button>
+  </div>
+</section>
+<!-- MODAL LIGHTBOX -->
+<div id="obraModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.96);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeObra()">
+  <button onclick="closeObra()" style="position:absolute;top:14px;right:18px;background:none;border:none;color:#fff;font-size:36px;cursor:pointer;line-height:1;z-index:10">×</button>
+  <button onclick="chF(-1)" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);background:rgba(200,168,75,0.9);border:none;color:#000;width:46px;height:46px;border-radius:50%;font-size:30px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;font-weight:700">&#8249;</button>
+  <button onclick="chF(1)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:rgba(200,168,75,0.9);border:none;color:#000;width:46px;height:46px;border-radius:50%;font-size:30px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;font-weight:700">&#8250;</button>
+  <div style="max-width:980px;width:100%;display:flex;flex-direction:column;gap:12px">
+    <div style="width:100%;max-height:60vh;display:flex;align-items:center;justify-content:center;background:#111;border-radius:4px;overflow:hidden">
+      <img id="modalImg" src="" alt="" style="max-width:100%;max-height:60vh;object-fit:contain" loading="lazy" decoding="async">
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mEmp"></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px" id="mProd"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#C8A84B" id="mArea"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin:3px 0" id="mCnt"></div>
+        <div style="display:flex;gap:5px;justify-content:flex-end" id="mDots"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:2px" id="mThumbs"></div>
+  </div>
+</div>
+<style>
+.ocard:hover img{transform:scale(1.06)}
+.ocard:hover .ocard-zoom-icon{opacity:1!important}
+@media(max-width:900px){#obrasGrid{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:480px){#obrasGrid{grid-template-columns:1fr!important}}
+</style>
+<script>
+const OB=[{e:"POSTOS SIM",p:"Divis\u00f3ria Modular + Forro Modular",a:"620m\u00b2 + 780m\u00b2",f:["images/img_629c39a72142.webp", "images/img_b979465208d7.webp", "images/img_268b08611693.webp", "images/img_d0e478245cf9.webp", "images/img_2344c5c79fca.webp", "images/img_a8e2640d5511.webp"]},{e:"AHT COOLING SYSTEM",p:"Parede Drywall + Forro Modular + Piso Vin\u00edlico",a:"350m\u00b2 + 210m\u00b2 + 80m\u00b2",f:["images/img_5d7cab468eab.webp", "images/img_2388ce28efa0.webp", "images/img_ce1e8a85bfeb.webp", "images/img_ab98528b1cf4.webp", "images/img_e68c6e93fdce.webp", "images/img_a2886f611b39.webp"]},{e:"MERCEDES-BENZ",p:"Piso Vin\u00edlico",a:"650m\u00b2",f:["images/img_a1b4e287faa1.webp", "images/img_378089c478d0.webp", "images/img_e33ec8376678.webp", "images/img_248027f74864.webp", "images/img_3ae702444802.webp", "images/img_b509c6f3d432.webp"]},{e:"RONI CHAVES",p:"Divis\u00f3ria Modular + Forro Modular + Piso Vin\u00edlico",a:"380m\u00b2 + 420m\u00b2 + 260m\u00b2",f:["images/img_8e9d1c5dda2d.webp", "images/img_d0389cf417c0.webp", "images/img_23858c90be8e.webp", "images/img_3677f1418e64.webp", "images/img_3aee144263f6.webp", "images/img_61daf8f0f7ea.webp"]},{e:"ZFLOG",p:"Divis\u00f3ria Modular + Forro Modular",a:"240m\u00b2 + 130m\u00b2",f:["images/img_88366ab86913.webp", "images/img_b957fff084c5.webp", "images/img_cccda21242ea.webp", "images/img_1246c9238882.webp"]},{e:"ALIAN\u00c7A IMOBILI\u00c1RIA",p:"Forro Modular",a:"400m\u00b2",f:["images/img_128f148609c3.webp", "images/img_67596981ecde.webp", "images/img_a907ce46ea8f.webp", "images/img_a3e6fe511adc.webp", "images/img_7178d35a4e14.webp", "images/img_1a24c3bed068.webp"]},{e:"MAERSK",p:"Parede Drywall",a:"380m\u00b2",f:["images/img_ecef20cb827c.webp", "images/img_e9dd6310d932.webp", "images/img_7841553cac69.webp", "images/img_a7ea05b0395d.webp", "images/img_e61f3a94192e.webp", "images/img_b81d2e6a6754.webp"]},{e:"TIROL",p:"Parede Drywall",a:"180m\u00b2",f:["images/img_d8b9dd07ea5c.webp", "images/img_d8f9f5fdcfdf.webp", "images/img_e0ebe01cd9ee.webp", "images/img_63ca20a2bbc0.webp", "images/img_3170d37961b1.webp", "images/img_07fb1ec478b2.webp"]},{e:"WEG",p:"Divis\u00f3ria Modular + Forro Modular",a:"310m\u00b2 + 260m\u00b2",f:["images/img_1152f08921cb.webp", "images/img_9c845fda8902.webp"]},{e:"HYUNDAI",p:"Divis\u00f3ria Modular",a:"120m\u00b2",f:["images/img_f26288b6401d.webp", "images/img_80f3dd277a52.webp", "images/img_2a65d23dfd04.webp", "images/img_5dffd17e8fee.webp", "images/img_c1d3a160dd7a.webp"]},{e:"MA HOSPITALAR",p:"Divis\u00f3ria Modular + Forro Modular",a:"550m\u00b2 + 420m\u00b2",f:["images/img_736a0719cfce.webp", "images/img_562125ec3b36.webp", "images/img_e3aeff9a14d6.webp", "images/img_022231968f5c.webp", "images/img_07b40972d9b8.webp", "images/img_58fc01d8db46.webp"]},{e:"ESTALEIRO NAVSHIP",p:"Divis\u00f3ria Modular + Drywall + Forro Modular",a:"380m\u00b2 + 250m\u00b2 + 380m\u00b2",f:["images/img_04e27e692ab7.webp", "images/img_07381fcacb8d.webp", "images/img_ba01a6e1fc1b.webp", "images/img_6d3b4250701c.webp", "images/img_3c6a87781610.webp"]},{e:"MOSCA",p:"Divis\u00f3ria Modular + Forro Modular + Piso Vin\u00edlico",a:"320m\u00b2 + 380m\u00b2 + 180m\u00b2",f:["images/img_589d66f4730c.webp", "images/img_f29d42e2865d.webp", "images/img_e1d8b7f50221.webp", "images/img_1aaa6ef9e1bb.webp", "images/img_15e9e26e540c.webp", "images/img_34cbaf3572f3.webp"]},{e:"ZIKELI IND\u00daSTRIA MEC\u00c2NICA",p:"Parede Drywall",a:"160m\u00b2",f:["images/img_ef72fa426035.webp", "images/img_72ae51a08b3c.webp", "images/img_a9cd9fb07bef.webp", "images/img_600a6fad7b15.webp", "images/img_24a940b3b4f0.webp", "images/img_f755aaad66cd.webp"]},{e:"TRACK&FIELD",p:"Piso Vin\u00edlico",a:"180m\u00b2",f:["images/img_3e694a671c04.webp", "images/img_f97dd37bfa6f.webp", "images/img_d25dab756818.webp", "images/img_e65080fce3ea.webp", "images/img_b959189adec5.webp", "images/img_8474b16bf2f6.webp"]},{e:"BANCO UNIPRIME",p:"Parede Drywall + Piso Vin\u00edlico + Carpetes",a:"150m\u00b2 + 210m\u00b2 + 80m\u00b2",f:["images/img_0699cb45c19c.webp", "images/img_1cb5e989186d.webp", "images/img_86e6fd64d235.webp", "images/img_a534bf1c77e2.webp", "images/img_cc3bd908593b.webp", "images/img_03284b36d770.webp"]},{e:"MAXSUL ENERGIA",p:"Divis\u00f3ria Modular + Forro Modular + Forra\u00e7\u00e3o",a:"150m\u00b2 + 180m\u00b2 + 180m\u00b2",f:["images/img_f36384e92adc.webp", "images/img_750e6c1a43ea.webp", "images/img_c34aeacb004b.webp", "images/img_e0b45db42c5b.webp", "images/img_3d457b6c56b0.webp", "images/img_3833e044e7d5.webp"]},{e:"OCEANIC AQUARIUM",p:"Parede Drywall + Forro Modular + Piso Vin\u00edlico",a:"80m\u00b2 + 280m\u00b2 + 280m\u00b2",f:["images/img_a165fc44741d.webp", "images/img_86582f25f013.webp"]},{e:"ESTALEIRO THYSSENKRUPP",p:"Parede Drywall + Forro Modular",a:"300m\u00b2 + 360m\u00b2",f:["images/img_71fc5db9025e.webp", "images/img_112a9d7f524f.webp"]},{e:"AR TERMINAIS",p:"Parede Drywall + Divis\u00f3ria Modular + Forro Modular",a:"90m\u00b2 + 150m\u00b2 + 110m\u00b2",f:["images/img_2be4907e9fe7.webp", "images/img_e643afa717b0.webp", "images/img_0314fb07dc6d.webp", "images/img_8c2e43a1a70a.webp", "images/img_a942b15e7bb8.webp", "images/img_ea7591345b69.webp"]}];
+var cO=0,cF=0,obrasExp=false;
+function openObra(i){cO=i;cF=0;var m=document.getElementById('obraModal');m.style.display='flex';document.body.style.overflow='hidden';renderObra();}
+function closeObra(){document.getElementById('obraModal').style.display='none';document.body.style.overflow='';}
+function chF(d){var o=OB[cO];cF=(cF+d+o.f.length)%o.f.length;renderObra();}
+function gF(i){cF=i;renderObra();}
+function renderObra(){
+  var o=OB[cO];
+  document.getElementById('modalImg').src=o.f[cF];
+  document.getElementById('mEmp').textContent=o.e;
+  document.getElementById('mProd').textContent=o.p;
+  document.getElementById('mArea').textContent=o.a;
+  document.getElementById('mCnt').textContent=(cF+1)+' / '+o.f.length;
+  var dd=document.getElementById('mDots');dd.innerHTML='';
+  o.f.forEach(function(_,i){var b=document.createElement('button');b.style.cssText='width:7px;height:7px;border-radius:50%;border:none;cursor:pointer;padding:0;background:'+(i===cF?'#C8A84B':'rgba(255,255,255,0.25)');b.onclick=function(){gF(i);};dd.appendChild(b);});
+  var th=document.getElementById('mThumbs');th.innerHTML='';
+  o.f.forEach(function(f,i){var t=document.createElement('img');t.src=f;t.style.cssText='height:54px;width:82px;object-fit:cover;border-radius:3px;cursor:pointer;flex-shrink:0;transition:all .2s;border:2px solid '+(i===cF?'#C8A84B':'transparent')+';opacity:'+(i===cF?'1':'0.45');t.onclick=function(){gF(i);};th.appendChild(t);});
+}
+function toggleObras(){
+  obrasExp=!obrasExp;
+  document.querySelectorAll('[data-extra="true"]').forEach(function(el){el.style.display=obrasExp?'block':'none';});
+  document.getElementById('verMaisTxt').textContent=obrasExp?'VER MENOS':'VER MAIS OBRAS';
+  document.getElementById('verMaisIcon').style.transform=obrasExp?'rotate(180deg)':'rotate(0deg)';
+  if(obrasExp){setTimeout(function(){var f=document.querySelector('[data-extra="true"]');if(f)f.scrollIntoView({behavior:'smooth',block:'nearest'});},100);}
+}
+document.addEventListener('keydown',function(e){
+  var m=document.getElementById('obraModal');
+  if(m.style.display!=='flex')return;
+  if(e.key==='ArrowLeft')chF(-1);
+  if(e.key==='ArrowRight')chF(1);
+  if(e.key==='Escape')closeObra();
+});
+</script>
+
+<style>
+.pdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4);cursor:pointer;transition:background .2s;flex-shrink:0}
+.pdot-on{background:#C8A84B}
+</style>
+<script>
+function getSlides(cid){return document.querySelectorAll('#'+cid+' .pslide')}
+function getDots(cid){return document.querySelectorAll('#'+cid+' .pdot')}
+function showSlide(cid,idx){
+  const slides=getSlides(cid),dots=getDots(cid);
+  slides.forEach((s,i)=>{s.style.opacity=i===idx?'1':'0'});
+  dots.forEach((d,i)=>{d.className='pdot'+(i===idx?' pdot-on':'')});
+  window['_pc_'+cid]=idx;
+}
+function nextSlide(cid){
+  const n=getSlides(cid).length,cur=window['_pc_'+cid]||0;
+  showSlide(cid,(cur+1)%n);
+}
+function prevSlide(cid){
+  const n=getSlides(cid).length,cur=window['_pc_'+cid]||0;
+  showSlide(cid,(cur-1+n)%n);
+}
+function goSlide(cid,idx){showSlide(cid,idx);}
+
+// Auto-advance every 4 seconds
+['pc1','pc2','pc3','pc4'].forEach(cid=>{
+  window['_pc_'+cid]=0;
+  setInterval(()=>nextSlide(cid),4000);
+});
+</script>
+
+<script>
+var obrasExpanded = false;
+function toggleObras() {
+  obrasExpanded = !obrasExpanded;
+  var extras = document.querySelectorAll('[data-extra="true"]');
+  extras.forEach(function(el) {
+    el.style.display = obrasExpanded ? 'block' : 'none';
+  });
+  document.getElementById('verMaisTxt').textContent = obrasExpanded ? 'VER MENOS' : 'VER MAIS OBRAS';
+  document.getElementById('verMaisIcon').style.transform = obrasExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+  if (obrasExpanded) {
+    setTimeout(function() {
+      document.querySelector('[data-extra="true"]').scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 100);
+  }
+}
+</script>
+
+<!-- SOBRE -->
+<section id="sobre" style="background:#1a1a1a;padding:90px 5%">
+  <div style="text-align:center;max-width:680px;margin:0 auto 64px">
+    <div style="font-size:11px;font-weight:700;color:#C8A84B;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px">Sobre a Decor Room</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:800;color:#fff;line-height:1.1;text-align:center">NOSSA EMPRESA ESTÁ <span style="color:#C8A84B">PRONTA PARA ATENDER SUA OBRA</span></h2>
+    <p style="font-size:15px;color:rgba(255,255,255,0.55);line-height:1.7;margin-top:16px;text-align:center">A Decor Room é uma empresa regional especializada em soluções corporativas. Somos uma empresa com estrutura completa, do estoque próprio em galpão até o showroom físico. Equipe treinada, instaladores especializados e atendimento consultivo do início ao fim da obra.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+    <div style="background:rgba(200,168,75,0.05);border:1px solid rgba(200,168,75,0.2);border-radius:8px;overflow:hidden">
+      <div style="position:relative;height:220px;overflow:hidden"><img src="images/img_b1386ba3d409.webp" alt="Instaladores especializados" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <div style="padding:28px 30px">
+        <div style="width:28px;height:2px;background:#C8A84B;margin-bottom:14px"></div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#C8A84B;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px">INSTALADORES ESPECIALIZADOS</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7">Contamos com equipes de instaladores especializados, com mais de 10 anos de experiência. Cada equipe é especializada no seu produto, divisórias, forros ou piso vinílicos, garantindo instalação profissional, rápida e com acabamento impecável.</p>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden">
+      <div style="position:relative;height:220px;overflow:hidden"><img src="images/img_e0bf508aaeda.webp" alt="Equipe treinada e pronta" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <div style="padding:28px 30px">
+        <div style="width:28px;height:2px;background:#C8A84B;margin-bottom:14px"></div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px">EQUIPE TREINADA E PRONTA</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7">Nossa equipe interna de vendas é treinada para oferecer o melhor atendimento, ajudando você a fazer a melhor escolha dos produtos. Do primeiro contato até a entrega final, você tem transparência do processo.</p>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden">
+      <div style="position:relative;height:220px;overflow:hidden"><img src="images/img_138a85206908.webp" alt="Loja com showroom físico" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <div style="padding:28px 30px">
+        <div style="width:28px;height:2px;background:#C8A84B;margin-bottom:14px"></div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px">LOJA FÍSICA COM SHOWROOM</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7">Temos um showroom físico completo em Itajaí, com amostras reais de todos os produtos. Venha nos visitar e tomar um cafezinho. Temos estacionamento privativo e seguro.</p>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden">
+      <div style="position:relative;height:220px;overflow:hidden"><img src="images/img_2f73b1fc204c.webp" alt="Galpão com estoque próprio" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" decoding="async"></div>
+      <div style="padding:28px 30px">
+        <div style="width:28px;height:2px;background:#C8A84B;margin-bottom:14px"></div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px">GALPÃO COM ESTOQUE</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7">Contamos com estoque próprio em nosso galpão logístico, garantindo disponibilidade imediata de materiais para iniciar sua obra sem esperar por fornecimento. Mais agilidade e previsibilidade no prazo de entrega.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section id="depoimentos" style="padding:90px 5% 80px;background:#f4f4f4">
+  <div style="text-align:center;margin-bottom:48px">
+    <div style="font-size:11px;font-weight:700;color:#C8A84B;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px">Avaliações</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,4vw,48px);font-weight:800;color:#0f0f0f;line-height:1.1;letter-spacing:-.01em;margin-bottom:24px">O QUE NOSSOS <span style="color:#C8A84B">CLIENTES DIZEM</span></h2>
+    <div style="display:inline-flex;align-items:center;gap:12px">
+      <svg width="28" height="28" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      <div style="text-align:left">
+        <div style="font-size:13px;color:#777">Veja as Avaliações da Decor Room no Google</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <span style="color:#C8A84B;font-size:15px;letter-spacing:2px">★★★★★</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#0f0f0f">4,9</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative">
+    <button onclick="changeRevPage(-1)" style="position:absolute;left:-56px;top:50%;transform:translateY(-50%);background:#C8A84B;border:none;color:#0f0f0f;width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;font-weight:700">&#8249;</button>
+    <button onclick="changeRevPage(1)" style="position:absolute;right:-56px;top:50%;transform:translateY(-50%);background:#C8A84B;border:none;color:#0f0f0f;width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;font-weight:700">&#8250;</button>
+    <div class="rev-page" data-page="0" style="display:block;grid-template-columns:repeat(3,1fr);gap:20px"><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_d7f9b0508b4a.webp" alt="Transcomex Transporte e Logística LTDA" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Transcomex Transporte e Logística LTDA</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Olá, boa tarde! Excelente atendimento do início ao fim. Equipe sempre disponível para esclarecer dúvidas e acompanhar o processo. Ficamos satisfeito com a experiência!"</p>
+    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_0b6e31607dbf.webp" alt="Pamela Oliveira" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Pamela Oliveira</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Ótima empresa, bom atendimento e ótimo serviço. A equipe foi muito atenciosa, prestativa e demonstrou profissionalismo em todo o processo. Achei uma empresa prestadora de serviços instalados que posso contar! Recomendo com confiança!"</p>
+    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_64aac34f7aee.webp" alt="Luiza Moser de Simas" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Luiza Moser de Simas</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Fui muito bem atendida!! Produto e serviço de ótima qualidade e confiança. Super indico!"</p>
+    </div></div><div class="rev-page" data-page="1" style="display:none;grid-template-columns:repeat(3,1fr);gap:20px"><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_fbb82ff1e769.webp" alt="Fernanda Dornelles" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Fernanda Dornelles</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Excelente atendimento, profissionais que tão sempre a disposição a nos ajudar. Empresa seria e com compromisso."</p>
+    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_387c18599c3f.webp" alt="Vythor Sousa Pedrosa" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Vythor Sousa Pedrosa</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Serviço e atendimento excelente, alem do material ser de primeira, indico de olhos fechados! 👏"</p>
+    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_2298fe2168a6.webp" alt="Pedro Henrique Lamim" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Pedro Henrique Lamim</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Excelente atendimento e serviço de alta qualidade. A instalação do drywall ficou bem executada com ótimo acabamento e dentro do prazo combinado. Recomendo para quem procura um serviço confiável e bem feito!"</p>
+    </div></div><div class="rev-page" data-page="2" style="display:none;grid-template-columns:repeat(3,1fr);gap:20px"><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_34e555dfb0e5.webp" alt="Jean Moser" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Jean Moser</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Contratei instalação de piso vinílico para todo meu apartamento e o atendimento foi extraordinário, desde da escolha de tonalidades, apresentações direto no apartamento, apoio no entendimento do processo de instalação. Após contratado o serviço foi executado rapidamente, o que ajudou muito devido aos prazos que eu tinha com outros fornecedores que dependiam do piso instalado, além da qualidade da matéria prima que até o momento não apresentou nenhum problema. Indico de olhos fechados!"</p>
+    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_34957de0ccdb.webp" alt="Fagner Lopes" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Fagner Lopes</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Super recomendo a DECOR ROOM! Atendimento nota 10, profissionais muito preparados e produtos lindos. Encontrei ótimas opções para o meu projeto e o processo de compra foi excelente do início ao fim. Com certeza voltarei mais vezes!"</p>
+    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="images/img_065fde150678.webp" alt="Raquel Miriã Alexandre" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Raquel Miriã Alexandre</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+      </div>
+      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
+      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Fui muito bem atendida e tive todas as minhas dúvidas sanadas, pessoal muito comprometido e honestos, indicarei!!!!"</p>
+    </div></div>
+  </div>
+  <div style="display:flex;justify-content:center;gap:8px;margin-top:32px"><div class="rev-dot rev-dot-on" onclick="goRevPage(0)" style="width:8px;height:8px;border-radius:50%;background:#C8A84B;cursor:pointer;transition:background .2s"></div><div class="rev-dot " onclick="goRevPage(1)" style="width:8px;height:8px;border-radius:50%;background:#ddd;cursor:pointer;transition:background .2s"></div><div class="rev-dot " onclick="goRevPage(2)" style="width:8px;height:8px;border-radius:50%;background:#ddd;cursor:pointer;transition:background .2s"></div></div>
+</section>
+<script>
+var revCur = 0, revTotal = 3;
+function goRevPage(i) {
+  document.querySelectorAll('.rev-page').forEach(function(el, idx) {
+    el.style.display = (idx === i) ? 'grid' : 'none';
+  });
+  document.querySelectorAll('.rev-dot').forEach(function(el, idx) {
+    el.style.background = (idx === i) ? '#C8A84B' : '#ddd';
+  });
+  revCur = i;
+}
+function changeRevPage(d) {
+  goRevPage((revCur + d + revTotal) % revTotal);
+}
+</script>
+
+<!-- CTA FINAL -->
+<section class="cta-sec" id="contato" style="background:#0f0f0f;padding:90px 5%;text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(200,168,75,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,168,75,0.04) 1px,transparent 1px);background-size:40px 40px"></div>
+  <div style="position:relative;z-index:1;max-width:660px;margin:0 auto">
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(34px,5vw,58px);font-weight:800;color:#fff;line-height:1.05;margin-bottom:18px;letter-spacing:-.01em">PRONTO PARA TRANSFORMAR <em style="color:#C8A84B;font-style:normal">SUA EMPRESA?</em></h2>
+    <p style="font-size:16px;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:36px">Entre em contato com a nossa equipe e peça seu orçamento agora!</p>
+    <a href="https://wa.me/554730481531?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20solicitar%20um%20orçamento" target="_blank" style="background:#25D366;color:#fff;padding:17px 34px;border-radius:4px;font-size:15px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;letter-spacing:.03em;text-transform:uppercase;transition:all .2s">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Solicitar Orçamento pelo WhatsApp
+    </a>
+    <div style="display:flex;align-items:center;justify-content:center;gap:40px;margin-top:28px;flex-wrap:wrap">
+      <a href="tel:+554730481531" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,0.7)" onmouseover="this.style.color='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
+        <span style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:15px">📞</span>
+        <div style="text-align:left"><div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px">Telefone</div><div style="font-size:15px;font-weight:600">(47) 3048-1531</div></div>
+      </a>
+      <div style="width:1px;height:36px;background:rgba(255,255,255,0.1)"></div>
+      <a href="mailto:contato@decorroomsc.com" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,0.7)" onmouseover="this.style.color='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
+        <span style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:15px">✉️</span>
+        <div style="text-align:left"><div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px">E-mail</div><div style="font-size:15px;font-weight:600">contato@decorroomsc.com</div></div>
+      </a>
+      <div style="width:1px;height:36px;background:rgba(255,255,255,0.1)"></div>
+      <a href="https://maps.google.com/?q=R.+Blumenau,+1530+Itajaí+SC" target="_blank" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,0.7)" onmouseover="this.style.color='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
+        <span style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:15px">📍</span>
+        <div style="text-align:left"><div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px">Endereço</div><div style="font-size:14px;font-weight:600;line-height:1.4">R. Blumenau, 1530 - Barra do Rio<br>Itajaí - SC, 88305-104</div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#0a0a0a;padding:36px 5%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,0.06);gap:16px;text-align:center">
+  <img src="images/img_eb9535305a62.webp" alt="Decor Room" style="height:40px;width:auto;filter:brightness(0) invert(1);object-fit:contain" loading="lazy" decoding="async">
+  <div style="font-size:12px;color:rgba(255,255,255,0.3)">Todos os direitos reservados. © 2026 Decor Room — Divisórias, Forros e Pisos</div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/554730481531?text=Olá,%20vim%20pelo%20site" class="wa-float" target="_blank" aria-label="WhatsApp" style="position:fixed;bottom:26px;right:26px;z-index:200;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,0.4);text-decoration:none">
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+var hbgCur = 0, hbgTotal = 6;
+function advanceHeroBg() {
+  document.getElementById('hbg' + hbgCur).style.opacity = '0';
+  hbgCur = (hbgCur + 1) % hbgTotal;
+  document.getElementById('hbg' + hbgCur).style.opacity = '1';
+}
+setInterval(advanceHeroBg, 5000);
+</script>
+
+<!-- ============================================================= -->
+<!-- CONVERSÃO: clique no WhatsApp (Lead) — Meta + GA4 + Google Ads -->
+<!-- Como não há formulário, TODO clique em wa.me é a conversão.    -->
+<!-- ============================================================= -->
+<script>
+(function () {
+  var T = window.DECORROOM_TRACKING || {};
+  function isWhatsApp(href) {
+    return /wa\.me|api\.whatsapp\.com|web\.whatsapp\.com/i.test(href || '');
+  }
+  document.addEventListener('click', function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
+    if (!a || !isWhatsApp(a.getAttribute('href'))) return;
+
+    var eventId = (crypto.randomUUID && crypto.randomUUID()) ||
+      (Date.now() + '-' + Math.random().toString(36).slice(2));
+    var eventTime = Math.floor(Date.now() / 1000);
+
+    // Meta — pixel (client) + CAPI (server via /tracker), deduplicados por event_id.
+    try { if (window.fbq) fbq('track', 'Lead', { content_name: 'WhatsApp' }, { eventID: eventId }); } catch (e) {}
+    try {
+      fetch('/tracker', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          event_name: 'Lead',
+          event_id: eventId,
+          event_time: eventTime,
+          event_source_url: window.location.href,
+          user_data: {}
+        })
+      }).catch(function () {});
+    } catch (e) {}
+
+    // GA4 generate_lead é disparado server-side pelo /tracker (evita contagem dupla).
+
+    // Google Ads — conversão client-side (até o import offline via API ficar pronto).
+    try {
+      if (window.gtag &&
+          window.__trkSet(T.GOOGLE_ADS_ID, 'AW-X') &&
+          window.__trkSet(T.GOOGLE_ADS_WA_LABEL, 'XXXX')) {
+        gtag('event', 'conversion', { send_to: T.GOOGLE_ADS_ID + '/' + T.GOOGLE_ADS_WA_LABEL });
+      }
+    } catch (e) {}
+  }, true);
+})();
+</script>
+</body>
+</html>
