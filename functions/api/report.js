@@ -82,12 +82,13 @@ export async function onRequestGet({ request, env }) {
   // ---- Web / Ads (decorroom-db) ----
   try {
     const D = env.DB;
-    const [spend, webleads, sess, daily, topads] = await Promise.all([
+    const [spend, webleads, sess, daily, topads, kw] = await Promise.all([
       D.prepare(`SELECT platform, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr FROM ad_spend WHERE date BETWEEN ? AND ? GROUP BY platform`).bind(fromDate, toDate).all(),
       D.prepare(`SELECT COUNT(*) n FROM event_log WHERE event_name='Lead' AND is_bot=0 AND timestamp BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
       D.prepare(`SELECT COUNT(*) n FROM sessions WHERE created_at BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
       D.prepare(`SELECT date, COALESCE(SUM(spend_cents),0) cents FROM ad_spend WHERE date BETWEEN ? AND ? GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
       D.prepare(`SELECT ad_name, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(impressions),0) impr, COALESCE(SUM(clicks),0) clk FROM ad_spend WHERE date BETWEEN ? AND ? AND ad_name IS NOT NULL GROUP BY ad_name HAVING SUM(spend_cents)>0 ORDER BY cents DESC LIMIT 10`).bind(fromDate, toDate).all(),
+      D.prepare(`SELECT keyword, COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(conversions),0) conv FROM keyword_stats WHERE date BETWEEN ? AND ? GROUP BY keyword HAVING SUM(cost_cents)>0 OR SUM(clicks)>0 ORDER BY cost DESC LIMIT 10`).bind(fromDate, toDate).all(),
     ]);
     const sm = {}, clk = {}; (spend.results || []).forEach((r) => { sm[r.platform] = r.cents; clk[r.platform] = r.clk; });
     const metaCents = sm.meta || 0, googleCents = sm.google || 0;
@@ -97,7 +98,11 @@ export async function onRequestGet({ request, env }) {
       web_leads: webleads?.n || 0, lp_views: sess?.n || 0,
       daily: (daily.results || []).map((d) => ({ date: d.date, invest: d.cents / 100 })),
       top_ads: (topads.results || []).map((a) => ({ name: a.ad_name, invest: a.cents / 100, impr: a.impr, clk: a.clk })),
-      keywords: [], // Google Ads keyword sync não configurado ainda
+      // leads = Google-tracked conversions (WhatsApp clicks); cpl = cost / leads.
+      keywords: (kw.results || []).map((r) => {
+        const leads = Math.round(r.conv || 0);
+        return { kw: r.keyword, leads, clicks: r.clk, cost: r.cost / 100, cpl: leads > 0 ? (r.cost / 100) / leads : 0 };
+      }),
     };
   } catch (e) { out.ads_error = e.message; }
 
