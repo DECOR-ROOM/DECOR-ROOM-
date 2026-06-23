@@ -3,6 +3,12 @@ paginas-krobcode-2-main/
 krob-tracking-stack-main/
 krob-whatsapp-tracking-v1/
 
+# --- Ferramenta MCP (Google Ads) — não é deploy do site ---
+google_ads_mcp-main/
+
+# --- Dashboard avançada (CRM/inbox) — backend ainda não portado; fora do deploy por ora ---
+dashboard/
+
 # --- Segredos / config local (nunca commitar) ---
 wrangler.toml
 wrangler.toml.audit
