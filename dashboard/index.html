@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,55 +8,56 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" defer></script>
 <style>
-  :root{--gold:#C8A84B;--gold-d:#a88a38;--ink:#0f0f0f;--bg:#f5f4f1;--card:#fff;--border:#e6e3dc;--line:#f0eee8;--text:#1a1a1a;--dim:#6b6b6b;--muted:#9a958c;--green:#16a34a;--red:#dc2626;--blue:#1877f2}
+  :root,[data-theme="light"]{--gold:#C8A84B;--gold-d:#a88a38;--ink:#0f0f0f;--bg:#f5f4f1;--card:#fff;--border:#e6e3dc;--line:#f0eee8;--text:#1a1a1a;--dim:#6b6b6b;--muted:#9a958c;--green:#16a34a;--red:#dc2626;--blue:#1877f2;--hero:#0f0f0f;--herotx:#fff}
+  [data-theme="dark"]{--gold:#C8A84B;--gold-d:#d8bd6e;--ink:#000;--bg:#14130f;--card:#1c1b16;--border:#2c2a22;--line:#262419;--text:#ece9e0;--dim:#b3ad9d;--muted:#807a6a;--green:#3ec16f;--red:#f06464;--blue:#5b9bf5;--hero:#000;--herotx:#fff}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   h1,h2,h3,.head{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
   .mono{font-variant-numeric:tabular-nums}
-  .wrap{max-width:1140px;margin:0 auto;padding:0 18px}
-  header{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20}
-  header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:14px;flex-wrap:wrap}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+  header{background:var(--hero);color:var(--herotx);position:sticky;top:0;z-index:20}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px;flex-wrap:wrap}
   .brand b{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:18px}
   .brand b em{color:var(--gold);font-style:normal}
-  .seg{display:inline-flex;background:#1c1c1c;border-radius:9px;padding:3px;gap:2px}
-  .seg button{padding:.34rem .7rem;font-size:.78rem;font-weight:700;border:0;background:transparent;color:#bdbdbd;border-radius:7px;cursor:pointer}
-  .seg button.active{background:var(--gold);color:var(--ink)}
+  .tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .seg{display:inline-flex;background:rgba(255,255,255,.08);border-radius:9px;padding:3px;gap:2px}
+  .seg button{padding:.3rem .62rem;font-size:.76rem;font-weight:700;border:0;background:transparent;color:#bdbdbd;border-radius:7px;cursor:pointer}
+  .seg button.active{background:var(--gold);color:#0f0f0f}
+  .di{font-size:.74rem;padding:.3rem .4rem;border:1px solid rgba(255,255,255,.2);border-radius:7px;background:rgba(255,255,255,.06);color:#fff}
+  .ic{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;cursor:pointer;font-size:1rem}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px}
   .slabel{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted);margin:24px 0 10px}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .kpi{padding:1rem 1.1rem}
-  .kpi .l{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;color:var(--dim)}
-  .kpi .v{font-size:1.55rem;font-weight:700;font-family:'Barlow Condensed',sans-serif;margin-top:.2rem}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  .kpi{padding:.85rem 1rem}
+  .kpi .l{font-size:.64rem;text-transform:uppercase;letter-spacing:.04em;font-weight:700;color:var(--dim)}
+  .kpi .v{font-size:1.45rem;font-weight:700;font-family:'Barlow Condensed',sans-serif;margin-top:.15rem}
   .kpi.hero{background:var(--ink);color:#fff}.kpi.hero .l{color:#a9a9a9}.kpi.hero .v{color:var(--gold)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   .pad{padding:16px}
-  .ctitle{font-weight:700;font-size:.95rem;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em}
+  .ctitle{font-weight:700;font-size:.92rem;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+  .miniseg{display:inline-flex;background:var(--line);border-radius:8px;padding:2px;gap:2px}
+  .miniseg button{padding:.2rem .55rem;font-size:.7rem;font-weight:700;border:0;background:transparent;color:var(--dim);border-radius:6px;cursor:pointer}
+  .miniseg button.active{background:var(--ink);color:#fff}[data-theme="dark"] .miniseg button.active{background:var(--gold);color:#000}
   .bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.82rem}
-  .bar .nm{width:120px;flex:0 0 auto;color:var(--dim)}
+  .bar .nm{width:130px;flex:0 0 auto;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bar .track{flex:1;background:var(--line);border-radius:6px;height:18px;overflow:hidden}
   .bar .fill{height:100%;background:var(--gold);border-radius:6px}
-  .bar .vl{width:64px;text-align:right;font-weight:700}
+  .bar .vl{width:70px;text-align:right;font-weight:700}
   table{width:100%;border-collapse:collapse}
-  th{font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:.5rem .6rem;border-bottom:1px solid var(--border)}
-  th:first-child{text-align:left}
-  td{padding:.5rem .6rem;font-size:.82rem;text-align:right;border-bottom:1px solid var(--line)}
-  td:first-child{text-align:left}
-  /* funnel */
+  th{font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:right;padding:.45rem .55rem;border-bottom:1px solid var(--border)}th:first-child{text-align:left}
+  td{padding:.45rem .55rem;font-size:.8rem;text-align:right;border-bottom:1px solid var(--line)}td:first-child{text-align:left}
+  tr.sub td{font-weight:700;background:var(--line)}
   .funnel{display:flex;flex-direction:column;gap:7px}
-  .fstep{display:flex;align-items:center;gap:10px}
-  .fstep .fn{width:110px;color:var(--dim);font-size:.8rem}
+  .fstep{display:flex;align-items:center;gap:10px}.fstep .fn{width:110px;color:var(--dim);font-size:.8rem}
   .fstep .ft{flex:1;height:26px;border-radius:7px;display:flex;align-items:center;padding:0 .6rem;color:#fff;font-weight:700;font-size:.82rem}
-  /* brazil tilegrid */
   .br{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-width:380px}
-  .uf{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--dim);background:var(--line)}
-  .uf .c{font-size:.78rem;color:var(--ink)}
+  .uf{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;color:var(--dim);background:var(--line)}
+  .uf .c{font-size:.76rem;color:var(--text)}
   .gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
-  .inp{font-size:.9rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:9px;width:100%}
-  .btn{font-size:.85rem;font-weight:700;padding:.55rem 1rem;border-radius:9px;border:1px solid var(--gold);background:var(--gold);color:var(--ink);cursor:pointer}
-  .hidden{display:none!important}
-  .notice{background:#fff7e6;border:1px solid #f0d48a;border-radius:10px;padding:.7rem .9rem;font-size:.82rem;color:#6b5a1f;margin-top:14px}
-  .muted{color:var(--muted)}
+  .inp{font-size:.9rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:9px;width:100%;background:var(--card);color:var(--text)}
+  .btn{font-size:.82rem;font-weight:700;padding:.4rem .9rem;border-radius:9px;border:1px solid var(--gold);background:var(--gold);color:#0f0f0f;cursor:pointer}
+  .hidden{display:none!important}.muted{color:var(--muted)}
+  .notice{background:color-mix(in srgb,var(--gold) 12%,var(--card));border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:10px;padding:.7rem .9rem;font-size:.82rem;margin-top:14px}
 </style>
 </head>
 <body>
@@ -74,31 +75,51 @@
 <div id="app" class="hidden">
   <header><div class="wrap">
     <div class="brand"><b>DECOR<em> ROOM</em></b> <span style="opacity:.5;font-size:.8rem;font-weight:600;letter-spacing:.1em">PAINEL</span></div>
-    <div class="seg" id="range">
-      <button data-d="7">7 dias</button><button data-d="30" class="active">30 dias</button><button data-d="90">90 dias</button>
+    <div class="tools">
+      <div class="seg" id="range">
+        <button data-d="0">Hoje</button><button data-d="7">7d</button><button data-d="30" class="active">30d</button><button data-d="90">90d</button>
+      </div>
+      <input id="dfrom" class="di" type="date"><span style="opacity:.5">→</span><input id="dto" class="di" type="date">
+      <button id="dapply" class="di" style="cursor:pointer;font-weight:700">Aplicar</button>
+      <button id="theme" class="ic" title="Modo dia/noite">🌙</button>
     </div>
   </div></header>
 
   <div class="wrap">
-    <div id="crm-warn" class="notice hidden">⚠️ O banco do CRM ainda não está conectado a este painel. Adicione o binding D1 <b>CRMDB → crm-db</b> no projeto do site e refaça o deploy.</div>
+    <div id="crm-warn" class="notice hidden">⚠️ Binding <b>CRMDB → crm-db</b> não detectado neste projeto. Os dados do CRM ficam vazios até ligar o binding e refazer o deploy.</div>
 
-    <div class="slabel">Visão geral</div>
+    <div class="slabel">Visão geral · <span id="period" class="muted"></span></div>
     <div class="kpis">
       <div class="kpi hero card"><div class="l">Investimento</div><div class="v mono" id="k-inv">—</div></div>
-      <div class="kpi card"><div class="l">Leads</div><div class="v mono" id="k-leads">—</div></div>
+      <div class="kpi card"><div class="l">CPL geral</div><div class="v mono" id="k-cpl">—</div></div>
+      <div class="kpi card"><div class="l">Leads totais</div><div class="v mono" id="k-leads">—</div></div>
+      <div class="kpi card"><div class="l">LP views</div><div class="v mono" id="k-lp">—</div></div>
+      <div class="kpi card"><div class="l">Cliques Meta</div><div class="v mono" id="k-cmeta">—</div></div>
+      <div class="kpi card"><div class="l">Cliques Google</div><div class="v mono" id="k-cgoogle">—</div></div>
+      <div class="kpi card"><div class="l">Leads Meta (zap)</div><div class="v mono" id="k-lmeta">—</div></div>
+      <div class="kpi card"><div class="l">Leads Google</div><div class="v mono" id="k-lgoogle">—</div></div>
       <div class="kpi card"><div class="l">Qualificados</div><div class="v mono" id="k-qual">—</div></div>
       <div class="kpi card"><div class="l">Vendas</div><div class="v mono" id="k-sales">—</div></div>
-      <div class="kpi card"><div class="l">Receita ganha</div><div class="v mono" id="k-won">—</div></div>
+      <div class="kpi card"><div class="l">Receita total</div><div class="v mono" id="k-won">—</div></div>
       <div class="kpi card"><div class="l">Receita pendente</div><div class="v mono" id="k-pend">—</div></div>
-      <div class="kpi card"><div class="l">CPL (geral)</div><div class="v mono" id="k-cpl">—</div></div>
-      <div class="kpi card"><div class="l">ROAS</div><div class="v mono" id="k-roas">—</div></div>
     </div>
 
-    <div class="slabel">Funil comercial</div>
+    <div class="slabel">Performance diária</div>
+    <div class="card pad">
+      <div class="ctitle">Investimento × <span id="lbl-metric">leads</span> por dia
+        <span class="miniseg" id="metric"><button data-m="leads" class="active">Leads</button><button data-m="cpl">CPL</button></span>
+      </div>
+      <canvas id="chDaily" height="92"></canvas>
+    </div>
+
+    <div class="slabel">Funil & receita</div>
     <div class="grid2">
-      <div class="card pad"><div class="ctitle">Etapas</div><div class="funnel" id="funnel"></div></div>
+      <div class="card pad"><div class="ctitle">Funil comercial</div><div class="funnel" id="funnel"></div></div>
       <div class="card pad"><div class="ctitle">Receita pendente × ganha</div><canvas id="chRev" height="150"></canvas></div>
     </div>
+
+    <div class="slabel">Receita por origem</div>
+    <div class="card pad"><table><thead><tr><th>Origem</th><th>Vendas</th><th>Receita</th></tr></thead><tbody id="rev-origin"></tbody></table></div>
 
     <div class="slabel">Segmentação dos leads</div>
     <div class="grid3">
@@ -118,8 +139,8 @@
 
     <div class="slabel">Mídia paga</div>
     <div class="grid2">
-      <div class="card pad"><div class="ctitle">Investimento por dia</div><canvas id="chDaily" height="150"></canvas></div>
-      <div class="card pad"><div class="ctitle">Top anúncios (Meta)</div><table><thead><tr><th>Anúncio</th><th>Invest.</th><th>Cliques</th></tr></thead><tbody id="topads"><tr><td colspan="3" class="muted" style="text-align:center">—</td></tr></tbody></table></div>
+      <div class="card pad"><div class="ctitle">Top anúncios (Meta)</div><table><thead><tr><th>Anúncio</th><th>Invest.</th><th>Cliques</th></tr></thead><tbody id="topads"></tbody></table></div>
+      <div class="card pad"><div class="ctitle">Palavras-chave (Google · top 10)</div><table><thead><tr><th>Palavra-chave</th><th>Leads</th><th>CPL</th></tr></thead><tbody id="kw"></tbody></table></div>
     </div>
     <div style="height:40px"></div>
   </div>
@@ -130,15 +151,20 @@ const PRODUCTS={divisorias_modular:'Divisórias Modular',parede_drywall:'Parede 
 const ENVS={residencial:'Residencial',comercial:'Comercial'};
 const PROPS={sala_comercial:'Sala Comercial',galpao:'Galpão',casa:'Casa',apartamento:'Apartamento'};
 const LOSS={preco_alto:'Preço acima do esperado',concorrente:'Fechou com concorrente',sem_retorno:'Sem retorno',sem_orcamento:'Sem orçamento no momento',projeto_pausado:'Projeto pausado/adiado',prazo_incompativel:'Prazo incompatível',fora_regiao:'Fora da região',servico_nao_oferecido:'Serviço não oferecido',desqualificado:'Desqualificado/curioso',pagamento_incompativel:'Pagamento incompatível',pesquisando:'Ainda pesquisando',impossibilidade_tecnica:'Impossibilidade técnica',obra_nao_pronta:'Obra não está pronta',decisao_terceiros:'Decisão de terceiros',demora_atendimento:'Demora no atendimento',orcamento_comparativo:'Orçamento comparativo',ticket_baixo:'Ticket muito baixo',desistiu:'Desistiu do projeto'};
+const ORIGINS={meta:'Meta / CTWA',google:'Google Ads',organico:'Orgânico',indicacao:'Indicação',remarketing:'Remarketing',instagram:'Instagram',google_meu_negocio:'Google Meu Negócio',site:'Site',whatsapp:'WhatsApp',outro:'Outro',manual:'Cadastro manual',desconhecido:'Desconhecido'};
 const STAGES=[['novo','Novo','#9a958c'],['qualificado','Qualificado','#C8A84B'],['orcado','Orçado','#1877f2'],['ganho','Ganho','#16a34a'],['perdido','Perdido','#dc2626']];
+const TRAFFIC=['meta','google'];
 const UFPOS={RR:[4,1],AP:[5,1],AM:[3,2],PA:[4,2],MA:[5,2],CE:[6,2],RN:[7,2],AC:[2,3],RO:[3,3],TO:[5,3],PI:[6,3],PB:[7,3],MT:[4,4],GO:[5,4],BA:[6,4],PE:[7,4],AL:[8,4],MS:[4,5],DF:[5,5],MG:[6,5],ES:[7,5],SE:[8,5],SP:[5,6],RJ:[6,6],PR:[5,7],SC:[5,8],RS:[4,9]};
 
 let KEY=sessionStorage.getItem('dashKey')||new URLSearchParams(location.search).get('key')||'';
-let days=30, chRev=null, chDaily=null;
+let days=30, customFrom=null, customTo=null, metric='leads', chRev=null, chDaily=null, lastData=null;
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const brl=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
 const int=v=>(v||0).toLocaleString('pt-BR');
+
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('dashTheme',t);$('theme').textContent=t==='dark'?'☀️':'🌙';if(lastData)paint(lastData);}
+$('theme').onclick=()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
 
 function bars(el,items,labelMap){
   const max=Math.max(1,...items.map(i=>i.n));
@@ -146,58 +172,97 @@ function bars(el,items,labelMap){
 }
 
 async function load(){
-  const r=await fetch('/api/report?key='+encodeURIComponent(KEY)+'&days='+days);
+  let q='key='+encodeURIComponent(KEY);
+  if(customFrom&&customTo)q+='&from='+customFrom+'&to='+customTo;
+  else if(days===0){const t=new Date().toISOString().slice(0,10);q+='&from='+t+'&to='+t;}
+  else q+='&days='+days;
+  const r=await fetch('/api/report?'+q);
   if(r.status===401){sessionStorage.removeItem('dashKey');location.reload();return;}
-  const d=await r.json();
-  $('crm-warn').classList.toggle('hidden', d.crm_bound!==false);
-  const crm=d.crm||{funnel:{},by_product:[],by_environment:[],by_property:[],loss_reasons:[],by_uf:[],top_cities:[],total:0,qualified:0,sales:0,pending_revenue:0,won_revenue:0};
-  const ads=d.ads||{total_invest:0,web_leads:0,daily:[],top_ads:[]};
+  lastData=await r.json();paint(lastData);
+}
 
-  const cpl = crm.total? ads.total_invest/crm.total : 0;
-  const roas = ads.total_invest? crm.won_revenue/ads.total_invest : 0;
+function paint(d){
+  $('crm-warn').classList.toggle('hidden', d.crm_bound!==false);
+  $('period').textContent=(d.from||'')+' → '+(d.to||'');
+  const crm=d.crm||{funnel:{},by_product:[],by_environment:[],by_property:[],loss_reasons:[],by_uf:[],top_cities:[],revenue_by_origin:[],daily_leads:{},total:0,qualified:0,sales:0,pending_revenue:0,won_revenue:0,leads_meta:0,leads_google:0};
+  const ads=d.ads||{total_invest:0,meta_clicks:0,google_clicks:0,lp_views:0,daily:[],top_ads:[],keywords:[]};
+  const cpl=crm.total?ads.total_invest/crm.total:0;
+
   $('k-inv').textContent=brl(ads.total_invest);
+  $('k-cpl').textContent=brl(cpl);
   $('k-leads').textContent=int(crm.total);
+  $('k-lp').textContent=int(ads.lp_views);
+  $('k-cmeta').textContent=int(ads.meta_clicks);
+  $('k-cgoogle').textContent=int(ads.google_clicks);
+  $('k-lmeta').textContent=int(crm.leads_meta);
+  $('k-lgoogle').textContent=int(crm.leads_google);
   $('k-qual').textContent=int(crm.qualified);
   $('k-sales').textContent=int(crm.sales);
   $('k-won').textContent=brl(crm.won_revenue);
   $('k-pend').textContent=brl(crm.pending_revenue);
-  $('k-cpl').textContent=brl(cpl);
-  $('k-roas').textContent=(roas?roas.toFixed(2):'0.00')+'×';
 
   // funnel
   const fmax=Math.max(1,...STAGES.map(s=>crm.funnel[s[0]]||0));
   $('funnel').innerHTML=STAGES.map(([k,lbl,col])=>{const n=crm.funnel[k]||0;return `<div class="fstep"><div class="fn">${lbl}</div><div class="ft" style="background:${col};width:${Math.max(8,Math.round(n/fmax*100))}%">${int(n)}</div></div>`;}).join('');
 
+  // revenue by origin
+  const rbo={};(crm.revenue_by_origin||[]).forEach(r=>rbo[r.k]={won:r.won,n:r.n});
+  const trafKeys=Object.keys(rbo).filter(k=>TRAFFIC.includes(k));
+  const orgKeys=Object.keys(rbo).filter(k=>!TRAFFIC.includes(k));
+  let html='';let tsum=0,tn=0,osum=0,on=0;
+  trafKeys.forEach(k=>{html+=row(k,rbo[k]);tsum+=rbo[k].won;tn+=rbo[k].n;});
+  html+=`<tr class="sub"><td>Tráfego (subtotal)</td><td class="mono">${int(tn)}</td><td class="mono">${brl(tsum)}</td></tr>`;
+  orgKeys.forEach(k=>{html+=row(k,rbo[k]);osum+=rbo[k].won;on+=rbo[k].n;});
+  html+=`<tr class="sub"><td>Orgânico (subtotal)</td><td class="mono">${int(on)}</td><td class="mono">${brl(osum)}</td></tr>`;
+  html+=`<tr class="sub" style="background:var(--ink);color:#fff"><td>Total</td><td class="mono">${int(tn+on)}</td><td class="mono">${brl(tsum+osum)}</td></tr>`;
+  $('rev-origin').innerHTML=html||'<tr><td colspan="3" class="muted" style="text-align:center">Sem vendas no período.</td></tr>';
+  function row(k,v){return `<tr><td>${ORIGINS[k]||k}</td><td class="mono">${int(v.n)}</td><td class="mono">${brl(v.won)}</td></tr>`;}
+
   // segments
-  bars($('seg-prod'),crm.by_product,PRODUCTS);
-  bars($('seg-env'),crm.by_environment,ENVS);
-  bars($('seg-prop'),crm.by_property,PROPS);
-  bars($('loss'),crm.loss_reasons,LOSS);
+  bars($('seg-prod'),crm.by_product,PRODUCTS);bars($('seg-env'),crm.by_environment,ENVS);bars($('seg-prop'),crm.by_property,PROPS);bars($('loss'),crm.loss_reasons,LOSS);
 
   // map
-  const ufmax=Math.max(1,...crm.by_uf.map(u=>u.n));
-  const ufc={};crm.by_uf.forEach(u=>ufc[u.k]=u.n);
+  const ufmax=Math.max(1,...crm.by_uf.map(u=>u.n));const ufc={};crm.by_uf.forEach(u=>ufc[u.k]=u.n);
   $('map').innerHTML=Object.entries(UFPOS).map(([uf,[c,r]])=>{const n=ufc[uf]||0;const op=n?(0.25+0.75*n/ufmax):0;return `<div class="uf" style="grid-column:${c};grid-row:${r};background:${n?`rgba(200,168,75,${op})`:'var(--line)'}"><div>${uf}</div><div class="c">${n||''}</div></div>`;}).join('');
-
-  // cities
   bars($('cities'),crm.top_cities.map(c=>({k:(c.k+(c.uf?'/'+c.uf:'')),n:c.n})));
 
-  // top ads
-  $('topads').innerHTML=ads.top_ads.length?ads.top_ads.map(a=>`<tr><td>${esc(a.name)}</td><td class="mono">${brl(a.invest)}</td><td class="mono">${int(a.clk)}</td></tr>`).join(''):'<tr><td colspan="3" class="muted" style="text-align:center">Sem investimento sincronizado ainda.</td></tr>';
+  // top ads + keywords
+  $('topads').innerHTML=ads.top_ads.length?ads.top_ads.map(a=>`<tr><td>${esc(a.name)}</td><td class="mono">${brl(a.invest)}</td><td class="mono">${int(a.clk)}</td></tr>`).join(''):'<tr><td colspan="3" class="muted" style="text-align:center">Sem investimento sincronizado.</td></tr>';
+  $('kw').innerHTML=(ads.keywords&&ads.keywords.length)?ads.keywords.map(k=>`<tr><td>${esc(k.kw)}</td><td class="mono">${int(k.leads)}</td><td class="mono">${brl(k.cpl)}</td></tr>`).join(''):'<tr><td colspan="3" class="muted" style="text-align:center">Sync do Google Ads não configurado.</td></tr>';
 
-  // charts
-  if(window.Chart){
-    if(chRev)chRev.destroy();
-    chRev=new Chart($('chRev'),{type:'bar',data:{labels:['Pendente','Ganha'],datasets:[{data:[crm.pending_revenue,crm.won_revenue],backgroundColor:['#1877f2','#16a34a'],borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+(v/1000)+'k'}}}}});
-    if(chDaily)chDaily.destroy();
-    chDaily=new Chart($('chDaily'),{type:'line',data:{labels:ads.daily.map(d=>d.date.slice(5)),datasets:[{data:ads.daily.map(d=>d.invest),borderColor:'#C8A84B',backgroundColor:'rgba(200,168,75,.15)',fill:true,tension:.3,pointRadius:0}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v}}}}});
-  }
+  drawCharts(crm,ads);
 }
 
-function showApp(){$('gate').classList.add('hidden');$('app').classList.remove('hidden');load();}
+function drawCharts(crm,ads){
+  if(!window.Chart)return setTimeout(()=>drawCharts(crm,ads),200);
+  const grid=getColor('--line'),tx=getColor('--muted');
+  // daily merged
+  const dates=Array.from(new Set([...ads.daily.map(d=>d.date),...Object.keys(crm.daily_leads)])).sort();
+  const invMap={};ads.daily.forEach(d=>invMap[d.date]=d.invest);
+  const series=dates.map(dt=>{const inv=invMap[dt]||0;const ld=crm.daily_leads[dt]||0;return {dt,inv,leads:ld,cpl:ld?inv/ld:0};});
+  const lineData=series.map(s=>metric==='cpl'?s.cpl:s.leads);
+  if(chDaily)chDaily.destroy();
+  chDaily=new Chart($('chDaily'),{data:{labels:series.map(s=>s.dt.slice(5)),datasets:[
+    {type:'bar',label:'Investimento',data:series.map(s=>s.inv),backgroundColor:'rgba(200,168,75,.55)',borderRadius:5,yAxisID:'y'},
+    {type:'line',label:metric==='cpl'?'CPL':'Leads',data:lineData,borderColor:'#1877f2',backgroundColor:'rgba(24,119,242,.12)',tension:.35,pointRadius:2,yAxisID:'y1'}
+  ]},options:{maintainAspectRatio:false,plugins:{legend:{labels:{color:tx}}},scales:{
+    y:{position:'left',grid:{color:grid},ticks:{color:tx,callback:v=>'R$'+int(v)}},
+    y1:{position:'right',grid:{display:false},ticks:{color:tx,callback:v=>metric==='cpl'?'R$'+int(v):int(v)}},
+    x:{grid:{display:false},ticks:{color:tx}}}}});
+  // revenue pending x won
+  const rmax=Math.max(crm.pending_revenue,crm.won_revenue,1000);
+  if(chRev)chRev.destroy();
+  chRev=new Chart($('chRev'),{type:'bar',data:{labels:['Pendente','Ganha'],datasets:[{data:[crm.pending_revenue,crm.won_revenue],backgroundColor:['#1877f2','#16a34a'],borderRadius:6}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,suggestedMax:rmax*1.1,grid:{color:grid},ticks:{color:tx,callback:v=>brl(v)}},x:{grid:{display:false},ticks:{color:tx}}}}});
+}
+function getColor(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#ccc';}
+
+function showApp(){$('gate').classList.add('hidden');$('app').classList.remove('hidden');applyTheme(localStorage.getItem('dashTheme')||'light');load();}
 $('gg').onclick=async()=>{const k=$('gk').value.trim();if(!k)return;const r=await fetch('/api/report?key='+encodeURIComponent(k)+'&days=7');if(r.ok){KEY=k;sessionStorage.setItem('dashKey',k);showApp();}else{$('ge').textContent='Chave inválida.';$('ge').classList.remove('hidden');}};
 $('gk').addEventListener('keydown',e=>{if(e.key==='Enter')$('gg').click();});
-$('range').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('range').querySelector('.active').classList.remove('active');b.classList.add('active');days=+b.dataset.d;load();});
+$('range').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('range').querySelector('.active').classList.remove('active');b.classList.add('active');days=+b.dataset.d;customFrom=customTo=null;$('dfrom').value='';$('dto').value='';load();});
+$('dapply').onclick=()=>{if($('dfrom').value&&$('dto').value){customFrom=$('dfrom').value;customTo=$('dto').value;$('range').querySelectorAll('button').forEach(x=>x.classList.remove('active'));load();}};
+$('metric').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('metric').querySelector('.active').classList.remove('active');b.classList.add('active');metric=b.dataset.m;$('lbl-metric').textContent=metric==='cpl'?'CPL':'leads';if(lastData)drawCharts(lastData.crm||{daily_leads:{}},lastData.ads||{daily:[]});});
 if(KEY)showApp();
 </script>
 </body>
