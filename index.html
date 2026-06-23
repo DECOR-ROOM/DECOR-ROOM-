@@ -1333,6 +1333,18 @@ setInterval(advanceHeroBg, 5000);
     var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
     if (!a || !isWhatsApp(a.getAttribute('href'))) return;
 
+    // Atribuição site↔WhatsApp: anexa o id da sessão ao texto do wa.me, para o
+    // rastreador de WhatsApp ligar esta conversa à sessão (gclid/UTMs do site).
+    try {
+      var sid = (document.cookie.match(/(?:^|; )_krob_sid=([^;]+)/) || [])[1];
+      if (sid && a.href.indexOf('#ref:') < 0 && a.href.indexOf('%23ref') < 0) {
+        var u = new URL(a.href);
+        var t = u.searchParams.get('text') || '';
+        u.searchParams.set('text', t + ' #ref:' + sid);
+        a.href = u.toString();
+      }
+    } catch (e) {}
+
     var eventId = (crypto.randomUUID && crypto.randomUUID()) ||
       (Date.now() + '-' + Math.random().toString(36).slice(2));
     var eventTime = Math.floor(Date.now() / 1000);
