@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Decor Room · Painel</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" defer></script>
+<style>
+  :root{--gold:#C8A84B;--gold-d:#a88a38;--ink:#0f0f0f;--bg:#f5f4f1;--card:#fff;--border:#e6e3dc;--line:#f0eee8;--text:#1a1a1a;--dim:#6b6b6b;--muted:#9a958c;--green:#16a34a;--red:#dc2626;--blue:#1877f2}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.head{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
+  .mono{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 18px}
+  header{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:14px;flex-wrap:wrap}
+  .brand b{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:18px}
+  .brand b em{color:var(--gold);font-style:normal}
+  .seg{display:inline-flex;background:#1c1c1c;border-radius:9px;padding:3px;gap:2px}
+  .seg button{padding:.34rem .7rem;font-size:.78rem;font-weight:700;border:0;background:transparent;color:#bdbdbd;border-radius:7px;cursor:pointer}
+  .seg button.active{background:var(--gold);color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px}
+  .slabel{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--muted);margin:24px 0 10px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{padding:1rem 1.1rem}
+  .kpi .l{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700;color:var(--dim)}
+  .kpi .v{font-size:1.55rem;font-weight:700;font-family:'Barlow Condensed',sans-serif;margin-top:.2rem}
+  .kpi.hero{background:var(--ink);color:#fff}.kpi.hero .l{color:#a9a9a9}.kpi.hero .v{color:var(--gold)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .pad{padding:16px}
+  .ctitle{font-weight:700;font-size:.95rem;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em}
+  .bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.82rem}
+  .bar .nm{width:120px;flex:0 0 auto;color:var(--dim)}
+  .bar .track{flex:1;background:var(--line);border-radius:6px;height:18px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--gold);border-radius:6px}
+  .bar .vl{width:64px;text-align:right;font-weight:700}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:.5rem .6rem;border-bottom:1px solid var(--border)}
+  th:first-child{text-align:left}
+  td{padding:.5rem .6rem;font-size:.82rem;text-align:right;border-bottom:1px solid var(--line)}
+  td:first-child{text-align:left}
+  /* funnel */
+  .funnel{display:flex;flex-direction:column;gap:7px}
+  .fstep{display:flex;align-items:center;gap:10px}
+  .fstep .fn{width:110px;color:var(--dim);font-size:.8rem}
+  .fstep .ft{flex:1;height:26px;border-radius:7px;display:flex;align-items:center;padding:0 .6rem;color:#fff;font-weight:700;font-size:.82rem}
+  /* brazil tilegrid */
+  .br{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-width:380px}
+  .uf{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--dim);background:var(--line)}
+  .uf .c{font-size:.78rem;color:var(--ink)}
+  .gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
+  .inp{font-size:.9rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:9px;width:100%}
+  .btn{font-size:.85rem;font-weight:700;padding:.55rem 1rem;border-radius:9px;border:1px solid var(--gold);background:var(--gold);color:var(--ink);cursor:pointer}
+  .hidden{display:none!important}
+  .notice{background:#fff7e6;border:1px solid #f0d48a;border-radius:10px;padding:.7rem .9rem;font-size:.82rem;color:#6b5a1f;margin-top:14px}
+  .muted{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <div class="card" style="max-width:360px;width:100%;padding:26px">
+    <div class="head" style="font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.1em">DECOR<span style="color:var(--gold)"> ROOM</span></div>
+    <div class="muted" style="font-size:.8rem;margin:.2rem 0 1rem">Painel · acesso restrito</div>
+    <input id="gk" class="inp" type="password" placeholder="DASH_KEY" autocomplete="off">
+    <div id="ge" class="hidden" style="color:var(--red);font-size:.78rem;margin-top:.4rem"></div>
+    <button id="gg" class="btn" style="width:100%;margin-top:14px">Entrar</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <header><div class="wrap">
+    <div class="brand"><b>DECOR<em> ROOM</em></b> <span style="opacity:.5;font-size:.8rem;font-weight:600;letter-spacing:.1em">PAINEL</span></div>
+    <div class="seg" id="range">
+      <button data-d="7">7 dias</button><button data-d="30" class="active">30 dias</button><button data-d="90">90 dias</button>
+    </div>
+  </div></header>
+
+  <div class="wrap">
+    <div id="crm-warn" class="notice hidden">⚠️ O banco do CRM ainda não está conectado a este painel. Adicione o binding D1 <b>CRMDB → crm-db</b> no projeto do site e refaça o deploy.</div>
+
+    <div class="slabel">Visão geral</div>
+    <div class="kpis">
+      <div class="kpi hero card"><div class="l">Investimento</div><div class="v mono" id="k-inv">—</div></div>
+      <div class="kpi card"><div class="l">Leads</div><div class="v mono" id="k-leads">—</div></div>
+      <div class="kpi card"><div class="l">Qualificados</div><div class="v mono" id="k-qual">—</div></div>
+      <div class="kpi card"><div class="l">Vendas</div><div class="v mono" id="k-sales">—</div></div>
+      <div class="kpi card"><div class="l">Receita ganha</div><div class="v mono" id="k-won">—</div></div>
+      <div class="kpi card"><div class="l">Receita pendente</div><div class="v mono" id="k-pend">—</div></div>
+      <div class="kpi card"><div class="l">CPL (geral)</div><div class="v mono" id="k-cpl">—</div></div>
+      <div class="kpi card"><div class="l">ROAS</div><div class="v mono" id="k-roas">—</div></div>
+    </div>
+
+    <div class="slabel">Funil comercial</div>
+    <div class="grid2">
+      <div class="card pad"><div class="ctitle">Etapas</div><div class="funnel" id="funnel"></div></div>
+      <div class="card pad"><div class="ctitle">Receita pendente × ganha</div><canvas id="chRev" height="150"></canvas></div>
+    </div>
+
+    <div class="slabel">Segmentação dos leads</div>
+    <div class="grid3">
+      <div class="card pad"><div class="ctitle">Por produto</div><div id="seg-prod"></div></div>
+      <div class="card pad"><div class="ctitle">Por ambiente</div><div id="seg-env"></div></div>
+      <div class="card pad"><div class="ctitle">Por tipo de imóvel</div><div id="seg-prop"></div></div>
+    </div>
+
+    <div class="slabel">Motivos de perda</div>
+    <div class="card pad"><div id="loss"></div></div>
+
+    <div class="slabel">Origem geográfica</div>
+    <div class="grid2">
+      <div class="card pad"><div class="ctitle">Mapa do Brasil (leads por estado)</div><div class="br" id="map"></div></div>
+      <div class="card pad"><div class="ctitle">Principais cidades</div><div id="cities"></div></div>
+    </div>
+
+    <div class="slabel">Mídia paga</div>
+    <div class="grid2">
+      <div class="card pad"><div class="ctitle">Investimento por dia</div><canvas id="chDaily" height="150"></canvas></div>
+      <div class="card pad"><div class="ctitle">Top anúncios (Meta)</div><table><thead><tr><th>Anúncio</th><th>Invest.</th><th>Cliques</th></tr></thead><tbody id="topads"><tr><td colspan="3" class="muted" style="text-align:center">—</td></tr></tbody></table></div>
+    </div>
+    <div style="height:40px"></div>
+  </div>
+</div>
+
+<script>
+const PRODUCTS={divisorias_modular:'Divisórias Modular',parede_drywall:'Parede Drywall',forro_modular:'Forro Modular'};
+const ENVS={residencial:'Residencial',comercial:'Comercial'};
+const PROPS={sala_comercial:'Sala Comercial',galpao:'Galpão',casa:'Casa',apartamento:'Apartamento'};
+const LOSS={preco_alto:'Preço acima do esperado',concorrente:'Fechou com concorrente',sem_retorno:'Sem retorno',sem_orcamento:'Sem orçamento no momento',projeto_pausado:'Projeto pausado/adiado',prazo_incompativel:'Prazo incompatível',fora_regiao:'Fora da região',servico_nao_oferecido:'Serviço não oferecido',desqualificado:'Desqualificado/curioso',pagamento_incompativel:'Pagamento incompatível',pesquisando:'Ainda pesquisando',impossibilidade_tecnica:'Impossibilidade técnica',obra_nao_pronta:'Obra não está pronta',decisao_terceiros:'Decisão de terceiros',demora_atendimento:'Demora no atendimento',orcamento_comparativo:'Orçamento comparativo',ticket_baixo:'Ticket muito baixo',desistiu:'Desistiu do projeto'};
+const STAGES=[['novo','Novo','#9a958c'],['qualificado','Qualificado','#C8A84B'],['orcado','Orçado','#1877f2'],['ganho','Ganho','#16a34a'],['perdido','Perdido','#dc2626']];
+const UFPOS={RR:[4,1],AP:[5,1],AM:[3,2],PA:[4,2],MA:[5,2],CE:[6,2],RN:[7,2],AC:[2,3],RO:[3,3],TO:[5,3],PI:[6,3],PB:[7,3],MT:[4,4],GO:[5,4],BA:[6,4],PE:[7,4],AL:[8,4],MS:[4,5],DF:[5,5],MG:[6,5],ES:[7,5],SE:[8,5],SP:[5,6],RJ:[6,6],PR:[5,7],SC:[5,8],RS:[4,9]};
+
+let KEY=sessionStorage.getItem('dashKey')||new URLSearchParams(location.search).get('key')||'';
+let days=30, chRev=null, chDaily=null;
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const brl=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const int=v=>(v||0).toLocaleString('pt-BR');
+
+function bars(el,items,labelMap){
+  const max=Math.max(1,...items.map(i=>i.n));
+  el.innerHTML=items.length?items.map(i=>`<div class="bar"><div class="nm">${esc(labelMap?labelMap[i.k]||i.k:i.k)}</div><div class="track"><div class="fill" style="width:${Math.round(i.n/max*100)}%"></div></div><div class="vl">${int(i.n)}</div></div>`).join(''):'<div class="muted" style="font-size:.82rem">Sem dados no período.</div>';
+}
+
+async function load(){
+  const r=await fetch('/api/report?key='+encodeURIComponent(KEY)+'&days='+days);
+  if(r.status===401){sessionStorage.removeItem('dashKey');location.reload();return;}
+  const d=await r.json();
+  $('crm-warn').classList.toggle('hidden', d.crm_bound!==false);
+  const crm=d.crm||{funnel:{},by_product:[],by_environment:[],by_property:[],loss_reasons:[],by_uf:[],top_cities:[],total:0,qualified:0,sales:0,pending_revenue:0,won_revenue:0};
+  const ads=d.ads||{total_invest:0,web_leads:0,daily:[],top_ads:[]};
+
+  const cpl = crm.total? ads.total_invest/crm.total : 0;
+  const roas = ads.total_invest? crm.won_revenue/ads.total_invest : 0;
+  $('k-inv').textContent=brl(ads.total_invest);
+  $('k-leads').textContent=int(crm.total);
+  $('k-qual').textContent=int(crm.qualified);
+  $('k-sales').textContent=int(crm.sales);
+  $('k-won').textContent=brl(crm.won_revenue);
+  $('k-pend').textContent=brl(crm.pending_revenue);
+  $('k-cpl').textContent=brl(cpl);
+  $('k-roas').textContent=(roas?roas.toFixed(2):'0.00')+'×';
+
+  // funnel
+  const fmax=Math.max(1,...STAGES.map(s=>crm.funnel[s[0]]||0));
+  $('funnel').innerHTML=STAGES.map(([k,lbl,col])=>{const n=crm.funnel[k]||0;return `<div class="fstep"><div class="fn">${lbl}</div><div class="ft" style="background:${col};width:${Math.max(8,Math.round(n/fmax*100))}%">${int(n)}</div></div>`;}).join('');
+
+  // segments
+  bars($('seg-prod'),crm.by_product,PRODUCTS);
+  bars($('seg-env'),crm.by_environment,ENVS);
+  bars($('seg-prop'),crm.by_property,PROPS);
+  bars($('loss'),crm.loss_reasons,LOSS);
+
+  // map
+  const ufmax=Math.max(1,...crm.by_uf.map(u=>u.n));
+  const ufc={};crm.by_uf.forEach(u=>ufc[u.k]=u.n);
+  $('map').innerHTML=Object.entries(UFPOS).map(([uf,[c,r]])=>{const n=ufc[uf]||0;const op=n?(0.25+0.75*n/ufmax):0;return `<div class="uf" style="grid-column:${c};grid-row:${r};background:${n?`rgba(200,168,75,${op})`:'var(--line)'}"><div>${uf}</div><div class="c">${n||''}</div></div>`;}).join('');
+
+  // cities
+  bars($('cities'),crm.top_cities.map(c=>({k:(c.k+(c.uf?'/'+c.uf:'')),n:c.n})));
+
+  // top ads
+  $('topads').innerHTML=ads.top_ads.length?ads.top_ads.map(a=>`<tr><td>${esc(a.name)}</td><td class="mono">${brl(a.invest)}</td><td class="mono">${int(a.clk)}</td></tr>`).join(''):'<tr><td colspan="3" class="muted" style="text-align:center">Sem investimento sincronizado ainda.</td></tr>';
+
+  // charts
+  if(window.Chart){
+    if(chRev)chRev.destroy();
+    chRev=new Chart($('chRev'),{type:'bar',data:{labels:['Pendente','Ganha'],datasets:[{data:[crm.pending_revenue,crm.won_revenue],backgroundColor:['#1877f2','#16a34a'],borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+(v/1000)+'k'}}}}});
+    if(chDaily)chDaily.destroy();
+    chDaily=new Chart($('chDaily'),{type:'line',data:{labels:ads.daily.map(d=>d.date.slice(5)),datasets:[{data:ads.daily.map(d=>d.invest),borderColor:'#C8A84B',backgroundColor:'rgba(200,168,75,.15)',fill:true,tension:.3,pointRadius:0}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v}}}}});
+  }
+}
+
+function showApp(){$('gate').classList.add('hidden');$('app').classList.remove('hidden');load();}
+$('gg').onclick=async()=>{const k=$('gk').value.trim();if(!k)return;const r=await fetch('/api/report?key='+encodeURIComponent(k)+'&days=7');if(r.ok){KEY=k;sessionStorage.setItem('dashKey',k);showApp();}else{$('ge').textContent='Chave inválida.';$('ge').classList.remove('hidden');}};
+$('gk').addEventListener('keydown',e=>{if(e.key==='Enter')$('gg').click();});
+$('range').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('range').querySelector('.active').classList.remove('active');b.classList.add('active');days=+b.dataset.d;load();});
+if(KEY)showApp();
+</script>
+</body>
+</html>
