@@ -29,7 +29,7 @@ export async function onRequestGet({ request, env }) {
       const C = env.CRMDB;
       const w = 'deleted_at IS NULL AND first_seen_at BETWEEN ? AND ?';
       const P = [fromMs, toMs];
-      const [funnel, rev, prod, environ, prop, loss, ufs, cities, totals, byOrigin, revByOrigin, dailyLeads] = await Promise.all([
+      const [funnel, rev, prod, environ, prop, loss, ufs, cities, totals, leadRows, dailyLeads] = await Promise.all([
         C.prepare(`SELECT stage, COUNT(*) n FROM leads WHERE ${w} GROUP BY stage`).bind(...P).all(),
         C.prepare(`SELECT COALESCE(SUM(CASE WHEN stage='orcado' THEN quote_value END),0) pending,
                           COALESCE(SUM(CASE WHEN stage='ganho'  THEN sale_value  END),0) won FROM leads WHERE ${w}`).bind(...P).first(),
@@ -40,11 +40,30 @@ export async function onRequestGet({ request, env }) {
         C.prepare(`SELECT uf k, COUNT(*) n FROM leads WHERE ${w} AND uf IS NOT NULL AND uf<>'' GROUP BY uf`).bind(...P).all(),
         C.prepare(`SELECT city k, uf, COUNT(*) n FROM leads WHERE ${w} AND city IS NOT NULL AND city<>'' GROUP BY city, uf ORDER BY n DESC LIMIT 15`).bind(...P).all(),
         C.prepare(`SELECT COUNT(*) total, SUM(CASE WHEN stage='qualificado' THEN 1 ELSE 0 END) qualificados, SUM(CASE WHEN stage='ganho' THEN 1 ELSE 0 END) ganhos FROM leads WHERE ${w}`).bind(...P).first(),
-        C.prepare(`SELECT COALESCE(origin,'desconhecido') k, COUNT(*) n FROM leads WHERE ${w} GROUP BY origin`).bind(...P).all(),
-        C.prepare(`SELECT COALESCE(origin,'desconhecido') k, COALESCE(SUM(sale_value),0) won, COUNT(*) n FROM leads WHERE ${w} AND stage='ganho' GROUP BY origin`).bind(...P).all(),
+        // lead-level rows so we can resolve web_ref -> real channel (cross-DB, in JS)
+        C.prepare(`SELECT COALESCE(origin,'desconhecido') origin, web_ref, stage, sale_value FROM leads WHERE ${w}`).bind(...P).all(),
         C.prepare(`SELECT strftime('%Y-%m-%d', first_seen_at/1000, 'unixepoch') d, COUNT(*) n FROM leads WHERE ${w} GROUP BY d`).bind(...P).all(),
       ]);
-      const oc = {}; (byOrigin.results || []).forEach((r) => { oc[r.k] = r.n; });
+
+      // --- Attribution: resolve web_ref -> decorroom-db sessions (gclid/fbclid/UTMs) ---
+      const leads = leadRows.results || [];
+      const refs = [...new Set(leads.filter((l) => l.web_ref).map((l) => l.web_ref))];
+      let sessMap = {}, resolved = 0;
+      try { sessMap = await loadSessions(env.DB, refs); } catch (_) { sessMap = {}; }
+      const oc = {}, revBy = {};
+      for (const l of leads) {
+        let eff = l.origin || 'desconhecido';
+        if (l.web_ref) {
+          const ch = resolveChannel(sessMap[l.web_ref]);
+          if (ch) { eff = ch; resolved++; }            // paid/organic signal beats stored origin
+        }
+        oc[eff] = (oc[eff] || 0) + 1;
+        if (l.stage === 'ganho') {
+          const v = l.sale_value || 0;
+          (revBy[eff] = revBy[eff] || { k: eff, won: 0, n: 0 }).won += v;
+          revBy[eff].n += 1;
+        }
+      }
       out.crm = {
         funnel: rowsToMap(funnel.results, 'stage', 'n'),
         pending_revenue: rev?.pending || 0, won_revenue: rev?.won || 0,
@@ -52,7 +71,9 @@ export async function onRequestGet({ request, env }) {
         loss_reasons: loss.results || [], by_uf: ufs.results || [], top_cities: cities.results || [],
         total: totals?.total || 0, qualified: totals?.qualificados || 0, sales: totals?.ganhos || 0,
         leads_meta: oc.meta || 0, leads_google: oc.google || 0,
-        by_origin: byOrigin.results || [], revenue_by_origin: revByOrigin.results || [],
+        by_origin: Object.entries(oc).map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n),
+        revenue_by_origin: Object.values(revBy).sort((a, b) => b.won - a.won),
+        attribution_resolved: resolved, web_refs_seen: refs.length,
         daily_leads: (dailyLeads.results || []).reduce((m, r) => { m[r.d] = r.n; return m; }, {}),
       };
     } catch (e) { out.crm_error = e.message; }
@@ -81,6 +102,34 @@ export async function onRequestGet({ request, env }) {
   } catch (e) { out.ads_error = e.message; }
 
   return json(out);
+}
+
+// Cross-DB lookup: web_ref (= _krob_sid) -> sessions row (gclid/fbclid/UTMs).
+// Chunked to stay under D1's bound-parameter limit.
+async function loadSessions(DB, refs) {
+  const map = {};
+  for (let i = 0; i < refs.length; i += 40) {
+    const chunk = refs.slice(i, i + 40);
+    const ph = chunk.map(() => '?').join(',');
+    const r = await DB.prepare(
+      `SELECT session_id, gclid, fbclid, fbc, utm_source, utm_medium FROM sessions WHERE session_id IN (${ph})`
+    ).bind(...chunk).all();
+    (r.results || []).forEach((s) => { map[s.session_id] = s; });
+  }
+  return map;
+}
+
+// Map a web session to a marketing channel. Returns null when there's no signal
+// (then the lead keeps its stored origin, e.g. 'site').
+function resolveChannel(s) {
+  if (!s) return null;
+  const src = (s.utm_source || '').toLowerCase();
+  const med = (s.utm_medium || '').toLowerCase();
+  const paid = med.includes('cpc') || med.includes('ppc') || med.includes('paid');
+  if (s.gclid || (src.includes('google') && paid) || src.includes('adwords')) return 'google';
+  if (s.fbclid || s.fbc || src.includes('facebook') || src.includes('instagram') || src === 'ig' || src === 'fb' || src.includes('meta')) return 'meta';
+  if (src || med) return 'organico'; // tagged but non-paid (organic/social/referral/email)
+  return null;
 }
 
 function rowsToMap(rows, k, v) { const m = {}; (rows || []).forEach((r) => { m[r[k]] = r[v]; }); return m; }
