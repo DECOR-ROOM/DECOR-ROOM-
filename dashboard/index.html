@@ -35,6 +35,10 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   .pad{padding:16px}
   .ctitle{font-weight:700;font-size:.92rem;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+  /* fixed-height wrapper keeps Chart.js (maintainAspectRatio:false) from growing infinitely */
+  .chartbox{position:relative;width:100%;height:300px}
+  .chartbox.sm{height:240px}
+  .chartbox canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
   .miniseg{display:inline-flex;background:var(--line);border-radius:8px;padding:2px;gap:2px}
   .miniseg button{padding:.2rem .55rem;font-size:.7rem;font-weight:700;border:0;background:transparent;color:var(--dim);border-radius:6px;cursor:pointer}
   .miniseg button.active{background:var(--ink);color:#fff}[data-theme="dark"] .miniseg button.active{background:var(--gold);color:#000}
@@ -109,13 +113,13 @@
       <div class="ctitle">Investimento × <span id="lbl-metric">leads</span> por dia
         <span class="miniseg" id="metric"><button data-m="leads" class="active">Leads</button><button data-m="cpl">CPL</button></span>
       </div>
-      <canvas id="chDaily" height="92"></canvas>
+      <div class="chartbox"><canvas id="chDaily"></canvas></div>
     </div>
 
     <div class="slabel">Funil & receita</div>
     <div class="grid2">
       <div class="card pad"><div class="ctitle">Funil comercial</div><div class="funnel" id="funnel"></div></div>
-      <div class="card pad"><div class="ctitle">Receita pendente × ganha</div><canvas id="chRev" height="150"></canvas></div>
+      <div class="card pad"><div class="ctitle">Receita pendente × ganha</div><div class="chartbox sm"><canvas id="chRev"></canvas></div></div>
     </div>
 
     <div class="slabel">Receita por origem</div>

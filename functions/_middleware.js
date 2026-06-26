@@ -19,6 +19,32 @@ export async function onRequest(context) {
     return next();
   }
 
+  // --- SEO / canonical routing -------------------------------------------------
+  // This site has exactly ONE real page (the homepage); /dashboard is served as a
+  // non-page route above. The domain previously hosted another site, and Google
+  // still indexes legacy URLs (/linhas/..., /atendimento/, ...) that currently
+  // resolve to the homepage with 200 (Pages SPA fallback). Return 410 Gone for
+  // any non-home page path so search engines drop those URLs permanently.
+  const host = (request.headers.get('host') || '').split(':')[0].toLowerCase();
+  const path = url.pathname;
+  const isHome = path === '/' || path === '/index.html';
+
+  if (!isHome) {
+    return new Response(GONE_HTML, {
+      status: 410,
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'x-robots-tag': 'noindex, nofollow',
+        'cache-control': 'public, max-age=3600',
+      },
+    });
+  }
+
+  // Canonical host: keep www only. 301 apex -> www, preserving path + query.
+  if (host === 'decorroomsc.com.br') {
+    return Response.redirect(`https://www.decorroomsc.com.br${path}${url.search}`, 301);
+  }
+
   // --- Extract tracking parameters from URL ---
   // CRITICAL: Use raw query string extraction, NOT url.searchParams.get().
   // searchParams.get() URL-decodes the value, but Meta expects the exact
@@ -126,6 +152,16 @@ export async function onRequest(context) {
 
   return newResponse;
 }
+
+const GONE_HTML = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">` +
+  `<meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width,initial-scale=1">` +
+  `<title>Página não encontrada — Decor Room</title>` +
+  `<style>body{font-family:system-ui,Arial,sans-serif;background:#0f0f0f;color:#eee;display:flex;` +
+  `min-height:100vh;margin:0;align-items:center;justify-content:center;text-align:center;padding:24px}` +
+  `a{color:#C8A84B;font-weight:600;text-decoration:none}</style></head>` +
+  `<body><div><h1>Página não encontrada</h1>` +
+  `<p>Esta página não existe mais.</p>` +
+  `<p><a href="https://www.decorroomsc.com.br/">Ir para o site da Decor Room →</a></p></div></body></html>`;
 
 function parseCookies(cookieHeader) {
   const cookies = {};
