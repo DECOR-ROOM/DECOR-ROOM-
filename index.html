@@ -465,7 +465,9 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
     gtag('js', new Date());
     var ga  = window.__trkSet(T.GA4_MEASUREMENT_ID, 'G-X') ? T.GA4_MEASUREMENT_ID : null;
     var ads = window.__trkSet(T.GOOGLE_ADS_ID, 'AW-X')     ? T.GOOGLE_ADS_ID     : null;
-    var primary = ga || ads;
+    // Carrega a biblioteca a partir de um ID válido. O ID do Google Ads é prioritário
+    // porque é o que garante a conversão; um GA4 inválido (404) derrubava todo o gtag.js.
+    var primary = ads || ga;
     if (primary) {
       var s = document.createElement('script');
       s.async = true;
