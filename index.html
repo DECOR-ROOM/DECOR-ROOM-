@@ -454,8 +454,9 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
 </script>
 
 <link rel="preconnect" href="https://connect.facebook.net" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com">
 
-<!-- GA4 + Google Ads (gtag.js servido first-party via /scripts/gtag.js) -->
+<!-- GA4 + Google Ads (gtag.js padrão do googletagmanager.com — detectável pelo Tag Assistant / Google Ads) -->
 <script>
   (function () {
     var T = window.DECORROOM_TRACKING;
@@ -468,7 +469,7 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
     if (primary) {
       var s = document.createElement('script');
       s.async = true;
-      s.src = '/scripts/gtag.js?id=' + encodeURIComponent(primary);
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(primary);
       document.head.appendChild(s);
       if (ga)  gtag('config', ga);
       if (ads) gtag('config', ads);
