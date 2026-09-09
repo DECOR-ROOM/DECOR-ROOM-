@@ -29,3 +29,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# --- Notas internas da agencia (nao vao pro deploy do site) ---
+contexto.md
+historico-otimizacoes.md

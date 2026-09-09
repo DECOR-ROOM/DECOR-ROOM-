@@ -1,14 +1,23 @@
-# Sync de Google Ads (investimento + palavras-chave)
+# Sync de Google Ads (investimento, leilão, palavras-chave e termos de busca)
 
 Endpoint: `POST https://www.decorroomsc.com.br/api/sync/google-ads`
-Auth: header `x-sync-secret: <SYNC_SECRET>` (o mesmo secret do sync da Meta).
+Auth: header `x-sync-secret: <SYNC_SECRET>`.
 
 Popula, no banco `decorroom-db`:
-- **`ad_spend`** (platform `google`) — custo/cliques/impressões por campanha/dia → alimenta os KPIs
-  *Investimento Google*, *Cliques Google*, CPL/CPA/ROAS e o gráfico diário.
-- **`keyword_stats`** — custo/cliques/conversões por palavra-chave/dia → alimenta o painel
-  *Palavras-chave (Google · top 10)*. `leads` = conversões rastreadas pelo Google (clique no
-  WhatsApp); `CPL` = custo ÷ conversões.
+- **`ad_spend`** (platform `google`) — custo/cliques/impressões por campanha/dia → KPIs de
+  investimento, cliques, CPC, CTR e o gráfico diário.
+- **`keyword_stats`** — por palavra-chave/dia: custo, cliques, impressões, conversões,
+  **índice de qualidade** e parcelas de impressão → painel *Palavras-chave que mais performaram*.
+- **`campaign_share`** — por campanha/dia: parcela de impressões, perda por classificação,
+  perda por orçamento, topo e topo absoluto → painel *Disputa de leilão*.
+- **`search_terms`** — o termo que a pessoa realmente digitou → painel *Termos de busca reais*
+  (o que converteu × o que gastou sem converter).
+
+> **Auction Insights não existe na Google Ads API.** O relatório com os domínios concorrentes é
+> exclusivo da interface do Google Ads. O que a API entrega — e o que estas tabelas guardam — é a
+> substância acionável da disputa: quanto do leilão a conta leva e por que perde o resto. Perda por
+> **classificação** se resolve com relevância (anúncio, página, índice de qualidade); perda por
+> **orçamento** se resolve com dinheiro. Só a segunda.
 
 ## Versão da API — atenção
 
@@ -70,27 +79,34 @@ No cron-job.org, ao lado do job da Meta:
    - `Content-Type` = `application/json`
 5. **Body:** vazio (usa os últimos 7 dias). → Salvar → **Run now**.
 
-Resposta saudável: `{"ok":true,"spend_rows":N,"keyword_rows":M,...}`.
+Resposta saudável: `{"ok":true,"spend_rows":N,"keyword_rows":M,"share_rows":S,"search_term_rows":T,...}`.
 Se vier `{"skipped":true,...}`, o `reason` diz qual env var está faltando.
+
+> A janela padrão de 7 dias já traz ~1.500 linhas de `search_term_view`. Os upserts vão em blocos de
+> 200 (`chunkedBatch`) porque um `db.batch()` único desse tamanho estoura o limite do D1.
 
 ## Conferir se está entrando
 
-O painel tem o bloco **Saúde das fontes** no topo: *Investimento Google* e *Palavras-chave* ficam
-verdes enquanto houver escrita nas últimas 48h. Pelo banco:
+O painel tem o bloco **Saúde das fontes** no topo: *Investimento Google*, *Palavras-chave*,
+*Disputa de leilão* e *Termos de busca* ficam verdes enquanto houver escrita nas últimas 48h.
+Pelo banco:
 
 ```bash
 npx wrangler@latest d1 execute decorroom-db --remote --command \
-  "SELECT platform, MAX(date) ultimo, COUNT(*) linhas FROM ad_spend GROUP BY platform"
+  "SELECT 'ad_spend' t, MAX(date) ultimo, COUNT(*) n FROM ad_spend WHERE platform='google'
+   UNION ALL SELECT 'keyword_stats', MAX(date), COUNT(*) FROM keyword_stats
+   UNION ALL SELECT 'campaign_share', MAX(date), COUNT(*) FROM campaign_share
+   UNION ALL SELECT 'search_terms', MAX(date), COUNT(*) FROM search_terms"
 npx wrangler@latest d1 execute decorroom-db --remote --command \
   "SELECT platform, status, rows_upserted, error_message, datetime(run_at,'unixepoch') FROM sync_log ORDER BY id DESC LIMIT 5"
 ```
 
 ## Backfill manual
 
-Aplicado em 09/09/2026 para a janela **06/06 → 09/09/2026**: 256 linhas em `ad_spend`
-(R$ 6.001,93 · 1.692 cliques) e 1.521 linhas em `keyword_stats`. O upsert é idempotente — rodar de
-novo sobre a mesma janela apenas atualiza. Para repetir, o caminho mais simples é chamar o próprio
-endpoint com a janela desejada:
+Aplicado em 09/09/2026 para a janela **06/06 → 09/09/2026**: `ad_spend` 256 linhas
+(R$ 6.001,93 · 1.692 cliques), `keyword_stats` 1.522, `campaign_share` 190, `search_terms` 3.151.
+O upsert é idempotente — rodar de novo sobre a mesma janela apenas atualiza. Para repetir, o
+caminho mais simples é chamar o próprio endpoint com a janela desejada:
 
 ```bash
 curl -X POST https://www.decorroomsc.com.br/api/sync/google-ads \
