@@ -20,9 +20,14 @@
 //   GOOGLE_ADS_CUSTOMER_ID       account being queried (digits only, no dashes)
 // Optional env:
 //   GOOGLE_ADS_LOGIN_CUSTOMER_ID MCC/manager id (digits only) — recommended if managed
-//   GOOGLE_ADS_API_VERSION       e.g. 'v18' (default below); bump if Google deprecates
+//   GOOGLE_ADS_API_VERSION       e.g. 'v23' (default below); bump if Google deprecates
+//
+// Google retires each API version about a year after release, and the REST
+// endpoint then answers 404 for it — v18 was the original default here and is
+// already gone. Keep this pinned to a version that still answers; set
+// GOOGLE_ADS_API_VERSION to override without a code change.
 
-const DEFAULT_API_VERSION = 'v18';
+const DEFAULT_API_VERSION = 'v22';
 
 export async function onRequestPost(context) {
   const { request, env } = context;

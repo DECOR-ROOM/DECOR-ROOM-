@@ -106,7 +106,49 @@ export async function onRequestGet({ request, env }) {
     };
   } catch (e) { out.ads_error = e.message; }
 
-  return json(out);
+  // ---- Source health ----
+  // Every panel above renders zeros both when a source is genuinely empty and
+  // when it stopped feeding. Without this block the dashboard can't tell the
+  // two apart, so an integration can die unnoticed for weeks. Freshness is
+  // deliberately period-independent: it answers "is this source still alive?",
+  // not "what happened in the selected range".
+  out.health = await collectHealth(env);
+
+  return json(out, 200, { 'Cache-Control': 'no-store' });
+}
+
+// Last-write timestamp (unix seconds) per source, plus the outcome of the most
+// recent ad-spend sync run. Never throws: a source that errors reports null.
+async function collectHealth(env) {
+  const h = {};
+  await Promise.all([
+    one(env.DB, `SELECT MAX(created_at) v FROM sessions`, (v) => { h.last_session = v; }),
+    one(env.DB, `SELECT MAX(timestamp) v FROM event_log WHERE event_name='Lead' AND is_bot=0`, (v) => { h.last_web_lead = v; }),
+    one(env.DB, `SELECT MAX(date) v FROM ad_spend WHERE platform='meta'`, (v) => { h.last_spend_meta = v; }),
+    one(env.DB, `SELECT MAX(date) v FROM ad_spend WHERE platform='google'`, (v) => { h.last_spend_google = v; }),
+    one(env.DB, `SELECT MAX(date) v FROM keyword_stats`, (v) => { h.last_keyword_stats = v; }),
+    one(env.CRMDB, `SELECT MAX(first_seen_at) v FROM leads WHERE deleted_at IS NULL`, (v) => { h.last_crm_lead = v ? Math.floor(v / 1000) : null; }),
+    one(env.CRMDB, `SELECT MAX(received_at) v FROM webhook_events`, (v) => { h.last_whatsapp_event = v ? Math.floor(v / 1000) : null; }),
+    (async () => {
+      try {
+        const r = await env.DB.prepare(`
+          SELECT platform, status, rows_upserted, error_message, run_at FROM sync_log
+          WHERE id IN (SELECT MAX(id) FROM sync_log GROUP BY platform)
+        `).all();
+        h.syncs = (r.results || []).reduce((m, s) => {
+          m[s.platform] = { status: s.status, rows: s.rows_upserted, error: s.error_message, run_at: s.run_at };
+          return m;
+        }, {});
+      } catch (_) { h.syncs = {}; }
+    })(),
+  ]);
+  return h;
+}
+
+async function one(db, sql, set) {
+  if (!db) return set(null);
+  try { const r = await db.prepare(sql).first(); set(r ? r.v : null); }
+  catch (_) { set(null); }
 }
 
 // Cross-DB lookup: web_ref (= _krob_sid) -> sessions row (gclid/fbclid/UTMs).
@@ -139,8 +181,11 @@ function resolveChannel(s) {
 
 function rowsToMap(rows, k, v) { const m = {}; (rows || []).forEach((r) => { m[r[k]] = r[v]; }); return m; }
 function iso(ms) { return new Date(ms).toISOString().slice(0, 10); }
-function json(body, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+function json(body, status = 200, extra = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', ...extra },
+  });
 }
 function clampInt(raw, fallback, min, max) {
   const n = parseInt(raw || '', 10);

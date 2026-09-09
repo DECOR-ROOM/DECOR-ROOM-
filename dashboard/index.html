@@ -62,6 +62,15 @@
   .btn{font-size:.82rem;font-weight:700;padding:.4rem .9rem;border-radius:9px;border:1px solid var(--gold);background:var(--gold);color:#0f0f0f;cursor:pointer}
   .hidden{display:none!important}.muted{color:var(--muted)}
   .notice{background:color-mix(in srgb,var(--gold) 12%,var(--card));border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:10px;padding:.7rem .9rem;font-size:.82rem;margin-top:14px}
+  .notice.bad{background:color-mix(in srgb,var(--red) 10%,var(--card));border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+  .kpi .s{font-size:.66rem;color:var(--muted);margin-top:.15rem;font-weight:600}
+  .kpi.hero .s{color:#8f8f8f}
+  .health{display:flex;flex-wrap:wrap;gap:7px}
+  .hsrc{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;border:1px solid var(--border);border-radius:20px;padding:.24rem .6rem;background:var(--card)}
+  .hsrc .d{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+  .hsrc .n{font-weight:700}
+  .hsrc .a{color:var(--muted)}
+  .hdot-ok{background:var(--green)}.hdot-warn{background:var(--gold)}.hdot-bad{background:var(--red)}.hdot-off{background:var(--muted)}
 </style>
 </head>
 <body>
@@ -91,12 +100,17 @@
 
   <div class="wrap">
     <div id="crm-warn" class="notice hidden">⚠️ Binding <b>CRMDB → crm-db</b> não detectado neste projeto. Os dados do CRM ficam vazios até ligar o binding e refazer o deploy.</div>
+    <div id="errs" class="notice bad hidden"></div>
+
+    <div class="slabel">Saúde das fontes</div>
+    <div class="card pad"><div class="health" id="health"></div>
+      <div id="health-note" class="muted" style="font-size:.74rem;margin-top:10px"></div></div>
 
     <div class="slabel">Visão geral · <span id="period" class="muted"></span></div>
     <div class="kpis">
       <div class="kpi hero card"><div class="l">Investimento</div><div class="v mono" id="k-inv">—</div></div>
-      <div class="kpi card"><div class="l">CPL geral</div><div class="v mono" id="k-cpl">—</div></div>
-      <div class="kpi card"><div class="l">Leads totais</div><div class="v mono" id="k-leads">—</div></div>
+      <div class="kpi card"><div class="l">CPL geral</div><div class="v mono" id="k-cpl">—</div><div class="s" id="k-cpl-s"></div></div>
+      <div class="kpi card"><div class="l">Leads totais</div><div class="v mono" id="k-leads">—</div><div class="s" id="k-leads-s"></div></div>
       <div class="kpi card"><div class="l">LP views</div><div class="v mono" id="k-lp">—</div></div>
       <div class="kpi card"><div class="l">Cliques Meta</div><div class="v mono" id="k-cmeta">—</div></div>
       <div class="kpi card"><div class="l">Cliques Google</div><div class="v mono" id="k-cgoogle">—</div></div>
@@ -185,16 +199,60 @@ async function load(){
   lastData=await r.json();paint(lastData);
 }
 
+// "há quanto tempo" a partir de um unix-seconds (ou 'YYYY-MM-DD' do ad_spend).
+function ago(v){
+  if(v==null||v==='')return null;
+  const ms=typeof v==='string'?Date.parse(v+'T12:00:00Z'):v*1000;
+  if(!isFinite(ms))return null;
+  const h=(Date.now()-ms)/3600000;
+  if(h<1)return{h,txt:'agora há pouco'};
+  if(h<48)return{h,txt:'há '+Math.round(h)+'h'};
+  return{h,txt:'há '+Math.round(h/24)+'d'};
+}
+// Verde = alimentando; âmbar = atrasado; vermelho = parado; cinza = nunca recebeu.
+function paintHealth(h){
+  const SRC=[
+    ['Site (sessões)',h.last_session,48],
+    ['Leads no site',h.last_web_lead,72],
+    ['WhatsApp / CRM',h.last_whatsapp_event,48],
+    ['Investimento Google',h.last_spend_google,48],
+    ['Investimento Meta',h.last_spend_meta,48],
+    ['Palavras-chave',h.last_keyword_stats,48],
+  ];
+  $('health').innerHTML=SRC.map(([nome,val,limite])=>{
+    const a=ago(val);
+    const cls=!a?'hdot-off':a.h<=limite?'hdot-ok':a.h<=limite*3.5?'hdot-warn':'hdot-bad';
+    return `<span class="hsrc"><span class="d ${cls}"></span><span class="n">${nome}</span><span class="a">${a?a.txt:'sem dados'}</span></span>`;
+  }).join('');
+  const notas=Object.entries(h.syncs||{}).map(([p,s])=>{
+    const a=ago(s.run_at);
+    return `sync ${p}: ${s.status}${s.error?' — '+esc(s.error):''} · ${int(s.rows)} linha(s)${a?' · '+a.txt:''}`;
+  });
+  $('health-note').innerHTML=notas.join('<br>');
+}
+
 function paint(d){
   $('crm-warn').classList.toggle('hidden', d.crm_bound!==false);
+  const errs=[];
+  if(d.crm_error)errs.push('<b>CRM:</b> '+esc(d.crm_error));
+  if(d.ads_error)errs.push('<b>Mídia paga:</b> '+esc(d.ads_error));
+  $('errs').innerHTML=errs.length?('⚠️ A API falhou ao ler uma das bases — os números abaixo estão incompletos.<br>'+errs.join('<br>')):'';
+  $('errs').classList.toggle('hidden',!errs.length);
+  paintHealth(d.health||{});
   $('period').textContent=(d.from||'')+' → '+(d.to||'');
   const crm=d.crm||{funnel:{},by_product:[],by_environment:[],by_property:[],loss_reasons:[],by_uf:[],top_cities:[],revenue_by_origin:[],daily_leads:{},total:0,qualified:0,sales:0,pending_revenue:0,won_revenue:0,leads_meta:0,leads_google:0};
   const ads=d.ads||{total_invest:0,meta_clicks:0,google_clicks:0,lp_views:0,daily:[],top_ads:[],keywords:[]};
   const cpl=crm.total?ads.total_invest/crm.total:0;
 
+  // Web leads (clique no WhatsApp, event_log) are an independent count from the
+  // CRM's: the site records every click, the CRM only conversations that reached
+  // WhatsApp. Showing both side by side is what tells you a feed has gone quiet.
+  const wl=ads.web_leads||0;
   $('k-inv').textContent=brl(ads.total_invest);
   $('k-cpl').textContent=brl(cpl);
+  $('k-cpl-s').textContent=wl?('site: '+brl(ads.total_invest/wl)):'';
   $('k-leads').textContent=int(crm.total);
+  $('k-leads-s').textContent='site (clique zap): '+int(wl);
   $('k-lp').textContent=int(ads.lp_views);
   $('k-cmeta').textContent=int(ads.meta_clicks);
   $('k-cgoogle').textContent=int(ads.google_clicks);
