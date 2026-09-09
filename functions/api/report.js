@@ -79,30 +79,85 @@ export async function onRequestGet({ request, env }) {
     } catch (e) { out.crm_error = e.message; }
   }
 
-  // ---- Web / Ads (decorroom-db) ----
+  // ---- Web / Google Ads (decorroom-db) ----
+  //
+  // Só Google. A conta Meta está sem veiculação desde antes de 06/2026 e a
+  // Decor Room decidiu (09/09/2026) anunciar só no Google por enquanto; o
+  // endpoint /api/sync/meta-ads continua de pé e ad_spend guarda o histórico,
+  // mas nada de Meta é agregado aqui.
   try {
     const D = env.DB;
-    const [spend, webleads, sess, daily, topads, kw] = await Promise.all([
-      D.prepare(`SELECT platform, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr FROM ad_spend WHERE date BETWEEN ? AND ? GROUP BY platform`).bind(fromDate, toDate).all(),
+    const G = `date BETWEEN ? AND ? AND platform='google'`;
+    const [spend, webleads, sess, daily, kw, share, shareCamp, shareDaily, terms, waste] = await Promise.all([
+      D.prepare(`SELECT COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr FROM ad_spend WHERE ${G}`).bind(fromDate, toDate).first(),
       D.prepare(`SELECT COUNT(*) n FROM event_log WHERE event_name='Lead' AND is_bot=0 AND timestamp BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
       D.prepare(`SELECT COUNT(*) n FROM sessions WHERE created_at BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
-      D.prepare(`SELECT date, COALESCE(SUM(spend_cents),0) cents FROM ad_spend WHERE date BETWEEN ? AND ? GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
-      D.prepare(`SELECT ad_name, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(impressions),0) impr, COALESCE(SUM(clicks),0) clk FROM ad_spend WHERE date BETWEEN ? AND ? AND ad_name IS NOT NULL GROUP BY ad_name HAVING SUM(spend_cents)>0 ORDER BY cents DESC LIMIT 10`).bind(fromDate, toDate).all(),
-      D.prepare(`SELECT keyword, COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(conversions),0) conv FROM keyword_stats WHERE date BETWEEN ? AND ? GROUP BY keyword HAVING SUM(cost_cents)>0 OR SUM(clicks)>0 ORDER BY cost DESC LIMIT 10`).bind(fromDate, toDate).all(),
+      D.prepare(`SELECT date, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk FROM ad_spend WHERE ${G} GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
+      // Top palavras-chave por investimento, com qualidade e disputa.
+      D.prepare(`SELECT keyword,
+                        COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk,
+                        COALESCE(SUM(impressions),0) impr, COALESCE(SUM(conversions),0) conv,
+                        ROUND(AVG(NULLIF(quality_score,0)),1) qs,
+                        AVG(search_is) sis, AVG(top_is) tis
+                 FROM keyword_stats WHERE date BETWEEN ? AND ?
+                 GROUP BY keyword HAVING SUM(impressions)>0
+                 ORDER BY cost DESC LIMIT 15`).bind(fromDate, toDate).all(),
+      // Parcela de impressões da conta: média ponderada pelas impressões do dia.
+      D.prepare(`SELECT AVG(search_is) sis, AVG(lost_is_rank) rank_lost, AVG(lost_is_budget) budget_lost,
+                        AVG(top_is) tis, AVG(abs_top_is) atis
+                 FROM campaign_share WHERE date BETWEEN ? AND ?`).bind(fromDate, toDate).first(),
+      D.prepare(`SELECT campaign_name nome, AVG(search_is) sis, AVG(lost_is_rank) rank_lost,
+                        AVG(lost_is_budget) budget_lost, AVG(abs_top_is) atis
+                 FROM campaign_share WHERE date BETWEEN ? AND ?
+                 GROUP BY campaign_id, campaign_name ORDER BY sis DESC`).bind(fromDate, toDate).all(),
+      D.prepare(`SELECT date, AVG(search_is) sis, AVG(lost_is_rank) rank_lost, AVG(lost_is_budget) budget_lost
+                 FROM campaign_share WHERE date BETWEEN ? AND ? GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
+      // Termos que realmente converteram.
+      D.prepare(`SELECT search_term termo, COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk,
+                        COALESCE(SUM(impressions),0) impr, COALESCE(SUM(conversions),0) conv
+                 FROM search_terms WHERE date BETWEEN ? AND ?
+                 GROUP BY search_term HAVING SUM(conversions)>0
+                 ORDER BY conv DESC, cost DESC LIMIT 15`).bind(fromDate, toDate).all(),
+      // Dinheiro sem retorno: termo com clique pago e nenhuma conversão.
+      D.prepare(`SELECT search_term termo, COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk
+                 FROM search_terms WHERE date BETWEEN ? AND ?
+                 GROUP BY search_term HAVING SUM(conversions)=0 AND SUM(cost_cents)>0
+                 ORDER BY cost DESC LIMIT 15`).bind(fromDate, toDate).all(),
     ]);
-    const sm = {}, clk = {}; (spend.results || []).forEach((r) => { sm[r.platform] = r.cents; clk[r.platform] = r.clk; });
-    const metaCents = sm.meta || 0, googleCents = sm.google || 0;
+
+    const cents = spend?.cents || 0, clicks = spend?.clk || 0, impr = spend?.impr || 0;
+    const kwRows = (kw.results || []).map((r) => {
+      const cost = r.cost / 100, conv = r.conv || 0;
+      return {
+        kw: r.keyword, cost, clicks: r.clk, impr: r.impr, conv,
+        ctr: r.impr ? r.clk / r.impr : 0,
+        cpc: r.clk ? cost / r.clk : 0,
+        cpa: conv > 0 ? cost / conv : 0,
+        qs: r.qs, sis: r.sis, tis: r.tis,
+      };
+    });
+    const convTotal = kwRows.reduce((s, r) => s + r.conv, 0);
+
     out.ads = {
-      meta_invest: metaCents / 100, google_invest: googleCents / 100, total_invest: (metaCents + googleCents) / 100,
-      meta_clicks: clk.meta || 0, google_clicks: clk.google || 0,
+      invest: cents / 100, clicks, impressions: impr,
+      ctr: impr ? clicks / impr : 0,
+      cpc: clicks ? (cents / 100) / clicks : 0,
+      conversions: convTotal,
+      cpa: convTotal > 0 ? (cents / 100) / convTotal : 0,
       web_leads: webleads?.n || 0, lp_views: sess?.n || 0,
-      daily: (daily.results || []).map((d) => ({ date: d.date, invest: d.cents / 100 })),
-      top_ads: (topads.results || []).map((a) => ({ name: a.ad_name, invest: a.cents / 100, impr: a.impr, clk: a.clk })),
-      // leads = Google-tracked conversions (WhatsApp clicks); cpl = cost / leads.
-      keywords: (kw.results || []).map((r) => {
-        const leads = Math.round(r.conv || 0);
-        return { kw: r.keyword, leads, clicks: r.clk, cost: r.cost / 100, cpl: leads > 0 ? (r.cost / 100) / leads : 0 };
-      }),
+      daily: (daily.results || []).map((d) => ({ date: d.date, invest: d.cents / 100, clicks: d.clk })),
+      keywords: kwRows,
+      auction: {
+        sis: share?.sis || 0, rank_lost: share?.rank_lost || 0, budget_lost: share?.budget_lost || 0,
+        tis: share?.tis || 0, atis: share?.atis || 0,
+        by_campaign: shareCamp.results || [],
+        daily: shareDaily.results || [],
+      },
+      search_terms: (terms.results || []).map((r) => ({
+        termo: r.termo, cost: r.cost / 100, clicks: r.clk, impr: r.impr, conv: r.conv,
+        cpa: r.conv > 0 ? (r.cost / 100) / r.conv : 0,
+      })),
+      wasted_terms: (waste.results || []).map((r) => ({ termo: r.termo, cost: r.cost / 100, clicks: r.clk })),
     };
   } catch (e) { out.ads_error = e.message; }
 
@@ -124,16 +179,17 @@ async function collectHealth(env) {
   await Promise.all([
     one(env.DB, `SELECT MAX(created_at) v FROM sessions`, (v) => { h.last_session = v; }),
     one(env.DB, `SELECT MAX(timestamp) v FROM event_log WHERE event_name='Lead' AND is_bot=0`, (v) => { h.last_web_lead = v; }),
-    one(env.DB, `SELECT MAX(date) v FROM ad_spend WHERE platform='meta'`, (v) => { h.last_spend_meta = v; }),
     one(env.DB, `SELECT MAX(date) v FROM ad_spend WHERE platform='google'`, (v) => { h.last_spend_google = v; }),
     one(env.DB, `SELECT MAX(date) v FROM keyword_stats`, (v) => { h.last_keyword_stats = v; }),
+    one(env.DB, `SELECT MAX(date) v FROM campaign_share`, (v) => { h.last_campaign_share = v; }),
+    one(env.DB, `SELECT MAX(date) v FROM search_terms`, (v) => { h.last_search_terms = v; }),
     one(env.CRMDB, `SELECT MAX(first_seen_at) v FROM leads WHERE deleted_at IS NULL`, (v) => { h.last_crm_lead = v ? Math.floor(v / 1000) : null; }),
     one(env.CRMDB, `SELECT MAX(received_at) v FROM webhook_events`, (v) => { h.last_whatsapp_event = v ? Math.floor(v / 1000) : null; }),
     (async () => {
       try {
         const r = await env.DB.prepare(`
           SELECT platform, status, rows_upserted, error_message, run_at FROM sync_log
-          WHERE id IN (SELECT MAX(id) FROM sync_log GROUP BY platform)
+          WHERE id = (SELECT MAX(id) FROM sync_log WHERE platform='google')
         `).all();
         h.syncs = (r.results || []).reduce((m, s) => {
           m[s.platform] = { status: s.status, rows: s.rows_upserted, error: s.error_message, run_at: s.run_at };

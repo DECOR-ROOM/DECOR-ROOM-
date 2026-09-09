@@ -51,7 +51,7 @@ export async function onRequestPost(context) {
   const customerId = String(env.GOOGLE_ADS_CUSTOMER_ID).replace(/\D/g, '');
 
   const runStartedAt = Date.now();
-  let status = 'ok', errorMessage = null, spendRows = 0, kwRows = 0;
+  let status = 'ok', errorMessage = null, spendRows = 0, kwRows = 0, shareRows = 0, termRows = 0;
 
   try {
     const accessToken = await getAccessToken(env);
@@ -72,15 +72,45 @@ export async function onRequestPost(context) {
     spendRows = await upsertAdSpend(env.DB, campaignRows);
 
     // --- Keyword performance -> keyword_stats ---
+    // quality_score e as parcelas de impressão só vêm em linhas com veiculação;
+    // filtrar por impressions > 0 evita arrastar milhares de keywords zeradas.
     const keywordRows = await runQuery(apiVersion, customerId, headers,
-      `SELECT campaign.id, campaign.name, ad_group.id,
+      `SELECT campaign.id, campaign.name, ad_group.id, ad_group.name,
               ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type,
+              ad_group_criterion.quality_info.quality_score,
               segments.date,
-              metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions
+              metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions,
+              metrics.search_impression_share, metrics.search_top_impression_share
        FROM keyword_view
        WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
+         AND metrics.impressions > 0
          AND ad_group_criterion.status != 'REMOVED'`);
     kwRows = await upsertKeywords(env.DB, keywordRows);
+
+    // --- Disputa de leilão -> campaign_share ---
+    // Auction Insights (domínios concorrentes) não existe na API; parcela de
+    // impressões e o motivo da perda (classificação x orçamento) existem, e são
+    // o que dá pra agir em cima.
+    const shareQueryRows = await runQuery(apiVersion, customerId, headers,
+      `SELECT campaign.id, campaign.name, segments.date,
+              metrics.search_impression_share,
+              metrics.search_rank_lost_impression_share,
+              metrics.search_budget_lost_impression_share,
+              metrics.search_top_impression_share,
+              metrics.search_absolute_top_impression_share
+       FROM campaign
+       WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
+         AND campaign.advertising_channel_type = 'SEARCH'`);
+    shareRows = await upsertCampaignShare(env.DB, shareQueryRows);
+
+    // --- Termos de busca reais -> search_terms ---
+    const termQueryRows = await runQuery(apiVersion, customerId, headers,
+      `SELECT campaign.id, campaign.name, ad_group.id,
+              search_term_view.search_term, segments.search_term_match_type, segments.date,
+              metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions
+       FROM search_term_view
+       WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'`);
+    termRows = await upsertSearchTerms(env.DB, termQueryRows);
   } catch (err) {
     status = 'error';
     errorMessage = err.message || String(err);
@@ -92,13 +122,16 @@ export async function onRequestPost(context) {
     await env.DB.prepare(`
       INSERT INTO sync_log (platform, status, rows_upserted, date_from, date_to, error_message, duration_ms, run_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind('google', status, spendRows + kwRows, dateFrom, dateTo, errorMessage, durationMs, runAt).run();
+    `).bind('google', status, spendRows + kwRows + shareRows + termRows, dateFrom, dateTo, errorMessage, durationMs, runAt).run();
   } catch (_) { /* ignore */ }
 
   if (status === 'error') {
     return json({ ok: false, error: errorMessage, duration_ms: durationMs }, 500);
   }
-  return json({ ok: true, spend_rows: spendRows, keyword_rows: kwRows, duration_ms: durationMs, date_from: dateFrom, date_to: dateTo });
+  return json({
+    ok: true, spend_rows: spendRows, keyword_rows: kwRows, share_rows: shareRows, search_term_rows: termRows,
+    duration_ms: durationMs, date_from: dateFrom, date_to: dateTo,
+  });
 }
 
 // -----------------------------------------------------------------------------
@@ -172,7 +205,7 @@ async function upsertAdSpend(db, rows) {
       now,
     );
   });
-  await db.batch(batch);
+  await chunkedBatch(db, batch);
   return rows.length;
 }
 
@@ -181,9 +214,96 @@ async function upsertKeywords(db, rows) {
   const now = Math.floor(Date.now() / 1000);
   const stmt = db.prepare(`
     INSERT INTO keyword_stats
-      (date, campaign_id, campaign_name, ad_group_id, keyword, match_type, clicks, impressions, cost_cents, conversions, synced_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (date, campaign_id, campaign_name, ad_group_id, ad_group_name, keyword, match_type,
+       clicks, impressions, cost_cents, conversions, quality_score, search_is, top_is, synced_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(date, campaign_id, ad_group_id, keyword, match_type)
+    DO UPDATE SET
+      campaign_name = excluded.campaign_name,
+      ad_group_name = excluded.ad_group_name,
+      clicks        = excluded.clicks,
+      impressions   = excluded.impressions,
+      cost_cents    = excluded.cost_cents,
+      conversions   = excluded.conversions,
+      quality_score = excluded.quality_score,
+      search_is     = excluded.search_is,
+      top_is        = excluded.top_is,
+      synced_at     = excluded.synced_at
+  `);
+  const batch = [];
+  for (const r of rows) {
+    const m = r.metrics || {}, c = r.campaign || {}, ag = r.adGroup || {};
+    const crit = r.adGroupCriterion || {};
+    const kw = crit.keyword || {};
+    const text = kw.text;
+    if (!text) continue; // keyword_view rows always carry a keyword, but be safe
+    batch.push(stmt.bind(
+      r.segments?.date,
+      String(c.id || ''),
+      c.name || '',
+      String(ag.id || ''),
+      ag.name || '',
+      text,
+      kw.matchType || '',
+      toInt(m.clicks),
+      toInt(m.impressions),
+      microsToCents(m.costMicros),
+      Number(m.conversions || 0),
+      crit.qualityInfo?.qualityScore ?? null,
+      numOrNull(m.searchImpressionShare),
+      numOrNull(m.searchTopImpressionShare),
+      now,
+    ));
+  }
+  if (batch.length === 0) return 0;
+  await chunkedBatch(db, batch);
+  return batch.length;
+}
+
+async function upsertCampaignShare(db, rows) {
+  if (!db || rows.length === 0) return 0;
+  const now = Math.floor(Date.now() / 1000);
+  const stmt = db.prepare(`
+    INSERT INTO campaign_share
+      (date, campaign_id, campaign_name, search_is, lost_is_rank, lost_is_budget, top_is, abs_top_is, synced_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(date, campaign_id)
+    DO UPDATE SET
+      campaign_name  = excluded.campaign_name,
+      search_is      = excluded.search_is,
+      lost_is_rank   = excluded.lost_is_rank,
+      lost_is_budget = excluded.lost_is_budget,
+      top_is         = excluded.top_is,
+      abs_top_is     = excluded.abs_top_is,
+      synced_at      = excluded.synced_at
+  `);
+  const batch = rows.map((r) => {
+    const m = r.metrics || {}, c = r.campaign || {};
+    return stmt.bind(
+      r.segments?.date,
+      String(c.id || ''),
+      c.name || '',
+      Number(m.searchImpressionShare || 0),
+      Number(m.searchRankLostImpressionShare || 0),
+      Number(m.searchBudgetLostImpressionShare || 0),
+      Number(m.searchTopImpressionShare || 0),
+      Number(m.searchAbsoluteTopImpressionShare || 0),
+      now,
+    );
+  });
+  await chunkedBatch(db, batch);
+  return batch.length;
+}
+
+async function upsertSearchTerms(db, rows) {
+  if (!db || rows.length === 0) return 0;
+  const now = Math.floor(Date.now() / 1000);
+  const stmt = db.prepare(`
+    INSERT INTO search_terms
+      (date, campaign_id, campaign_name, ad_group_id, search_term, match_type,
+       clicks, impressions, cost_cents, conversions, synced_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(date, campaign_id, ad_group_id, search_term, match_type)
     DO UPDATE SET
       campaign_name = excluded.campaign_name,
       clicks        = excluded.clicks,
@@ -195,16 +315,15 @@ async function upsertKeywords(db, rows) {
   const batch = [];
   for (const r of rows) {
     const m = r.metrics || {}, c = r.campaign || {}, ag = r.adGroup || {};
-    const kw = r.adGroupCriterion?.keyword || {};
-    const text = kw.text;
-    if (!text) continue; // keyword_view rows always carry a keyword, but be safe
+    const term = r.searchTermView?.searchTerm;
+    if (!term) continue;
     batch.push(stmt.bind(
       r.segments?.date,
       String(c.id || ''),
       c.name || '',
       String(ag.id || ''),
-      text,
-      kw.matchType || '',
+      term,
+      r.segments?.searchTermMatchType || '',
       toInt(m.clicks),
       toInt(m.impressions),
       microsToCents(m.costMicros),
@@ -213,9 +332,19 @@ async function upsertKeywords(db, rows) {
     ));
   }
   if (batch.length === 0) return 0;
-  await db.batch(batch);
+  await chunkedBatch(db, batch);
   return batch.length;
 }
+
+// search_term_view de 7 dias já passa de mil linhas; um único db.batch() desse
+// tamanho estoura o limite de statements do D1, então vai em blocos.
+async function chunkedBatch(db, stmts, size = 200) {
+  for (let i = 0; i < stmts.length; i += size) {
+    await db.batch(stmts.slice(i, i + size));
+  }
+}
+
+function numOrNull(v) { return v == null ? null : Number(v); }
 
 // -----------------------------------------------------------------------------
 // Helpers

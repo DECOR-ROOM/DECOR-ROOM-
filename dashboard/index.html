@@ -71,6 +71,19 @@
   .hsrc .n{font-weight:700}
   .hsrc .a{color:var(--muted)}
   .hdot-ok{background:var(--green)}.hdot-warn{background:var(--gold)}.hdot-bad{background:var(--red)}.hdot-off{background:var(--muted)}
+  /* barra 100% da disputa: ganhou | perdeu por classificação | perdeu por orçamento */
+  .share{display:flex;height:38px;border-radius:9px;overflow:hidden;background:var(--line)}
+  .share div{display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700;color:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+  .sharelg{display:flex;flex-wrap:wrap;gap:14px;margin-top:11px;font-size:.76rem}
+  .sharelg span{display:inline-flex;align-items:center;gap:6px}
+  .sharelg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .posrow{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:.82rem}
+  .posrow .pn{width:120px;flex:0 0 auto;color:var(--dim)}
+  .posrow .pt{flex:1;background:var(--line);border-radius:6px;height:16px;overflow:hidden}
+  .posrow .pf{height:100%;background:var(--gold);border-radius:6px}
+  .posrow .pv{width:52px;text-align:right;font-weight:700}
+  .qs{display:inline-block;min-width:22px;padding:.1rem .3rem;border-radius:5px;font-weight:700;font-size:.72rem;color:#fff}
+  .qs-lo{background:var(--red)}.qs-mid{background:var(--gold);color:#0f0f0f}.qs-hi{background:var(--green)}.qs-na{background:var(--line);color:var(--muted)}
 </style>
 </head>
 <body>
@@ -108,14 +121,14 @@
 
     <div class="slabel">Visão geral · <span id="period" class="muted"></span></div>
     <div class="kpis">
-      <div class="kpi hero card"><div class="l">Investimento</div><div class="v mono" id="k-inv">—</div></div>
-      <div class="kpi card"><div class="l">CPL geral</div><div class="v mono" id="k-cpl">—</div><div class="s" id="k-cpl-s"></div></div>
-      <div class="kpi card"><div class="l">Leads totais</div><div class="v mono" id="k-leads">—</div><div class="s" id="k-leads-s"></div></div>
-      <div class="kpi card"><div class="l">LP views</div><div class="v mono" id="k-lp">—</div></div>
-      <div class="kpi card"><div class="l">Cliques Meta</div><div class="v mono" id="k-cmeta">—</div></div>
-      <div class="kpi card"><div class="l">Cliques Google</div><div class="v mono" id="k-cgoogle">—</div></div>
-      <div class="kpi card"><div class="l">Leads Meta (zap)</div><div class="v mono" id="k-lmeta">—</div></div>
-      <div class="kpi card"><div class="l">Leads Google</div><div class="v mono" id="k-lgoogle">—</div></div>
+      <div class="kpi hero card"><div class="l">Investimento Google</div><div class="v mono" id="k-inv">—</div><div class="s" id="k-inv-s"></div></div>
+      <div class="kpi card"><div class="l">Cliques</div><div class="v mono" id="k-clicks">—</div><div class="s" id="k-clicks-s"></div></div>
+      <div class="kpi card"><div class="l">CPC médio</div><div class="v mono" id="k-cpc">—</div></div>
+      <div class="kpi card"><div class="l">CTR</div><div class="v mono" id="k-ctr">—</div></div>
+      <div class="kpi card"><div class="l">Conversões (Google)</div><div class="v mono" id="k-conv">—</div></div>
+      <div class="kpi card"><div class="l">CPA (Google)</div><div class="v mono" id="k-cpa">—</div></div>
+      <div class="kpi card"><div class="l">Leads no site</div><div class="v mono" id="k-lp">—</div><div class="s" id="k-lp-s"></div></div>
+      <div class="kpi card"><div class="l">Leads no CRM</div><div class="v mono" id="k-leads">—</div><div class="s" id="k-leads-s"></div></div>
       <div class="kpi card"><div class="l">Qualificados</div><div class="v mono" id="k-qual">—</div></div>
       <div class="kpi card"><div class="l">Vendas</div><div class="v mono" id="k-sales">—</div></div>
       <div class="kpi card"><div class="l">Receita total</div><div class="v mono" id="k-won">—</div></div>
@@ -124,10 +137,48 @@
 
     <div class="slabel">Performance diária</div>
     <div class="card pad">
-      <div class="ctitle">Investimento × <span id="lbl-metric">leads</span> por dia
-        <span class="miniseg" id="metric"><button data-m="leads" class="active">Leads</button><button data-m="cpl">CPL</button></span>
+      <div class="ctitle">Investimento × <span id="lbl-metric">cliques</span> por dia
+        <span class="miniseg" id="metric"><button data-m="clicks" class="active">Cliques</button><button data-m="leads">Leads</button><button data-m="cpl">CPL</button></span>
       </div>
       <div class="chartbox"><canvas id="chDaily"></canvas></div>
+    </div>
+
+    <div class="slabel">Disputa de leilão</div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="ctitle">Onde foram as impressões que você podia ter tido</div>
+        <div class="share" id="share-bar"></div>
+        <div class="sharelg" id="share-legend"></div>
+        <div class="muted" style="font-size:.74rem;margin-top:12px;line-height:1.45">
+          <b>Perdida por classificação</b> = anúncio/página não competiram (índice de qualidade, lance).
+          <b>Perdida por orçamento</b> = a verba acabou antes do dia. Só a segunda se resolve com dinheiro.
+        </div>
+      </div>
+      <div class="card pad">
+        <div class="ctitle">Posição quando aparece</div>
+        <div id="share-pos"></div>
+        <div class="chartbox sm" style="height:170px;margin-top:6px"><canvas id="chShare"></canvas></div>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:14px">
+      <div class="ctitle">Por campanha</div>
+      <table><thead><tr><th>Campanha</th><th>Parcela impr.</th><th>Perd. classif.</th><th>Perd. orçam.</th><th>Topo abs.</th></tr></thead><tbody id="share-camp"></tbody></table>
+    </div>
+
+    <div class="slabel">Palavras-chave que mais performaram</div>
+    <div class="card pad">
+      <table><thead><tr><th>Palavra-chave</th><th>Impr.</th><th>Cliques</th><th>CTR</th><th>Custo</th><th>CPC</th><th>Conv.</th><th>CPA</th><th>QI</th><th>Parcela</th></tr></thead><tbody id="kw"></tbody></table>
+      <div class="muted" style="font-size:.74rem;margin-top:10px">QI = índice de qualidade do Google (1–10). Abaixo de 5 encarece o clique e derruba a posição — é a causa mais comum de perda por classificação.</div>
+    </div>
+
+    <div class="slabel">Termos de busca reais</div>
+    <div class="grid2">
+      <div class="card pad"><div class="ctitle">O que trouxe conversão</div>
+        <table><thead><tr><th>Termo digitado</th><th>Cliques</th><th>Conv.</th><th>Custo</th><th>CPA</th></tr></thead><tbody id="terms-win"></tbody></table></div>
+      <div class="card pad"><div class="ctitle">Gastou e não converteu</div>
+        <table><thead><tr><th>Termo digitado</th><th>Cliques</th><th>Custo</th></tr></thead><tbody id="terms-waste"></tbody></table>
+        <div class="muted" style="font-size:.74rem;margin-top:10px">Candidatos a palavra-chave negativa. Conferir antes de negativar — termo sem conversão registrada pode ter virado contato por outro caminho.</div>
+      </div>
     </div>
 
     <div class="slabel">Funil & receita</div>
@@ -155,11 +206,6 @@
       <div class="card pad"><div class="ctitle">Principais cidades</div><div id="cities"></div></div>
     </div>
 
-    <div class="slabel">Mídia paga</div>
-    <div class="grid2">
-      <div class="card pad"><div class="ctitle">Top anúncios (Meta)</div><table><thead><tr><th>Anúncio</th><th>Invest.</th><th>Cliques</th></tr></thead><tbody id="topads"></tbody></table></div>
-      <div class="card pad"><div class="ctitle">Palavras-chave (Google · top 10)</div><table><thead><tr><th>Palavra-chave</th><th>Leads</th><th>CPL</th></tr></thead><tbody id="kw"></tbody></table></div>
-    </div>
     <div style="height:40px"></div>
   </div>
 </div>
@@ -175,10 +221,13 @@ const TRAFFIC=['meta','google'];
 const UFPOS={RR:[4,1],AP:[5,1],AM:[3,2],PA:[4,2],MA:[5,2],CE:[6,2],RN:[7,2],AC:[2,3],RO:[3,3],TO:[5,3],PI:[6,3],PB:[7,3],MT:[4,4],GO:[5,4],BA:[6,4],PE:[7,4],AL:[8,4],MS:[4,5],DF:[5,5],MG:[6,5],ES:[7,5],SE:[8,5],SP:[5,6],RJ:[6,6],PR:[5,7],SC:[5,8],RS:[4,9]};
 
 let KEY=sessionStorage.getItem('dashKey')||new URLSearchParams(location.search).get('key')||'';
-let days=30, customFrom=null, customTo=null, metric='leads', chRev=null, chDaily=null, lastData=null;
+let days=30, customFrom=null, customTo=null, metric='clicks', chRev=null, chDaily=null, chShare=null, lastData=null;
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const brl=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+// CPC costuma ficar entre R$ 1 e R$ 20 — arredondar pra inteiro apagaria a diferença.
+const brl2=v=>(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=v=>((v||0)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
 const int=v=>(v||0).toLocaleString('pt-BR');
 
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('dashTheme',t);$('theme').textContent=t==='dark'?'☀️':'🌙';if(lastData)paint(lastData);}
@@ -216,8 +265,9 @@ function paintHealth(h){
     ['Leads no site',h.last_web_lead,72],
     ['WhatsApp / CRM',h.last_whatsapp_event,48],
     ['Investimento Google',h.last_spend_google,48],
-    ['Investimento Meta',h.last_spend_meta,48],
     ['Palavras-chave',h.last_keyword_stats,48],
+    ['Disputa de leilão',h.last_campaign_share,48],
+    ['Termos de busca',h.last_search_terms,48],
   ];
   $('health').innerHTML=SRC.map(([nome,val,limite])=>{
     const a=ago(val);
@@ -235,29 +285,31 @@ function paint(d){
   $('crm-warn').classList.toggle('hidden', d.crm_bound!==false);
   const errs=[];
   if(d.crm_error)errs.push('<b>CRM:</b> '+esc(d.crm_error));
-  if(d.ads_error)errs.push('<b>Mídia paga:</b> '+esc(d.ads_error));
+  if(d.ads_error)errs.push('<b>Google Ads:</b> '+esc(d.ads_error));
   $('errs').innerHTML=errs.length?('⚠️ A API falhou ao ler uma das bases — os números abaixo estão incompletos.<br>'+errs.join('<br>')):'';
   $('errs').classList.toggle('hidden',!errs.length);
   paintHealth(d.health||{});
   $('period').textContent=(d.from||'')+' → '+(d.to||'');
-  const crm=d.crm||{funnel:{},by_product:[],by_environment:[],by_property:[],loss_reasons:[],by_uf:[],top_cities:[],revenue_by_origin:[],daily_leads:{},total:0,qualified:0,sales:0,pending_revenue:0,won_revenue:0,leads_meta:0,leads_google:0};
-  const ads=d.ads||{total_invest:0,meta_clicks:0,google_clicks:0,lp_views:0,daily:[],top_ads:[],keywords:[]};
-  const cpl=crm.total?ads.total_invest/crm.total:0;
+  const crm=d.crm||{funnel:{},by_product:[],by_environment:[],by_property:[],loss_reasons:[],by_uf:[],top_cities:[],revenue_by_origin:[],daily_leads:{},total:0,qualified:0,sales:0,pending_revenue:0,won_revenue:0};
+  const ads=d.ads||{invest:0,clicks:0,impressions:0,ctr:0,cpc:0,conversions:0,cpa:0,lp_views:0,web_leads:0,daily:[],keywords:[],search_terms:[],wasted_terms:[],auction:{}};
 
-  // Web leads (clique no WhatsApp, event_log) are an independent count from the
-  // CRM's: the site records every click, the CRM only conversations that reached
-  // WhatsApp. Showing both side by side is what tells you a feed has gone quiet.
+  // Três contagens diferentes de "lead", e é de propósito: conversões do Google
+  // (o que a plataforma registrou e usa pra otimizar), cliques no WhatsApp
+  // medidos no site (event_log) e conversas que chegaram no CRM. Divergência
+  // entre elas é sinal, não erro — foi assim que o CRM mudo apareceu.
   const wl=ads.web_leads||0;
-  $('k-inv').textContent=brl(ads.total_invest);
-  $('k-cpl').textContent=brl(cpl);
-  $('k-cpl-s').textContent=wl?('site: '+brl(ads.total_invest/wl)):'';
+  $('k-inv').textContent=brl(ads.invest);
+  $('k-inv-s').textContent=int(ads.impressions)+' impressões';
+  $('k-clicks').textContent=int(ads.clicks);
+  $('k-clicks-s').textContent=wl?('CPL site: '+brl(ads.invest/wl)):'';
+  $('k-cpc').textContent=brl2(ads.cpc);
+  $('k-ctr').textContent=pct(ads.ctr);
+  $('k-conv').textContent=int(Math.round(ads.conversions));
+  $('k-cpa').textContent=ads.cpa?brl(ads.cpa):'—';
+  $('k-lp').textContent=int(wl);
+  $('k-lp-s').textContent=int(ads.lp_views)+' sessões';
   $('k-leads').textContent=int(crm.total);
-  $('k-leads-s').textContent='site (clique zap): '+int(wl);
-  $('k-lp').textContent=int(ads.lp_views);
-  $('k-cmeta').textContent=int(ads.meta_clicks);
-  $('k-cgoogle').textContent=int(ads.google_clicks);
-  $('k-lmeta').textContent=int(crm.leads_meta);
-  $('k-lgoogle').textContent=int(crm.leads_google);
+  $('k-leads-s').textContent=crm.total?'':'CRM sem leads no período';
   $('k-qual').textContent=int(crm.qualified);
   $('k-sales').textContent=int(crm.sales);
   $('k-won').textContent=brl(crm.won_revenue);
@@ -288,11 +340,65 @@ function paint(d){
   $('map').innerHTML=Object.entries(UFPOS).map(([uf,[c,r]])=>{const n=ufc[uf]||0;const op=n?(0.25+0.75*n/ufmax):0;return `<div class="uf" style="grid-column:${c};grid-row:${r};background:${n?`rgba(200,168,75,${op})`:'var(--line)'}"><div>${uf}</div><div class="c">${n||''}</div></div>`;}).join('');
   bars($('cities'),crm.top_cities.map(c=>({k:(c.k+(c.uf?'/'+c.uf:'')),n:c.n})));
 
-  // top ads + keywords
-  $('topads').innerHTML=ads.top_ads.length?ads.top_ads.map(a=>`<tr><td>${esc(a.name)}</td><td class="mono">${brl(a.invest)}</td><td class="mono">${int(a.clk)}</td></tr>`).join(''):'<tr><td colspan="3" class="muted" style="text-align:center">Sem investimento sincronizado.</td></tr>';
-  $('kw').innerHTML=(ads.keywords&&ads.keywords.length)?ads.keywords.map(k=>`<tr><td>${esc(k.kw)}</td><td class="mono">${int(k.leads)}</td><td class="mono">${brl(k.cpl)}</td></tr>`).join(''):'<tr><td colspan="3" class="muted" style="text-align:center">Sync do Google Ads não configurado.</td></tr>';
+  paintAuction(ads.auction||{});
+  paintKeywords(ads.keywords||[]);
+  paintTerms(ads.search_terms||[],ads.wasted_terms||[]);
 
   drawCharts(crm,ads);
+}
+
+const empty=(cols,txt)=>`<tr><td colspan="${cols}" class="muted" style="text-align:center;padding:1.2rem">${txt}</td></tr>`;
+
+function paintAuction(a){
+  // As três fatias somam ~100% do leilão elegível: o que você levou, o que
+  // perdeu por classificação e o que perdeu por orçamento.
+  const won=a.sis||0, rank=a.rank_lost||0, bud=a.budget_lost||0;
+  const tot=won+rank+bud;
+  if(!tot){
+    $('share-bar').innerHTML='<div style="background:var(--line);flex:1;color:var(--muted)">sem dados de leilão no período</div>';
+    $('share-legend').innerHTML='';$('share-pos').innerHTML='';$('share-camp').innerHTML=empty(5,'Sem dados de leilão no período.');
+    return;
+  }
+  const seg=[['Você levou',won,'#16a34a'],['Perdida por classificação',rank,'#dc2626'],['Perdida por orçamento',bud,'#1877f2']];
+  $('share-bar').innerHTML=seg.map(([,v,c])=>{
+    const w=v/tot*100;
+    return `<div style="background:${c};width:${w}%">${w>=9?pct(v/tot):''}</div>`;
+  }).join('');
+  $('share-legend').innerHTML=seg.map(([n,v,c])=>`<span><i style="background:${c}"></i>${n} <b>${pct(v/tot)}</b></span>`).join('');
+
+  $('share-pos').innerHTML=[['No topo da página',a.tis||0],['No topo absoluto',a.atis||0]].map(([n,v])=>
+    `<div class="posrow"><div class="pn">${n}</div><div class="pt"><div class="pf" style="width:${Math.round(v*100)}%"></div></div><div class="pv">${pct(v)}</div></div>`).join('');
+
+  const cs=a.by_campaign||[];
+  $('share-camp').innerHTML=cs.length?cs.map(c=>
+    `<tr><td>${esc(c.nome||'—')}</td><td class="mono">${pct(c.sis)}</td><td class="mono">${pct(c.rank_lost)}</td><td class="mono">${pct(c.budget_lost)}</td><td class="mono">${pct(c.atis)}</td></tr>`
+  ).join(''):empty(5,'Sem campanhas de pesquisa no período.');
+}
+
+// QI baixo é o que encarece o clique — destacar em cor faz a leitura em 1s.
+function qsChip(q){
+  if(q==null)return '<span class="qs qs-na">—</span>';
+  const c=q<=3?'qs-lo':q<=6?'qs-mid':'qs-hi';
+  return `<span class="qs ${c}">${q}</span>`;
+}
+
+function paintKeywords(ks){
+  $('kw').innerHTML=ks.length?ks.map(k=>
+    `<tr><td>${esc(k.kw)}</td>`+
+    `<td class="mono">${int(k.impr)}</td><td class="mono">${int(k.clicks)}</td><td class="mono">${pct(k.ctr)}</td>`+
+    `<td class="mono">${brl(k.cost)}</td><td class="mono">${brl2(k.cpc)}</td>`+
+    `<td class="mono">${int(Math.round(k.conv))}</td><td class="mono">${k.cpa?brl(k.cpa):'—'}</td>`+
+    `<td>${qsChip(k.qs)}</td><td class="mono">${k.sis!=null?pct(k.sis):'—'}</td></tr>`
+  ).join(''):empty(10,'Sem palavras-chave com veiculação no período.');
+}
+
+function paintTerms(win,waste){
+  $('terms-win').innerHTML=win.length?win.map(t=>
+    `<tr><td>${esc(t.termo)}</td><td class="mono">${int(t.clicks)}</td><td class="mono">${int(Math.round(t.conv))}</td><td class="mono">${brl(t.cost)}</td><td class="mono">${t.cpa?brl(t.cpa):'—'}</td></tr>`
+  ).join(''):empty(5,'Nenhum termo com conversão registrada no período.');
+  $('terms-waste').innerHTML=waste.length?waste.map(t=>
+    `<tr><td>${esc(t.termo)}</td><td class="mono">${int(t.clicks)}</td><td class="mono">${brl(t.cost)}</td></tr>`
+  ).join(''):empty(3,'Nenhum termo com gasto e zero conversão.');
 }
 
 function drawCharts(crm,ads){
@@ -300,17 +406,28 @@ function drawCharts(crm,ads){
   const grid=getColor('--line'),tx=getColor('--muted');
   // daily merged
   const dates=Array.from(new Set([...ads.daily.map(d=>d.date),...Object.keys(crm.daily_leads)])).sort();
-  const invMap={};ads.daily.forEach(d=>invMap[d.date]=d.invest);
-  const series=dates.map(dt=>{const inv=invMap[dt]||0;const ld=crm.daily_leads[dt]||0;return {dt,inv,leads:ld,cpl:ld?inv/ld:0};});
-  const lineData=series.map(s=>metric==='cpl'?s.cpl:s.leads);
+  const invMap={},clkMap={};ads.daily.forEach(d=>{invMap[d.date]=d.invest;clkMap[d.date]=d.clicks||0;});
+  const series=dates.map(dt=>{const inv=invMap[dt]||0;const ld=crm.daily_leads[dt]||0;return {dt,inv,clicks:clkMap[dt]||0,leads:ld,cpl:ld?inv/ld:0};});
+  const LBL={clicks:'Cliques',leads:'Leads',cpl:'CPL'};
+  const lineData=series.map(s=>s[metric]);
   if(chDaily)chDaily.destroy();
   chDaily=new Chart($('chDaily'),{data:{labels:series.map(s=>s.dt.slice(5)),datasets:[
     {type:'bar',label:'Investimento',data:series.map(s=>s.inv),backgroundColor:'rgba(200,168,75,.55)',borderRadius:5,yAxisID:'y'},
-    {type:'line',label:metric==='cpl'?'CPL':'Leads',data:lineData,borderColor:'#1877f2',backgroundColor:'rgba(24,119,242,.12)',tension:.35,pointRadius:2,yAxisID:'y1'}
+    {type:'line',label:LBL[metric],data:lineData,borderColor:'#1877f2',backgroundColor:'rgba(24,119,242,.12)',tension:.35,pointRadius:2,yAxisID:'y1'}
   ]},options:{maintainAspectRatio:false,plugins:{legend:{labels:{color:tx}}},scales:{
     y:{position:'left',grid:{color:grid},ticks:{color:tx,callback:v=>'R$'+int(v)}},
     y1:{position:'right',grid:{display:false},ticks:{color:tx,callback:v=>metric==='cpl'?'R$'+int(v):int(v)}},
     x:{grid:{display:false},ticks:{color:tx}}}}});
+  // parcela de impressões por dia — mostra se a perda é constante ou episódica
+  const sd=(ads.auction&&ads.auction.daily)||[];
+  if(chShare)chShare.destroy();
+  if(sd.length)chShare=new Chart($('chShare'),{type:'line',data:{labels:sd.map(d=>d.date.slice(5)),datasets:[
+    {label:'Parcela de impressões',data:sd.map(d=>(d.sis||0)*100),borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.12)',fill:true,tension:.35,pointRadius:0},
+    {label:'Perdida por classificação',data:sd.map(d=>(d.rank_lost||0)*100),borderColor:'#dc2626',tension:.35,pointRadius:0},
+    {label:'Perdida por orçamento',data:sd.map(d=>(d.budget_lost||0)*100),borderColor:'#1877f2',tension:.35,pointRadius:0},
+  ]},options:{maintainAspectRatio:false,plugins:{legend:{labels:{color:tx,boxWidth:10,font:{size:10}}}},scales:{
+    y:{beginAtZero:true,max:100,grid:{color:grid},ticks:{color:tx,callback:v=>v+'%'}},
+    x:{grid:{display:false},ticks:{color:tx,maxTicksLimit:8}}}}});
   // revenue pending x won
   const rmax=Math.max(crm.pending_revenue,crm.won_revenue,1000);
   if(chRev)chRev.destroy();
@@ -324,7 +441,7 @@ $('gg').onclick=async()=>{const k=$('gk').value.trim();if(!k)return;const r=awai
 $('gk').addEventListener('keydown',e=>{if(e.key==='Enter')$('gg').click();});
 $('range').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('range').querySelector('.active').classList.remove('active');b.classList.add('active');days=+b.dataset.d;customFrom=customTo=null;$('dfrom').value='';$('dto').value='';load();});
 $('dapply').onclick=()=>{if($('dfrom').value&&$('dto').value){customFrom=$('dfrom').value;customTo=$('dto').value;$('range').querySelectorAll('button').forEach(x=>x.classList.remove('active'));load();}};
-$('metric').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('metric').querySelector('.active').classList.remove('active');b.classList.add('active');metric=b.dataset.m;$('lbl-metric').textContent=metric==='cpl'?'CPL':'leads';if(lastData)drawCharts(lastData.crm||{daily_leads:{}},lastData.ads||{daily:[]});});
+$('metric').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('metric').querySelector('.active').classList.remove('active');b.classList.add('active');metric=b.dataset.m;$('lbl-metric').textContent={clicks:'cliques',leads:'leads',cpl:'CPL'}[metric];if(lastData)drawCharts(lastData.crm||{daily_leads:{}},lastData.ads||{daily:[],auction:{}});});
 if(KEY)showApp();
 </script>
 </body>
