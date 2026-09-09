@@ -29,7 +29,7 @@ export async function onRequestGet({ request, env }) {
       const C = env.CRMDB;
       const w = 'deleted_at IS NULL AND first_seen_at BETWEEN ? AND ?';
       const P = [fromMs, toMs];
-      const [funnel, rev, prod, environ, prop, loss, ufs, cities, totals, leadRows, dailyLeads] = await Promise.all([
+      const [funnel, rev, prod, environ, prop, loss, ufs, cities, totals, leadRows, dailyLeads, escreveram] = await Promise.all([
         C.prepare(`SELECT stage, COUNT(*) n FROM leads WHERE ${w} GROUP BY stage`).bind(...P).all(),
         C.prepare(`SELECT COALESCE(SUM(CASE WHEN stage='orcado' THEN quote_value END),0) pending,
                           COALESCE(SUM(CASE WHEN stage='ganho'  THEN sale_value  END),0) won FROM leads WHERE ${w}`).bind(...P).first(),
@@ -43,6 +43,12 @@ export async function onRequestGet({ request, env }) {
         // lead-level rows so we can resolve web_ref -> real channel (cross-DB, in JS)
         C.prepare(`SELECT COALESCE(origin,'desconhecido') origin, web_ref, stage, sale_value FROM leads WHERE ${w}`).bind(...P).all(),
         C.prepare(`SELECT strftime('%Y-%m-%d', first_seen_at/1000, 'unixepoch') d, COUNT(*) n FROM leads WHERE ${w} GROUP BY d`).bind(...P).all(),
+        // Pessoas, não mensagens: quem realmente escreveu pro WhatsApp no período.
+        // De propósito não usa `leads` — ali a data é a do primeiro contato de
+        // sempre, então quem já era cliente e voltou a escrever não apareceria.
+        C.prepare(`SELECT COUNT(DISTINCT sender_pn) n FROM webhook_events
+                   WHERE from_me=0 AND is_group=0 AND sender_pn IS NOT NULL
+                     AND received_at BETWEEN ? AND ?`).bind(...P).first(),
       ]);
 
       // --- Attribution: resolve web_ref -> decorroom-db sessions (gclid/fbclid/UTMs) ---
@@ -75,6 +81,7 @@ export async function onRequestGet({ request, env }) {
         revenue_by_origin: Object.values(revBy).sort((a, b) => b.won - a.won),
         attribution_resolved: resolved, web_refs_seen: refs.length,
         daily_leads: (dailyLeads.results || []).reduce((m, r) => { m[r.d] = r.n; return m; }, {}),
+        pessoas_escreveram: escreveram?.n || 0,
       };
     } catch (e) { out.crm_error = e.message; }
   }
@@ -88,11 +95,14 @@ export async function onRequestGet({ request, env }) {
   try {
     const D = env.DB;
     const G = `date BETWEEN ? AND ? AND platform='google'`;
-    const [spend, webleads, sess, daily, kw, share, shareCamp, shareDaily, terms, waste, geo] = await Promise.all([
-      D.prepare(`SELECT COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr FROM ad_spend WHERE ${G}`).bind(fromDate, toDate).first(),
+    // A PMax existe só pra dar fluxo às campanhas de pesquisa — fora de todos os
+    // números. O gasto dela sai separado em `pmax` pra bater com o Google Ads.
+    const S = `${G} AND channel='SEARCH'`;
+    const [spend, webleads, sess, daily, kw, share, shareCamp, shareDaily, terms, waste, pmax, geo] = await Promise.all([
+      D.prepare(`SELECT COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr, COALESCE(SUM(conversions),0) conv FROM ad_spend WHERE ${S}`).bind(fromDate, toDate).first(),
       D.prepare(`SELECT COUNT(*) n FROM event_log WHERE event_name='Lead' AND is_bot=0 AND timestamp BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
       D.prepare(`SELECT COUNT(*) n FROM sessions WHERE created_at BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
-      D.prepare(`SELECT date, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk FROM ad_spend WHERE ${G} GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
+      D.prepare(`SELECT date, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk FROM ad_spend WHERE ${S} GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
       // Top palavras-chave por investimento, com qualidade e disputa.
       D.prepare(`SELECT keyword,
                         COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk,
@@ -123,12 +133,14 @@ export async function onRequestGet({ request, env }) {
                  FROM search_terms WHERE date BETWEEN ? AND ?
                  GROUP BY search_term HAVING SUM(conversions)=0 AND SUM(cost_cents)>0
                  ORDER BY cost DESC LIMIT 15`).bind(fromDate, toDate).all(),
+      D.prepare(`SELECT COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk
+                 FROM ad_spend WHERE ${G} AND channel IS NOT NULL AND channel<>'SEARCH'`).bind(fromDate, toDate).first(),
       // Geografia. Agrupa por NOME e não por city_id: o Google tem mais de um
       // geo target pro mesmo município (um da cidade, outro da região dentro
       // dela), e no mapa os dois têm que virar o mesmo polígono.
       D.prepare(`SELECT city_name cidade, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr,
                         COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(conversions),0) conv
-                 FROM geo_stats WHERE date BETWEEN ? AND ?
+                 FROM geo_stats WHERE date BETWEEN ? AND ? AND channel='SEARCH'
                  GROUP BY city_name ORDER BY clk DESC`).bind(fromDate, toDate).all(),
     ]);
 
@@ -143,7 +155,9 @@ export async function onRequestGet({ request, env }) {
         qs: r.qs, sis: r.sis, tis: r.tis,
       };
     });
-    const convTotal = kwRows.reduce((s, r) => s + r.conv, 0);
+    // Conversões no nível de campanha: kwRows vem com LIMIT 15 e só cobre o que
+    // o Google atribuiu a uma palavra-chave — somar aquilo subcontava.
+    const convTotal = spend?.conv || 0;
 
     out.ads = {
       invest: cents / 100, clicks, impressions: impr,
@@ -152,6 +166,7 @@ export async function onRequestGet({ request, env }) {
       conversions: convTotal,
       cpa: convTotal > 0 ? (cents / 100) / convTotal : 0,
       web_leads: webleads?.n || 0, lp_views: sess?.n || 0,
+      pmax_invest: (pmax?.cents || 0) / 100, pmax_clicks: pmax?.clk || 0,
       daily: (daily.results || []).map((d) => ({ date: d.date, invest: d.cents / 100, clicks: d.clk })),
       keywords: kwRows,
       auction: {

@@ -73,6 +73,13 @@
   .hidden{display:none!important}.muted{color:var(--muted)}
   .notice{background:color-mix(in srgb,var(--gold) 12%,var(--card));border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:10px;padding:.7rem .9rem;font-size:.82rem;margin-top:14px}
   .notice.bad{background:color-mix(in srgb,var(--red) 10%,var(--card));border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+  /* Resumo: três números em português, sem sigla. É a primeira coisa da página. */
+  .big3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .bignum{padding:1.15rem 1.25rem}
+  .bignum .bn{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.9rem;line-height:1;color:var(--gold);font-variant-numeric:tabular-nums}
+  .bignum .bl{font-size:.92rem;font-weight:600;margin-top:.35rem;line-height:1.25}
+  .bignum .bh{font-size:.73rem;color:var(--muted);margin-top:.5rem;line-height:1.4}
+  @media(max-width:820px){.big3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}}
   .kpi .s{font-size:.66rem;color:var(--muted);margin-top:.15rem;font-weight:600}
   .kpi.hero .s{color:#8f8f8f}
   .health{display:flex;flex-wrap:wrap;gap:7px}
@@ -125,20 +132,40 @@
     <div id="crm-warn" class="notice hidden">⚠️ Binding <b>CRMDB → crm-db</b> não detectado neste projeto. Os dados do CRM ficam vazios até ligar o binding e refazer o deploy.</div>
     <div id="errs" class="notice bad hidden"></div>
 
+    <div class="slabel">Resumo · <span id="period2" class="muted"></span></div>
+    <div class="big3">
+      <div class="card bignum">
+        <div class="bn" id="b-cliques">—</div>
+        <div class="bl">pessoas clicaram no botão do WhatsApp no site</div>
+        <div class="bh">Medido no próprio site. Vale para quem chegou de qualquer lugar: anúncio, busca comum, Instagram, link salvo.</div>
+      </div>
+      <div class="card bignum">
+        <div class="bn" id="b-msg">—</div>
+        <div class="bl">pessoas mandaram mensagem no WhatsApp</div>
+        <div class="bh">Pessoas de verdade que escreveram, não cliques. Quem clica no botão e não envia a mensagem não entra aqui.</div>
+      </div>
+      <div class="card bignum">
+        <div class="bn" id="b-google">—</div>
+        <div class="bl">vieram das campanhas de pesquisa do Google</div>
+        <div class="bh">Contadas pelo próprio Google: clicaram no anúncio e depois no WhatsApp. Só campanhas de pesquisa.</div>
+      </div>
+    </div>
+    <div id="b-nota" class="notice hidden"></div>
+
     <div class="slabel">Saúde das fontes</div>
     <div class="card pad"><div class="health" id="health"></div>
       <div id="health-note" class="muted" style="font-size:.74rem;margin-top:10px"></div></div>
 
-    <div class="slabel">Visão geral · <span id="period" class="muted"></span></div>
+    <div class="slabel">Detalhe da pesquisa · <span id="period" class="muted"></span></div>
     <div class="kpis">
-      <div class="kpi hero card"><div class="l">Investimento Google</div><div class="v mono" id="k-inv">—</div><div class="s" id="k-inv-s"></div></div>
+      <div class="kpi hero card"><div class="l">Investimento (pesquisa)</div><div class="v mono" id="k-inv">—</div><div class="s" id="k-inv-s"></div></div>
       <div class="kpi card"><div class="l">Cliques</div><div class="v mono" id="k-clicks">—</div><div class="s" id="k-clicks-s"></div></div>
       <div class="kpi card"><div class="l">CPC médio</div><div class="v mono" id="k-cpc">—</div></div>
       <div class="kpi card"><div class="l">CTR</div><div class="v mono" id="k-ctr">—</div></div>
-      <div class="kpi card"><div class="l">Conversões (Google)</div><div class="v mono" id="k-conv">—</div></div>
-      <div class="kpi card"><div class="l">CPA (Google)</div><div class="v mono" id="k-cpa">—</div></div>
-      <div class="kpi card"><div class="l">Leads no site</div><div class="v mono" id="k-lp">—</div><div class="s" id="k-lp-s"></div></div>
-      <div class="kpi card"><div class="l">Leads no CRM</div><div class="v mono" id="k-leads">—</div><div class="s" id="k-leads-s"></div></div>
+      <div class="kpi card"><div class="l">Conversões (pesquisa)</div><div class="v mono" id="k-conv">—</div></div>
+      <div class="kpi card"><div class="l">Custo por conversão</div><div class="v mono" id="k-cpa">—</div></div>
+      <div class="kpi card"><div class="l">Clicaram no site</div><div class="v mono" id="k-lp">—</div><div class="s" id="k-lp-s"></div></div>
+      <div class="kpi card"><div class="l">Mandaram mensagem</div><div class="v mono" id="k-leads">—</div><div class="s" id="k-leads-s"></div></div>
       <div class="kpi card"><div class="l">Qualificados</div><div class="v mono" id="k-qual">—</div></div>
       <div class="kpi card"><div class="l">Vendas</div><div class="v mono" id="k-sales">—</div></div>
       <div class="kpi card"><div class="l">Receita total</div><div class="v mono" id="k-won">—</div></div>
@@ -213,7 +240,7 @@
     <div class="slabel">Origem geográfica · Santa Catarina</div>
     <div class="grid2">
       <div class="card pad">
-        <div class="ctitle">Onde os cliques acontecem
+        <div class="ctitle">Onde os cliques acontecem (pesquisa)
           <span class="miniseg" id="geometric"><button data-g="clicks" class="active">Cliques</button><button data-g="conv">Conv.</button><button data-g="cost">Custo</button></span>
         </div>
         <div id="scmap" class="scwrap"></div>
@@ -320,6 +347,25 @@ function paint(d){
   // medidos no site (event_log) e conversas que chegaram no CRM. Divergência
   // entre elas é sinal, não erro — foi assim que o CRM mudo apareceu.
   const wl=ads.web_leads||0;
+
+  // Resumo em português. Os três medem coisas distintas de propósito — não é
+  // funil: quem manda mensagem pode nunca ter passado pelo site.
+  const escreveram=crm.pessoas_escreveram||0;
+  $('period2').textContent=(d.from||'')+' → '+(d.to||'');
+  $('b-cliques').textContent=int(wl);
+  $('b-msg').textContent=int(escreveram);
+  $('b-google').textContent=int(Math.round(ads.conversions));
+  // O número de quem escreveu só vale se o WhatsApp esteve conectado o período
+  // inteiro. Ficou 2 meses mudo em 2026 — melhor avisar do que deixar ler errado.
+  const paradoAte=(d.health||{}).last_whatsapp_event;
+  const inicio=Date.parse((d.from||'')+'T00:00:00Z')/1000;
+  const furo=paradoAte&&inicio&&(paradoAte<inicio);
+  const notas=[];
+  if(furo)notas.push('⚠️ O WhatsApp não registrou nada desde '+new Date(paradoAte*1000).toLocaleDateString('pt-BR')+' — o número de quem mandou mensagem está incompleto neste período.');
+  if(ads.pmax_invest>0)notas.push('A campanha Performance Max está fora de todos os números acima (ela existe só pra dar fluxo às de pesquisa). No período ela consumiu <b>'+brl(ads.pmax_invest)+'</b> em '+int(ads.pmax_clicks)+' cliques — some isso ao investimento do painel pra bater com o total do Google Ads.');
+  $('b-nota').innerHTML=notas.join('<br>');
+  $('b-nota').classList.toggle('hidden',!notas.length);
+
   $('k-inv').textContent=brl(ads.invest);
   $('k-inv-s').textContent=int(ads.impressions)+' impressões';
   $('k-clicks').textContent=int(ads.clicks);
@@ -330,8 +376,8 @@ function paint(d){
   $('k-cpa').textContent=ads.cpa?brl(ads.cpa):'—';
   $('k-lp').textContent=int(wl);
   $('k-lp-s').textContent=int(ads.lp_views)+' sessões';
-  $('k-leads').textContent=int(crm.total);
-  $('k-leads-s').textContent=crm.total?'':'CRM sem leads no período';
+  $('k-leads').textContent=int(escreveram);
+  $('k-leads-s').textContent=crm.total?(int(crm.total)+' viraram ficha no CRM'):'';
   $('k-qual').textContent=int(crm.qualified);
   $('k-sales').textContent=int(crm.sales);
   $('k-won').textContent=brl(crm.won_revenue);

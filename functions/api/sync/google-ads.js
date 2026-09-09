@@ -68,8 +68,8 @@ export async function onRequestPost(context) {
 
     // --- Campaign spend -> ad_spend (platform='google') ---
     const campaignRows = await runQuery(apiVersion, customerId, headers,
-      `SELECT campaign.id, campaign.name, segments.date,
-              metrics.cost_micros, metrics.impressions, metrics.clicks
+      `SELECT campaign.id, campaign.name, campaign.advertising_channel_type, segments.date,
+              metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions
        FROM campaign
        WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'`);
     spendRows = await upsertAdSpend(env.DB, campaignRows);
@@ -119,7 +119,7 @@ export async function onRequestPost(context) {
     // geographic_view devolve o município como resource name
     // (geoTargetConstants/<id>); o nome vem de uma segunda consulta.
     const geoQueryRows = await runQuery(apiVersion, customerId, headers,
-      `SELECT segments.geo_target_city, segments.date,
+      `SELECT segments.geo_target_city, segments.date, campaign.advertising_channel_type,
               metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions
        FROM geographic_view
        WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
@@ -198,14 +198,16 @@ async function upsertAdSpend(db, rows) {
   const now = Math.floor(Date.now() / 1000);
   const stmt = db.prepare(`
     INSERT INTO ad_spend
-      (platform, date, campaign_id, campaign_name, ad_id, ad_name, spend_cents, currency, impressions, clicks, synced_at)
-    VALUES ('google', ?, ?, ?, NULL, NULL, ?, 'BRL', ?, ?, ?)
+      (platform, date, campaign_id, campaign_name, ad_id, ad_name, spend_cents, currency, impressions, clicks, channel, conversions, synced_at)
+    VALUES ('google', ?, ?, ?, NULL, NULL, ?, 'BRL', ?, ?, ?, ?, ?)
     ON CONFLICT(platform, date, campaign_id, COALESCE(ad_id, ''))
     DO UPDATE SET
       campaign_name = excluded.campaign_name,
       spend_cents   = excluded.spend_cents,
       impressions   = excluded.impressions,
       clicks        = excluded.clicks,
+      channel       = excluded.channel,
+      conversions   = excluded.conversions,
       synced_at     = excluded.synced_at
   `);
   const batch = rows.map((r) => {
@@ -217,6 +219,8 @@ async function upsertAdSpend(db, rows) {
       microsToCents(m.costMicros),
       toInt(m.impressions),
       toInt(m.clicks),
+      c.advertisingChannelType || null,
+      Number(m.conversions || 0),
       now,
     );
   });
@@ -381,9 +385,9 @@ async function upsertGeoStats(db, rows, names) {
   const now = Math.floor(Date.now() / 1000);
   const stmt = db.prepare(`
     INSERT INTO geo_stats
-      (date, city_id, city_name, clicks, impressions, cost_cents, conversions, synced_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(date, city_id)
+      (date, city_id, city_name, clicks, impressions, cost_cents, conversions, channel, synced_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(date, city_id, COALESCE(channel, ''))
     DO UPDATE SET
       city_name   = excluded.city_name,
       clicks      = excluded.clicks,
@@ -406,6 +410,7 @@ async function upsertGeoStats(db, rows, names) {
       toInt(m.impressions),
       microsToCents(m.costMicros),
       Number(m.conversions || 0),
+      r.campaign?.advertisingChannelType || null,
       now,
     ));
   }
