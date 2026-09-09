@@ -3,7 +3,10 @@
 // Pulls Google Ads performance from the Google Ads API (searchStream / GAQL) for
 // the configured customer and UPSERTs:
 //   * campaign-level cost/clicks/impressions  -> `ad_spend`     (platform='google')
-//   * keyword-level cost/clicks/conversions   -> `keyword_stats`
+//   * keyword-level cost/clicks/conversions   -> `keyword_stats` (+ índice de qualidade)
+//   * parcela de impressões por campanha       -> `campaign_share`
+//   * termos de busca reais                    -> `search_terms`
+//   * desempenho por cidade                    -> `geo_stats`
 // Called on a schedule by an external cron (same provider as the Meta sync).
 // The dashboard reads both tables directly — it never hits this endpoint.
 //
@@ -51,7 +54,7 @@ export async function onRequestPost(context) {
   const customerId = String(env.GOOGLE_ADS_CUSTOMER_ID).replace(/\D/g, '');
 
   const runStartedAt = Date.now();
-  let status = 'ok', errorMessage = null, spendRows = 0, kwRows = 0, shareRows = 0, termRows = 0;
+  let status = 'ok', errorMessage = null, spendRows = 0, kwRows = 0, shareRows = 0, termRows = 0, geoRows = 0;
 
   try {
     const accessToken = await getAccessToken(env);
@@ -111,6 +114,18 @@ export async function onRequestPost(context) {
        FROM search_term_view
        WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'`);
     termRows = await upsertSearchTerms(env.DB, termQueryRows);
+
+    // --- Desempenho por cidade -> geo_stats ---
+    // geographic_view devolve o município como resource name
+    // (geoTargetConstants/<id>); o nome vem de uma segunda consulta.
+    const geoQueryRows = await runQuery(apiVersion, customerId, headers,
+      `SELECT segments.geo_target_city, segments.date,
+              metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions
+       FROM geographic_view
+       WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
+         AND metrics.impressions > 0`);
+    const cityNames = await loadCityNames(apiVersion, customerId, headers, geoQueryRows);
+    geoRows = await upsertGeoStats(env.DB, geoQueryRows, cityNames);
   } catch (err) {
     status = 'error';
     errorMessage = err.message || String(err);
@@ -122,14 +137,14 @@ export async function onRequestPost(context) {
     await env.DB.prepare(`
       INSERT INTO sync_log (platform, status, rows_upserted, date_from, date_to, error_message, duration_ms, run_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind('google', status, spendRows + kwRows + shareRows + termRows, dateFrom, dateTo, errorMessage, durationMs, runAt).run();
+    `).bind('google', status, spendRows + kwRows + shareRows + termRows + geoRows, dateFrom, dateTo, errorMessage, durationMs, runAt).run();
   } catch (_) { /* ignore */ }
 
   if (status === 'error') {
     return json({ ok: false, error: errorMessage, duration_ms: durationMs }, 500);
   }
   return json({
-    ok: true, spend_rows: spendRows, keyword_rows: kwRows, share_rows: shareRows, search_term_rows: termRows,
+    ok: true, spend_rows: spendRows, keyword_rows: kwRows, share_rows: shareRows, search_term_rows: termRows, geo_rows: geoRows,
     duration_ms: durationMs, date_from: dateFrom, date_to: dateTo,
   });
 }
@@ -324,6 +339,69 @@ async function upsertSearchTerms(db, rows) {
       String(ag.id || ''),
       term,
       r.segments?.searchTermMatchType || '',
+      toInt(m.clicks),
+      toInt(m.impressions),
+      microsToCents(m.costMicros),
+      Number(m.conversions || 0),
+      now,
+    ));
+  }
+  if (batch.length === 0) return 0;
+  await chunkedBatch(db, batch);
+  return batch.length;
+}
+
+// geographic_view devolve o município só como `geoTargetConstants/<id>`. Os ids
+// se repetem muito entre os dias, então resolve o conjunto distinto de uma vez.
+async function loadCityNames(apiVersion, customerId, headers, rows) {
+  const ids = [...new Set(rows.map((r) => idFromResource(r.segments?.geoTargetCity)).filter(Boolean))];
+  const names = {};
+  for (let i = 0; i < ids.length; i += 200) {
+    const chunk = ids.slice(i, i + 200);
+    const res = await runQuery(apiVersion, customerId, headers,
+      `SELECT geo_target_constant.id, geo_target_constant.name
+       FROM geo_target_constant
+       WHERE geo_target_constant.id IN (${chunk.join(',')})`);
+    for (const r of res) {
+      const g = r.geoTargetConstant || {};
+      if (g.id) names[String(g.id)] = g.name || '';
+    }
+  }
+  return names;
+}
+
+function idFromResource(res) {
+  if (!res) return null;
+  const m = String(res).match(/(\d+)$/);
+  return m ? m[1] : null;
+}
+
+async function upsertGeoStats(db, rows, names) {
+  if (!db || rows.length === 0) return 0;
+  const now = Math.floor(Date.now() / 1000);
+  const stmt = db.prepare(`
+    INSERT INTO geo_stats
+      (date, city_id, city_name, clicks, impressions, cost_cents, conversions, synced_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(date, city_id)
+    DO UPDATE SET
+      city_name   = excluded.city_name,
+      clicks      = excluded.clicks,
+      impressions = excluded.impressions,
+      cost_cents  = excluded.cost_cents,
+      conversions = excluded.conversions,
+      synced_at   = excluded.synced_at
+  `);
+  const batch = [];
+  for (const r of rows) {
+    const m = r.metrics || {};
+    const id = idFromResource(r.segments?.geoTargetCity);
+    const name = id ? names[id] : null;
+    if (!id || !name) continue; // sem nome não dá pra casar com o município no mapa
+    batch.push(stmt.bind(
+      r.segments?.date,
+      id,
+      name,
       toInt(m.clicks),
       toInt(m.impressions),
       microsToCents(m.costMicros),

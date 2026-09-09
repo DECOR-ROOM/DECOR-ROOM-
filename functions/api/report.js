@@ -88,7 +88,7 @@ export async function onRequestGet({ request, env }) {
   try {
     const D = env.DB;
     const G = `date BETWEEN ? AND ? AND platform='google'`;
-    const [spend, webleads, sess, daily, kw, share, shareCamp, shareDaily, terms, waste] = await Promise.all([
+    const [spend, webleads, sess, daily, kw, share, shareCamp, shareDaily, terms, waste, geo] = await Promise.all([
       D.prepare(`SELECT COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr FROM ad_spend WHERE ${G}`).bind(fromDate, toDate).first(),
       D.prepare(`SELECT COUNT(*) n FROM event_log WHERE event_name='Lead' AND is_bot=0 AND timestamp BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
       D.prepare(`SELECT COUNT(*) n FROM sessions WHERE created_at BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
@@ -123,6 +123,13 @@ export async function onRequestGet({ request, env }) {
                  FROM search_terms WHERE date BETWEEN ? AND ?
                  GROUP BY search_term HAVING SUM(conversions)=0 AND SUM(cost_cents)>0
                  ORDER BY cost DESC LIMIT 15`).bind(fromDate, toDate).all(),
+      // Geografia. Agrupa por NOME e não por city_id: o Google tem mais de um
+      // geo target pro mesmo município (um da cidade, outro da região dentro
+      // dela), e no mapa os dois têm que virar o mesmo polígono.
+      D.prepare(`SELECT city_name cidade, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr,
+                        COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(conversions),0) conv
+                 FROM geo_stats WHERE date BETWEEN ? AND ?
+                 GROUP BY city_name ORDER BY clk DESC`).bind(fromDate, toDate).all(),
     ]);
 
     const cents = spend?.cents || 0, clicks = spend?.clk || 0, impr = spend?.impr || 0;
@@ -158,6 +165,10 @@ export async function onRequestGet({ request, env }) {
         cpa: r.conv > 0 ? (r.cost / 100) / r.conv : 0,
       })),
       wasted_terms: (waste.results || []).map((r) => ({ termo: r.termo, cost: r.cost / 100, clicks: r.clk })),
+      geo: (geo.results || []).map((r) => ({
+        cidade: r.cidade, clicks: r.clk, impr: r.impr, cost: r.cost / 100, conv: r.conv,
+        cpa: r.conv > 0 ? (r.cost / 100) / r.conv : 0,
+      })),
     };
   } catch (e) { out.ads_error = e.message; }
 
@@ -183,6 +194,7 @@ async function collectHealth(env) {
     one(env.DB, `SELECT MAX(date) v FROM keyword_stats`, (v) => { h.last_keyword_stats = v; }),
     one(env.DB, `SELECT MAX(date) v FROM campaign_share`, (v) => { h.last_campaign_share = v; }),
     one(env.DB, `SELECT MAX(date) v FROM search_terms`, (v) => { h.last_search_terms = v; }),
+    one(env.DB, `SELECT MAX(date) v FROM geo_stats`, (v) => { h.last_geo_stats = v; }),
     one(env.CRMDB, `SELECT MAX(first_seen_at) v FROM leads WHERE deleted_at IS NULL`, (v) => { h.last_crm_lead = v ? Math.floor(v / 1000) : null; }),
     one(env.CRMDB, `SELECT MAX(received_at) v FROM webhook_events`, (v) => { h.last_whatsapp_event = v ? Math.floor(v / 1000) : null; }),
     (async () => {

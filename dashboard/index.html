@@ -54,9 +54,19 @@
   .funnel{display:flex;flex-direction:column;gap:7px}
   .fstep{display:flex;align-items:center;gap:10px}.fstep .fn{width:110px;color:var(--dim);font-size:.8rem}
   .fstep .ft{flex:1;height:26px;border-radius:7px;display:flex;align-items:center;padding:0 .6rem;color:#fff;font-weight:700;font-size:.82rem}
-  .br{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-width:380px}
-  .uf{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;color:var(--dim);background:var(--line)}
-  .uf .c{font-size:.76rem;color:var(--text)}
+  /* mapa de SC: 295 municípios, silhueta real (malha IBGE simplificada) */
+  .scwrap{position:relative;width:100%}
+  .scwrap svg{width:100%;height:auto;display:block}
+  .scwrap path{stroke:var(--card);stroke-width:.7;stroke-linejoin:round;transition:fill .12s}
+  .scwrap path.on{cursor:pointer}
+  .scwrap path.on:hover{stroke:var(--text);stroke-width:1.4}
+  .sctip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;
+    padding:.4rem .6rem;font-size:.74rem;line-height:1.35;z-index:5;white-space:nowrap;transform:translate(-50%,-115%)}
+  [data-theme="dark"] .sctip{background:#000;border:1px solid var(--border)}
+  .sctip b{color:var(--gold)}
+  .scscale{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:.7rem;color:var(--muted)}
+  .scscale .sw{display:flex;height:9px;border-radius:5px;overflow:hidden;flex:0 0 120px}
+  .scscale .sw i{flex:1}
   .gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:18px;z-index:60}
   .inp{font-size:.9rem;padding:.55rem .7rem;border:1px solid var(--border);border-radius:9px;width:100%;background:var(--card);color:var(--text)}
   .btn{font-size:.82rem;font-weight:700;padding:.4rem .9rem;border-radius:9px;border:1px solid var(--gold);background:var(--gold);color:#0f0f0f;cursor:pointer}
@@ -200,10 +210,19 @@
     <div class="slabel">Motivos de perda</div>
     <div class="card pad"><div id="loss"></div></div>
 
-    <div class="slabel">Origem geográfica</div>
+    <div class="slabel">Origem geográfica · Santa Catarina</div>
     <div class="grid2">
-      <div class="card pad"><div class="ctitle">Mapa do Brasil (leads por estado)</div><div class="br" id="map"></div></div>
-      <div class="card pad"><div class="ctitle">Principais cidades</div><div id="cities"></div></div>
+      <div class="card pad">
+        <div class="ctitle">Onde os cliques acontecem
+          <span class="miniseg" id="geometric"><button data-g="clicks" class="active">Cliques</button><button data-g="conv">Conv.</button><button data-g="cost">Custo</button></span>
+        </div>
+        <div id="scmap" class="scwrap"></div>
+        <div id="sc-tip" class="sctip hidden"></div>
+        <div id="sc-unmatched" class="muted" style="font-size:.72rem;margin-top:8px"></div>
+      </div>
+      <div class="card pad"><div class="ctitle">Cidades</div>
+        <table><thead><tr><th>Cidade</th><th>Cliques</th><th>Conv.</th><th>Custo</th><th>CPA</th></tr></thead><tbody id="cities"></tbody></table>
+      </div>
     </div>
 
     <div style="height:40px"></div>
@@ -218,7 +237,10 @@ const LOSS={preco_alto:'Preço acima do esperado',concorrente:'Fechou com concor
 const ORIGINS={meta:'Meta / CTWA',google:'Google Ads',organico:'Orgânico',indicacao:'Indicação',remarketing:'Remarketing',instagram:'Instagram',google_meu_negocio:'Google Meu Negócio',site:'Site',whatsapp:'WhatsApp',outro:'Outro',manual:'Cadastro manual',desconhecido:'Desconhecido'};
 const STAGES=[['novo','Novo','#9a958c'],['qualificado','Qualificado','#C8A84B'],['orcado','Orçado','#1877f2'],['ganho','Ganho','#16a34a'],['perdido','Perdido','#dc2626']];
 const TRAFFIC=['meta','google'];
-const UFPOS={RR:[4,1],AP:[5,1],AM:[3,2],PA:[4,2],MA:[5,2],CE:[6,2],RN:[7,2],AC:[2,3],RO:[3,3],TO:[5,3],PI:[6,3],PB:[7,3],MT:[4,4],GO:[5,4],BA:[6,4],PE:[7,4],AL:[8,4],MS:[4,5],DF:[5,5],MG:[6,5],ES:[7,5],SE:[8,5],SP:[5,6],RJ:[6,6],PR:[5,7],SC:[5,8],RS:[4,9]};
+// O Google escreve o município sem acento e às vezes com o nome curto; o IBGE usa
+// o nome oficial. A normalização resolve quase tudo; o que sobra vem aqui.
+const CIDADE_ALIAS={picarras:'balneariopicarras',sanjoaobatista:'saojoaobatista'};
+const chaveCidade=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 
 let KEY=sessionStorage.getItem('dashKey')||new URLSearchParams(location.search).get('key')||'';
 let days=30, customFrom=null, customTo=null, metric='clicks', chRev=null, chDaily=null, chShare=null, lastData=null;
@@ -335,10 +357,7 @@ function paint(d){
   // segments
   bars($('seg-prod'),crm.by_product,PRODUCTS);bars($('seg-env'),crm.by_environment,ENVS);bars($('seg-prop'),crm.by_property,PROPS);bars($('loss'),crm.loss_reasons,LOSS);
 
-  // map
-  const ufmax=Math.max(1,...crm.by_uf.map(u=>u.n));const ufc={};crm.by_uf.forEach(u=>ufc[u.k]=u.n);
-  $('map').innerHTML=Object.entries(UFPOS).map(([uf,[c,r]])=>{const n=ufc[uf]||0;const op=n?(0.25+0.75*n/ufmax):0;return `<div class="uf" style="grid-column:${c};grid-row:${r};background:${n?`rgba(200,168,75,${op})`:'var(--line)'}"><div>${uf}</div><div class="c">${n||''}</div></div>`;}).join('');
-  bars($('cities'),crm.top_cities.map(c=>({k:(c.k+(c.uf?'/'+c.uf:'')),n:c.n})));
+  paintGeo(ads.geo||[]);
 
   paintAuction(ads.auction||{});
   paintKeywords(ads.keywords||[]);
@@ -392,6 +411,81 @@ function paintKeywords(ks){
   ).join(''):empty(10,'Sem palavras-chave com veiculação no período.');
 }
 
+/* ---------- mapa de Santa Catarina ---------- */
+// A malha (295 municípios, IBGE simplificado) é grande demais pra embutir no HTML
+// e nunca muda — vem de arquivo estático, buscada uma vez e reaproveitada.
+let SCMAP=null, SCPORCHAVE=null, geoMetric='clicks', geoDados=[];
+async function carregaMapa(){
+  if(SCMAP)return SCMAP;
+  const r=await fetch('/dashboard/sc-map.json');
+  if(!r.ok)throw new Error('malha indisponível ('+r.status+')');
+  SCMAP=await r.json();
+  SCPORCHAVE={};
+  for(const [cod,m] of Object.entries(SCMAP.mun))SCPORCHAVE[chaveCidade(m.n)]=cod;
+  return SCMAP;
+}
+function codigoDaCidade(nome){
+  const k=chaveCidade(nome);
+  return SCPORCHAVE[k]||SCPORCHAVE[CIDADE_ALIAS[k]]||null;
+}
+const GEO_LABEL={clicks:'cliques',conv:'conversões',cost:'investimento'};
+const geoValor=(v,m)=>m==='cost'?brl(v.cost):m==='conv'?int(Math.round(v.conv)):int(v.clicks);
+
+async function paintGeo(linhas){
+  geoDados=linhas;
+  // Tabela lateral não depende da malha: se o mapa falhar, os números continuam.
+  $('cities').innerHTML=linhas.length?linhas.map(c=>
+    `<tr><td>${esc(c.cidade)}</td><td class="mono">${int(c.clicks)}</td><td class="mono">${int(Math.round(c.conv))}</td><td class="mono">${brl(c.cost)}</td><td class="mono">${c.cpa?brl(c.cpa):'—'}</td></tr>`
+  ).join(''):empty(5,'Sem dados geográficos no período.');
+  try{ await carregaMapa(); }
+  catch(e){ $('scmap').innerHTML=`<div class="muted" style="padding:2rem;text-align:center;font-size:.82rem">Mapa indisponível: ${esc(e.message)}</div>`; return; }
+  desenhaMapa();
+}
+
+function desenhaMapa(){
+  if(!SCMAP)return;
+  // Vários geo targets do Google caem no mesmo município — somar por código.
+  const porCod={}, semMapa=[];
+  for(const c of geoDados){
+    const cod=codigoDaCidade(c.cidade);
+    if(!cod){semMapa.push(c.cidade);continue;}
+    const a=porCod[cod]||(porCod[cod]={cidade:SCMAP.mun[cod].n,clicks:0,conv:0,cost:0});
+    a.clicks+=c.clicks;a.conv+=c.conv;a.cost+=c.cost;
+  }
+  const val=v=>geoMetric==='cost'?v.cost:geoMetric==='conv'?v.conv:v.clicks;
+  const max=Math.max(...Object.values(porCod).map(val),0);
+  const partes=[];
+  for(const [cod,m] of Object.entries(SCMAP.mun)){
+    const d=porCod[cod];
+    const v=d?val(d):0;
+    // Escala em raiz: sem ela Itajaí domina e o resto da região sombreia igual a zero.
+    const t=max>0&&v>0?Math.sqrt(v/max):0;
+    const cor=v>0?`rgba(200,168,75,${(0.22+0.78*t).toFixed(3)})`:'var(--line)';
+    const cls=d?' class="on"':'';
+    const dt=d?` data-c="${esc(d.cidade)}" data-v="${esc(geoValor(d,geoMetric))}" data-k="${int(d.clicks)}|${int(Math.round(d.conv))}|${esc(brl(d.cost))}"`:'';
+    partes.push(`<path d="${m.d}" fill="${cor}"${cls}${dt}></path>`);
+  }
+  $('scmap').innerHTML=`<svg viewBox="0 0 ${SCMAP.w} ${SCMAP.h}" role="img" aria-label="Mapa de Santa Catarina por ${GEO_LABEL[geoMetric]}">${partes.join('')}</svg>`
+    +`<div class="scscale"><span>0</span><span class="sw">${[0.22,0.42,0.6,0.78,1].map(a=>`<i style="background:rgba(200,168,75,${a})"></i>`).join('')}</span><span>${max>0?geoValor(geoMetric==='cost'?{cost:max}:geoMetric==='conv'?{conv:max}:{clicks:max},geoMetric):'0'} ${GEO_LABEL[geoMetric]}</span></div>`;
+  $('sc-unmatched').textContent=semMapa.length?('Fora do mapa (não é município de SC ou nome não reconhecido): '+semMapa.join(', ')):'';
+  ligaTooltip();
+}
+
+function ligaTooltip(){
+  const tip=$('sc-tip'), wrap=$('scmap');
+  wrap.querySelectorAll('path.on').forEach(p=>{
+    p.onmousemove=e=>{
+      const [k,cv,ct]=p.dataset.k.split('|');
+      tip.innerHTML=`<b>${p.dataset.c}</b><br>${k} cliques · ${cv} conv.<br>${ct}`;
+      const r=wrap.getBoundingClientRect();
+      tip.style.left=(e.clientX-r.left)+'px';
+      tip.style.top=(e.clientY-r.top)+'px';
+      tip.classList.remove('hidden');
+    };
+    p.onmouseleave=()=>tip.classList.add('hidden');
+  });
+}
+
 function paintTerms(win,waste){
   $('terms-win').innerHTML=win.length?win.map(t=>
     `<tr><td>${esc(t.termo)}</td><td class="mono">${int(t.clicks)}</td><td class="mono">${int(Math.round(t.conv))}</td><td class="mono">${brl(t.cost)}</td><td class="mono">${t.cpa?brl(t.cpa):'—'}</td></tr>`
@@ -441,6 +535,7 @@ $('gg').onclick=async()=>{const k=$('gk').value.trim();if(!k)return;const r=awai
 $('gk').addEventListener('keydown',e=>{if(e.key==='Enter')$('gg').click();});
 $('range').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('range').querySelector('.active').classList.remove('active');b.classList.add('active');days=+b.dataset.d;customFrom=customTo=null;$('dfrom').value='';$('dto').value='';load();});
 $('dapply').onclick=()=>{if($('dfrom').value&&$('dto').value){customFrom=$('dfrom').value;customTo=$('dto').value;$('range').querySelectorAll('button').forEach(x=>x.classList.remove('active'));load();}};
+$('geometric').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('geometric').querySelector('.active').classList.remove('active');b.classList.add('active');geoMetric=b.dataset.g;desenhaMapa();});
 $('metric').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('metric').querySelector('.active').classList.remove('active');b.classList.add('active');metric=b.dataset.m;$('lbl-metric').textContent={clicks:'cliques',leads:'leads',cpl:'CPL'}[metric];if(lastData)drawCharts(lastData.crm||{daily_leads:{}},lastData.ads||{daily:[],auction:{}});});
 if(KEY)showApp();
 </script>
