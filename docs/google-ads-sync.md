@@ -12,6 +12,9 @@ Popula, no banco `decorroom-db`:
   perda por orçamento, topo e topo absoluto → painel *Disputa de leilão*.
 - **`search_terms`** — o termo que a pessoa realmente digitou → painel *Termos de busca reais*
   (o que converteu × o que gastou sem converter).
+- **`geo_stats`** — cliques/conversões/custo por município → mapa de Santa Catarina.
+  O `geographic_view` devolve o município como `geoTargetConstants/<id>`; o nome sai de uma segunda
+  consulta a `geo_target_constant`, feita uma vez por conjunto distinto de ids.
 
 > **Auction Insights não existe na Google Ads API.** O relatório com os domínios concorrentes é
 > exclusivo da interface do Google Ads. O que a API entrega — e o que estas tabelas guardam — é a
