@@ -158,12 +158,12 @@
 
     <div class="slabel">Detalhe da pesquisa · <span id="period" class="muted"></span></div>
     <div class="kpis">
-      <div class="kpi hero card"><div class="l">Investimento (pesquisa)</div><div class="v mono" id="k-inv">—</div><div class="s" id="k-inv-s"></div></div>
+      <div class="kpi hero card"><div class="l">Investimento no Google</div><div class="v mono" id="k-inv">—</div><div class="s" id="k-inv-s"></div></div>
       <div class="kpi card"><div class="l">Cliques</div><div class="v mono" id="k-clicks">—</div><div class="s" id="k-clicks-s"></div></div>
       <div class="kpi card"><div class="l">CPC médio</div><div class="v mono" id="k-cpc">—</div></div>
       <div class="kpi card"><div class="l">CTR</div><div class="v mono" id="k-ctr">—</div></div>
       <div class="kpi card"><div class="l">Conversões (pesquisa)</div><div class="v mono" id="k-conv">—</div></div>
-      <div class="kpi card"><div class="l">Custo por conversão</div><div class="v mono" id="k-cpa">—</div></div>
+      <div class="kpi card"><div class="l">Custo por conversão</div><div class="v mono" id="k-cpa">—</div><div class="s" id="k-cpa-s"></div></div>
       <div class="kpi card"><div class="l">Clicaram no site</div><div class="v mono" id="k-lp">—</div><div class="s" id="k-lp-s"></div></div>
       <div class="kpi card"><div class="l">Mandaram mensagem</div><div class="v mono" id="k-leads">—</div><div class="s" id="k-leads-s"></div></div>
       <div class="kpi card"><div class="l">Qualificados</div><div class="v mono" id="k-qual">—</div></div>
@@ -362,18 +362,23 @@ function paint(d){
   const furo=paradoAte&&inicio&&(paradoAte<inicio);
   const notas=[];
   if(furo)notas.push('⚠️ O WhatsApp não registrou nada desde '+new Date(paradoAte*1000).toLocaleDateString('pt-BR')+' — o número de quem mandou mensagem está incompleto neste período.');
-  if(ads.pmax_invest>0)notas.push('A campanha Performance Max está fora de todos os números acima (ela existe só pra dar fluxo às de pesquisa). No período ela consumiu <b>'+brl(ads.pmax_invest)+'</b> em '+int(ads.pmax_clicks)+' cliques — some isso ao investimento do painel pra bater com o total do Google Ads.');
+  if(ads.invest_pmax>0)notas.push('<b>Performance Max:</b> o gasto dela ('+brl(ads.invest_pmax)+' no período) <b>entra</b> no investimento — o dinheiro sai de verdade. Mas os '+int(ads.pmax_clicks)+' cliques e as conversões dela <b>ficam de fora</b> das métricas: são inflados e imprecisos. Cliques, conversões, CTR e custo por conversão consideram só as campanhas de pesquisa.');
   $('b-nota').innerHTML=notas.join('<br>');
   $('b-nota').classList.toggle('hidden',!notas.length);
 
+  // Investimento é TUDO que saiu no Google (a PMax gasta de verdade); as métricas
+  // ao lado são só de pesquisa. A divisão fica à vista pra ninguém ler errado.
   $('k-inv').textContent=brl(ads.invest);
-  $('k-inv-s').textContent=int(ads.impressions)+' impressões';
+  $('k-inv-s').textContent=ads.invest_pmax>0
+    ? ('pesquisa '+brl(ads.invest_search)+' · PMax '+brl(ads.invest_pmax))
+    : (int(ads.impressions)+' impressões');
   $('k-clicks').textContent=int(ads.clicks);
   $('k-clicks-s').textContent=wl?('CPL site: '+brl(ads.invest/wl)):'';
   $('k-cpc').textContent=brl2(ads.cpc);
   $('k-ctr').textContent=pct(ads.ctr);
   $('k-conv').textContent=int(Math.round(ads.conversions));
   $('k-cpa').textContent=ads.cpa?brl(ads.cpa):'—';
+  $('k-cpa-s').textContent=(ads.cpa&&ads.invest_pmax>0)?('só pesquisa: '+brl(ads.cpa_search)):'';
   $('k-lp').textContent=int(wl);
   $('k-lp-s').textContent=int(ads.lp_views)+' sessões';
   $('k-leads').textContent=int(escreveram);

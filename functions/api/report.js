@@ -95,14 +95,24 @@ export async function onRequestGet({ request, env }) {
   try {
     const D = env.DB;
     const G = `date BETWEEN ? AND ? AND platform='google'`;
-    // A PMax existe só pra dar fluxo às campanhas de pesquisa — fora de todos os
-    // números. O gasto dela sai separado em `pmax` pra bater com o Google Ads.
+    // A PMax entra no INVESTIMENTO e fica fora das MÉTRICAS.
+    //
+    // O dinheiro dela sai da conta de verdade, então ignorá-lo faria o painel
+    // mentir sobre quanto custa operar o Google. Já cliques e conversões da PMax
+    // são inflados: ela compra clique barato em inventário de descoberta e leva
+    // crédito por demanda que já existia (30d até 09/09: 482 cliques a R$ 0,58 e
+    // 60 "conversões", contra 225 cliques a R$ 8,28 na pesquisa). Misturar os dois
+    // fazia o custo por conversão parecer R$ 22,40 quando o real é R$ 54,79.
     const S = `${G} AND channel='SEARCH'`;
     const [spend, webleads, sess, daily, kw, share, shareCamp, shareDaily, terms, waste, pmax, geo] = await Promise.all([
       D.prepare(`SELECT COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk, COALESCE(SUM(impressions),0) impr, COALESCE(SUM(conversions),0) conv FROM ad_spend WHERE ${S}`).bind(fromDate, toDate).first(),
       D.prepare(`SELECT COUNT(*) n FROM event_log WHERE event_name='Lead' AND is_bot=0 AND timestamp BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
       D.prepare(`SELECT COUNT(*) n FROM sessions WHERE created_at BETWEEN ? AND ?`).bind(fromSec, toSec).first(),
-      D.prepare(`SELECT date, COALESCE(SUM(spend_cents),0) cents, COALESCE(SUM(clicks),0) clk FROM ad_spend WHERE ${S} GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
+      // Investimento do dia = tudo que saiu no Google. Cliques do dia = só pesquisa.
+      D.prepare(`SELECT date,
+                        COALESCE(SUM(spend_cents),0) cents,
+                        COALESCE(SUM(CASE WHEN channel='SEARCH' THEN clicks END),0) clk
+                 FROM ad_spend WHERE ${G} GROUP BY date ORDER BY date`).bind(fromDate, toDate).all(),
       // Top palavras-chave por investimento, com qualidade e disputa.
       D.prepare(`SELECT keyword,
                         COALESCE(SUM(cost_cents),0) cost, COALESCE(SUM(clicks),0) clk,
@@ -144,7 +154,9 @@ export async function onRequestGet({ request, env }) {
                  GROUP BY city_name ORDER BY clk DESC`).bind(fromDate, toDate).all(),
     ]);
 
-    const cents = spend?.cents || 0, clicks = spend?.clk || 0, impr = spend?.impr || 0;
+    const centsSearch = spend?.cents || 0, clicks = spend?.clk || 0, impr = spend?.impr || 0;
+    const centsPmax = pmax?.cents || 0;
+    const centsTotal = centsSearch + centsPmax;
     const kwRows = (kw.results || []).map((r) => {
       const cost = r.cost / 100, conv = r.conv || 0;
       return {
@@ -160,13 +172,21 @@ export async function onRequestGet({ request, env }) {
     const convTotal = spend?.conv || 0;
 
     out.ads = {
-      invest: cents / 100, clicks, impressions: impr,
+      // invest = dinheiro total no Google (inclui PMax). As demais métricas são
+      // só de pesquisa — ver o comentário no topo do bloco.
+      invest: centsTotal / 100,
+      invest_search: centsSearch / 100,
+      invest_pmax: centsPmax / 100,
+      clicks, impressions: impr,
       ctr: impr ? clicks / impr : 0,
-      cpc: clicks ? (cents / 100) / clicks : 0,
+      cpc: clicks ? (centsSearch / 100) / clicks : 0,   // CPC de pesquisa: misturar canal não faz sentido
       conversions: convTotal,
-      cpa: convTotal > 0 ? (cents / 100) / convTotal : 0,
+      // Duas leituras do custo por conversão, ambas úteis: o que o negócio paga
+      // de fato por conversão confiável, e a eficiência isolada da pesquisa.
+      cpa: convTotal > 0 ? (centsTotal / 100) / convTotal : 0,
+      cpa_search: convTotal > 0 ? (centsSearch / 100) / convTotal : 0,
       web_leads: webleads?.n || 0, lp_views: sess?.n || 0,
-      pmax_invest: (pmax?.cents || 0) / 100, pmax_clicks: pmax?.clk || 0,
+      pmax_clicks: pmax?.clk || 0,
       daily: (daily.results || []).map((d) => ({ date: d.date, invest: d.cents / 100, clicks: d.clk })),
       keywords: kwRows,
       auction: {
