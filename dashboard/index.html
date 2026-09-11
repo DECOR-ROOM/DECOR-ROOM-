@@ -234,7 +234,7 @@
       <div class="card pad"><div class="ctitle">Por tipo de imóvel</div><div id="seg-prop"></div></div>
     </div>
 
-    <div class="slabel">Motivos de perda</div>
+    <div class="slabel">Motivos de perda e desqualificação</div>
     <div class="card pad"><div id="loss"></div></div>
 
     <div class="slabel">Origem geográfica · Santa Catarina</div>
@@ -257,12 +257,12 @@
 </div>
 
 <script>
-const PRODUCTS={divisorias_modular:'Divisórias Modular',parede_drywall:'Parede Drywall',forro_modular:'Forro Modular'};
+const PRODUCTS={divisorias_modular:'Divisória Modular',parede_drywall:'Parede Drywall',steel_frame:'Steel Frame',forro_modular:'Forro Modular',forro_drywall:'Forro Drywall',acabamento_drywall:'Acabamento Drywall',isolamento_acustico:'Isolamento Acústico',piso_vinilico_laminado:'Piso Vinílico/Laminado',carpete:'Carpete',rodape:'Rodapé',porta:'Porta',vidro:'Vidro',eletrica:'Elétrica',pintura:'Pintura',remocao:'Remoção',instalacao:'Instalação'};
 const ENVS={residencial:'Residencial',comercial:'Comercial'};
 const PROPS={sala_comercial:'Sala Comercial',galpao:'Galpão',casa:'Casa',apartamento:'Apartamento'};
 const LOSS={preco_alto:'Preço acima do esperado',concorrente:'Fechou com concorrente',sem_retorno:'Sem retorno',sem_orcamento:'Sem orçamento no momento',projeto_pausado:'Projeto pausado/adiado',prazo_incompativel:'Prazo incompatível',fora_regiao:'Fora da região',servico_nao_oferecido:'Serviço não oferecido',desqualificado:'Desqualificado/curioso',pagamento_incompativel:'Pagamento incompatível',pesquisando:'Ainda pesquisando',impossibilidade_tecnica:'Impossibilidade técnica',obra_nao_pronta:'Obra não está pronta',decisao_terceiros:'Decisão de terceiros',demora_atendimento:'Demora no atendimento',orcamento_comparativo:'Orçamento comparativo',ticket_baixo:'Ticket muito baixo',desistiu:'Desistiu do projeto'};
 const ORIGINS={meta:'Meta / CTWA',google:'Google Ads',organico:'Orgânico',indicacao:'Indicação',remarketing:'Remarketing',instagram:'Instagram',google_meu_negocio:'Google Meu Negócio',site:'Site',whatsapp:'WhatsApp',outro:'Outro',manual:'Cadastro manual',desconhecido:'Desconhecido'};
-const STAGES=[['novo','Novo','#9a958c'],['qualificado','Qualificado','#C8A84B'],['orcado','Orçado','#1877f2'],['ganho','Ganho','#16a34a'],['perdido','Perdido','#dc2626']];
+const STAGES=[['novo','Novo','#9a958c'],['qualificado','Qualificado','#C8A84B'],['orcado','Orçado','#1877f2'],['ganho','Ganho','#16a34a'],['perdido','Perdido','#dc2626'],['desqualificado','Desqualificado','#44403c']];
 const TRAFFIC=['meta','google'];
 // O Google escreve o município sem acento e às vezes com o nome curto; o IBGE usa
 // o nome oficial. A normalização resolve quase tudo; o que sobra vem aqui.

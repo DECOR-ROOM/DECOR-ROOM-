@@ -33,10 +33,15 @@ export async function onRequestGet({ request, env }) {
         C.prepare(`SELECT stage, COUNT(*) n FROM leads WHERE ${w} GROUP BY stage`).bind(...P).all(),
         C.prepare(`SELECT COALESCE(SUM(CASE WHEN stage='orcado' THEN quote_value END),0) pending,
                           COALESCE(SUM(CASE WHEN stage='ganho'  THEN sale_value  END),0) won FROM leads WHERE ${w}`).bind(...P).first(),
-        C.prepare(`SELECT product_interest k, COUNT(*) n, COALESCE(SUM(CASE WHEN stage='ganho' THEN sale_value END),0) won FROM leads WHERE ${w} AND product_interest IS NOT NULL GROUP BY product_interest ORDER BY n DESC`).bind(...P).all(),
+        // product_interest é um array JSON (múltipla escolha desde 11/09/2026): um lead
+        // com 3 produtos conta em cada um deles, então a soma das barras passa do total
+        // de leads — e a venda de um lead multi-produto aparece em cada produto dele.
+        C.prepare(`SELECT p.value k, COUNT(*) n, COALESCE(SUM(CASE WHEN stage='ganho' THEN sale_value END),0) won
+                   FROM leads, json_each(CASE WHEN json_valid(product_interest) THEN product_interest ELSE json_array(product_interest) END) p
+                   WHERE ${w} AND product_interest IS NOT NULL AND product_interest <> '' GROUP BY p.value ORDER BY n DESC`).bind(...P).all(),
         C.prepare(`SELECT environment_type k, COUNT(*) n FROM leads WHERE ${w} AND environment_type IS NOT NULL GROUP BY environment_type ORDER BY n DESC`).bind(...P).all(),
         C.prepare(`SELECT property_type k, COUNT(*) n FROM leads WHERE ${w} AND property_type IS NOT NULL GROUP BY property_type ORDER BY n DESC`).bind(...P).all(),
-        C.prepare(`SELECT loss_reason k, COUNT(*) n FROM leads WHERE ${w} AND stage='perdido' AND loss_reason IS NOT NULL GROUP BY loss_reason ORDER BY n DESC`).bind(...P).all(),
+        C.prepare(`SELECT loss_reason k, COUNT(*) n FROM leads WHERE ${w} AND stage IN ('perdido','desqualificado') AND loss_reason IS NOT NULL GROUP BY loss_reason ORDER BY n DESC`).bind(...P).all(),
         C.prepare(`SELECT uf k, COUNT(*) n FROM leads WHERE ${w} AND uf IS NOT NULL AND uf<>'' GROUP BY uf`).bind(...P).all(),
         C.prepare(`SELECT city k, uf, COUNT(*) n FROM leads WHERE ${w} AND city IS NOT NULL AND city<>'' GROUP BY city, uf ORDER BY n DESC LIMIT 15`).bind(...P).all(),
         C.prepare(`SELECT COUNT(*) total, SUM(CASE WHEN stage='qualificado' THEN 1 ELSE 0 END) qualificados, SUM(CASE WHEN stage='ganho' THEN 1 ELSE 0 END) ganhos FROM leads WHERE ${w}`).bind(...P).first(),
