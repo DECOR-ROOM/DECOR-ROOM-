@@ -1,10 +1,11 @@
 // POST /api/crm-conversion
 //
-// Sends the CRM funnel conversions queued in crm-db.lead_conversions (today:
-// Lead_desqualificado, queued when a lead moves to the "Desqualificado" stage
-// in decorroom-crm). The CRM only enqueues; this project sends, because it holds
-// the Google Ads + Meta Pixel credentials and the visitor's session (gclid,
-// fbc/fbp, IP, user agent) that make the match.
+// Sends the CRM funnel conversions queued in crm-db.lead_conversions —
+// Lead_qualificado, Lead_orcado (value = quote_value), Lead_ganho (value =
+// sale_value) and Lead_desqualificado, queued when a lead reaches that stage in
+// decorroom-crm. The CRM only enqueues; this project sends, because it holds the
+// Google Ads + Meta Pixel credentials and the visitor's session (gclid, fbc/fbp,
+// IP, user agent) that make the match.
 //
 //   Google Ads -> offline conversion through the Data Manager API
 //                 (datamanager.googleapis.com/v1/events:ingest) on the UPLOAD_CLICKS
@@ -32,6 +33,14 @@ const DEFAULT_API_VERSION = 'v22';
 const GRAPH_VERSION = 'v25.0';
 const MAX_ATTEMPTS = 15;
 const WAIT_FOR_SETUP_MS = 6 * 3600_000;
+
+// Which lead column carries the value of each funnel event. Keep in sync with
+// EVENT_VALUE_FIELD in the CRM's functions/lib/taxonomy.js.
+const EVENT_VALUE_FIELD = { Lead_orcado: 'quote_value', Lead_ganho: 'sale_value' };
+function eventValue(event, lead) {
+  const v = Number(lead?.[EVENT_VALUE_FIELD[event]] ?? 0);
+  return Number.isFinite(v) && v > 0 ? v : 0;
+}
 
 export async function onRequestPost({ request, env }) {
   const sent = request.headers.get('x-crm-secret') || '';
@@ -176,7 +185,7 @@ class GoogleAds {
     const ev = {
       adIdentifiers: { gclid },
       eventTimestamp: brIso(Date.now()),
-      conversionValue: 0,
+      conversionValue: eventValue(event, lead),
       currency: 'BRL',
       transactionId: `crm-${lead.id}-${event}`, // Google dedupes a resend of the same id
       eventSource: 'OTHER',
@@ -253,7 +262,12 @@ async function sendMeta(env, event, lead, session, testEventCode = null) {
       event_id: `crm-${lead.id}-${event}`, // stable: a retry is deduplicated by Meta
       action_source: 'system_generated',
       user_data: userData,
-      custom_data: { lead_stage: lead.stage, lead_origin: lead.origin || null },
+      custom_data: {
+        lead_stage: lead.stage,
+        lead_origin: lead.origin || null,
+        value: eventValue(event, lead),
+        currency: env.META_CURRENCY || 'BRL',
+      },
     }],
   };
   const testCode = testEventCode || env.META_TEST_EVENT_CODE;
