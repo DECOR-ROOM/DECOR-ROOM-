@@ -6,18 +6,24 @@
 // the Google Ads + Meta Pixel credentials and the visitor's session (gclid,
 // fbc/fbp, IP, user agent) that make the match.
 //
-//   Google Ads -> offline click conversion (uploadClickConversions) on the
-//                 action with the same name as the event. Needs the gclid of
-//                 the site visit (lead.gclid, or the session behind web_ref).
-//                 The action is SECONDARY (not in "Conversões") — it's a signal
-//                 for reporting/audiences, never a bidding goal.
+//   Google Ads -> offline conversion through the Data Manager API
+//                 (datamanager.googleapis.com/v1/events:ingest) on the UPLOAD_CLICKS
+//                 action with the same name as the event. Needs the gclid of the
+//                 site visit (lead.gclid, or the session behind web_ref). The
+//                 action is SECONDARY (not in "Conversões") — a signal for
+//                 reporting/audiences, never a bidding goal.
+//                 Why not ConversionUploadService.uploadClickConversions: Google
+//                 closed it to new integrations (CUSTOMER_NOT_ALLOWLISTED_FOR_THIS_
+//                 FEATURE, seen 11/09/2026). The Data Manager API needs an OAuth
+//                 token with the `datamanager` scope — GOOGLE_DM_REFRESH_TOKEN,
+//                 minted by scripts/autorizar-google-datamanager.mjs in the
+//                 decorroom-crm repo (not here: this repo root is public). Until it
+//                 exists, Google rows wait in the queue without burning attempts.
 //   Meta       -> Conversions API on META_PIXEL_ID, action_source
 //                 system_generated, matched by hashed phone + session ids.
 //
 // Called by the CRM right after the stage change ({ lead_id }) and by the CRM
-// monitor cron every few minutes ({}), which retries whatever is still pending
-// (e.g. Google refuses uploads for a conversion action created < 6 h ago, and
-// clicks < 6 h old: TOO_RECENT_*).
+// monitor cron every few minutes ({}), which retries whatever is still pending.
 //
 // Auth: header `x-crm-secret: <env.CRM_EVENT_SECRET>` (same value set on the
 // decorroom-crm project).
@@ -25,7 +31,7 @@
 const DEFAULT_API_VERSION = 'v22';
 const GRAPH_VERSION = 'v25.0';
 const MAX_ATTEMPTS = 15;
-const RETRYABLE_GOOGLE = /TOO_RECENT_CONVERSION_ACTION|TOO_RECENT_EVENT|CLICK_NOT_FOUND|CONCURRENT_MODIFICATION|INTERNAL_ERROR|TRANSIENT_ERROR/;
+const WAIT_FOR_SETUP_MS = 6 * 3600_000;
 
 export async function onRequestPost({ request, env }) {
   const sent = request.headers.get('x-crm-secret') || '';
@@ -43,12 +49,17 @@ export async function onRequestPost({ request, env }) {
   // without sending a real conversion.
   const test = body.test === true;
   if (test && !leadId) return json({ error: 'test exige lead_id' }, 400);
+  // { retry_waiting: true } makes rows parked for setup eligible right away —
+  // used once the Data Manager token has just been configured.
+  if (body.retry_waiting === true && !test) {
+    await env.CRMDB.prepare(`UPDATE lead_conversions SET next_attempt_at = NULL WHERE status = 'pendente'`).run();
+  }
 
   const where = test ? [] : [`status = 'pendente'`, `(next_attempt_at IS NULL OR next_attempt_at <= ?)`];
   const params = test ? [] : [now];
   if (leadId) { where.push('lead_id = ?'); params.push(leadId); }
   const rows = (await env.CRMDB.prepare(
-    `SELECT * FROM lead_conversions WHERE ${where.join(' AND ')} ORDER BY id LIMIT 20`,
+    `SELECT * FROM lead_conversions ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY id LIMIT 20`,
   ).bind(...params).all()).results || [];
 
   const google = new GoogleAds(env, { validateOnly: test });
@@ -74,9 +85,11 @@ export async function onRequestPost({ request, env }) {
       }
     }
     if (test) { out.push({ id: row.id, platform: row.platform, event: row.event, ...res }); continue; }
-    const attempts = (row.attempts || 0) + 1;
+    // A setup problem (missing token, API disabled) isn't the conversion's fault:
+    // park it without counting the attempt, so it goes out once setup is done.
+    const attempts = (row.attempts || 0) + (res.setup ? 0 : 1);
     if (res.status === 'pendente' && attempts >= MAX_ATTEMPTS) res.status = 'falhou';
-    const next = res.status === 'pendente' ? now + (res.retryInMs || backoff(attempts)) : null;
+    const next = res.status === 'pendente' ? now + (res.setup ? WAIT_FOR_SETUP_MS : (res.retryInMs || backoff(attempts))) : null;
     await env.CRMDB.prepare(`
       UPDATE lead_conversions
       SET status = ?, detail = ?, attempts = ?, next_attempt_at = ?, updated_at = ?,
@@ -92,7 +105,7 @@ export async function onRequestPost({ request, env }) {
 function backoff(attempts) { return Math.min(6 * 3600_000, 5 * 60_000 * 2 ** (attempts - 1)); }
 
 // -----------------------------------------------------------------------------
-// Google Ads — offline click conversion
+// Google Ads — offline conversion via the Data Manager API
 // -----------------------------------------------------------------------------
 
 class GoogleAds {
@@ -101,101 +114,118 @@ class GoogleAds {
     this.validateOnly = validateOnly;
     this.version = env.GOOGLE_ADS_API_VERSION || DEFAULT_API_VERSION;
     this.customerId = String(env.GOOGLE_ADS_CUSTOMER_ID || '').replace(/\D/g, '');
-    this.headers = null;
+    this.loginId = String(env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '').replace(/\D/g, '');
+    this.adsHeaders = null;
+    this.dmToken = null;
     this.actions = {};
   }
 
-  async auth() {
-    if (this.headers) return this.headers;
+  // Google Ads API (adwords scope — the credentials the hourly sync already uses).
+  async ads() {
+    if (this.adsHeaders) return this.adsHeaders;
     const env = this.env;
     const missing = ['GOOGLE_ADS_DEVELOPER_TOKEN', 'GOOGLE_ADS_CLIENT_ID', 'GOOGLE_ADS_CLIENT_SECRET',
       'GOOGLE_ADS_REFRESH_TOKEN', 'GOOGLE_ADS_CUSTOMER_ID'].filter((k) => !env[k]);
     if (missing.length) throw new Error(`env ausente: ${missing.join(', ')}`);
-    const resp = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: env.GOOGLE_ADS_CLIENT_ID,
-        client_secret: env.GOOGLE_ADS_CLIENT_SECRET,
-        refresh_token: env.GOOGLE_ADS_REFRESH_TOKEN,
-        grant_type: 'refresh_token',
-      }),
-    });
-    const data = await resp.json().catch(() => ({}));
-    if (!resp.ok || !data.access_token) throw new Error(`OAuth ${resp.status}`);
-    this.headers = {
-      Authorization: `Bearer ${data.access_token}`,
-      'developer-token': env.GOOGLE_ADS_DEVELOPER_TOKEN,
-      'Content-Type': 'application/json',
-    };
-    const loginId = String(env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '').replace(/\D/g, '');
-    if (loginId) this.headers['login-customer-id'] = loginId;
-    return this.headers;
+    const token = await accessToken(env.GOOGLE_ADS_CLIENT_ID, env.GOOGLE_ADS_CLIENT_SECRET, env.GOOGLE_ADS_REFRESH_TOKEN);
+    this.adsHeaders = { Authorization: `Bearer ${token}`, 'developer-token': env.GOOGLE_ADS_DEVELOPER_TOKEN, 'Content-Type': 'application/json' };
+    if (this.loginId) this.adsHeaders['login-customer-id'] = this.loginId;
+    return this.adsHeaders;
   }
 
-  // Conversion action resource name, looked up by name (= event name).
-  async action(name) {
+  // Conversion action id, looked up by name (= event name). Override with
+  // GOOGLE_ADS_ACTION_<EVENT> (e.g. GOOGLE_ADS_ACTION_LEAD_DESQUALIFICADO) to skip it.
+  async actionId(name) {
     if (name in this.actions) return this.actions[name];
-    const headers = await this.auth();
+    const override = this.env[`GOOGLE_ADS_ACTION_${String(name).toUpperCase()}`];
+    if (override) return (this.actions[name] = String(override));
     const safe = String(name).replace(/'/g, '');
     const resp = await fetch(`https://googleads.googleapis.com/${this.version}/customers/${this.customerId}/googleAds:search`, {
-      method: 'POST', headers,
-      body: JSON.stringify({ query: `SELECT conversion_action.resource_name FROM conversion_action WHERE conversion_action.name = '${safe}' AND conversion_action.status = 'ENABLED' LIMIT 1` }),
+      method: 'POST', headers: await this.ads(),
+      body: JSON.stringify({ query: `SELECT conversion_action.id FROM conversion_action WHERE conversion_action.name = '${safe}' AND conversion_action.status = 'ENABLED' AND conversion_action.type = 'UPLOAD_CLICKS' LIMIT 1` }),
     });
     if (!resp.ok) throw new Error(`Google Ads ${resp.status}: ${(await resp.text()).slice(0, 200)}`);
     const data = await resp.json();
-    this.actions[name] = data.results?.[0]?.conversionAction?.resourceName || null;
-    return this.actions[name];
+    return (this.actions[name] = data.results?.[0]?.conversionAction?.id ? String(data.results[0].conversionAction.id) : null);
   }
 
   async upload(event, lead, session) {
     const gclid = lead.gclid || session?.gclid || '';
     if (!gclid) return { status: 'ignorado', detail: 'Lead sem gclid (não veio de clique no Google Ads pelo site)' };
-    const action = await this.action(event);
-    if (!action) return { status: 'falhou', detail: `Ação de conversão "${event}" não existe (ou não está ativa) no Google Ads` };
 
-    const resp = await fetch(`https://googleads.googleapis.com/${this.version}/customers/${this.customerId}:uploadClickConversions`, {
+    const env = this.env;
+    if (!env.GOOGLE_DM_REFRESH_TOKEN) {
+      return { status: 'pendente', setup: true, detail: 'Aguardando autorização do Google para a Data Manager API (GOOGLE_DM_REFRESH_TOKEN) — sai sozinho depois de autorizar' };
+    }
+    const action = await this.actionId(event);
+    if (!action) return { status: 'falhou', detail: `Ação de conversão "${event}" (UPLOAD_CLICKS, ativa) não existe no Google Ads` };
+
+    if (!this.dmToken) {
+      this.dmToken = await accessToken(
+        env.GOOGLE_DM_CLIENT_ID || env.GOOGLE_ADS_CLIENT_ID,
+        env.GOOGLE_DM_CLIENT_SECRET || env.GOOGLE_ADS_CLIENT_SECRET,
+        env.GOOGLE_DM_REFRESH_TOKEN,
+      );
+    }
+    const destination = {
+      operatingAccount: { accountType: 'GOOGLE_ADS', accountId: this.customerId },
+      productDestinationId: action,
+    };
+    if (this.loginId) destination.loginAccount = { accountType: 'GOOGLE_ADS', accountId: this.loginId };
+
+    const ev = {
+      adIdentifiers: { gclid },
+      eventTimestamp: brIso(Date.now()),
+      conversionValue: 0,
+      currency: 'BRL',
+      transactionId: `crm-${lead.id}-${event}`, // Google dedupes a resend of the same id
+      eventSource: 'OTHER',
+    };
+    const e164 = toE164(lead.phone, env.DEFAULT_COUNTRY_CODE);
+    if (e164) ev.userData = { userIdentifiers: [{ phoneNumber: await sha256Hex(e164, false) }] };
+
+    const resp = await fetch('https://datamanager.googleapis.com/v1/events:ingest', {
       method: 'POST',
-      headers: await this.auth(),
-      body: JSON.stringify({
-        conversions: [{
-          gclid,
-          conversionAction: action,
-          conversionDateTime: brDateTime(Date.now()),
-          conversionValue: 0,
-          currencyCode: 'BRL',
-          orderId: `crm-${lead.id}-${event}`, // Google dedupes a re-upload of the same order
-        }],
-        partialFailure: true,
-        validateOnly: this.validateOnly,
-      }),
+      headers: { Authorization: `Bearer ${this.dmToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destinations: [destination], encoding: 'HEX', events: [ev], validateOnly: this.validateOnly }),
     });
     const text = await resp.text();
-    if (!resp.ok) {
-      const retry = resp.status === 429 || resp.status >= 500;
-      return { status: retry ? 'pendente' : 'falhou', detail: `HTTP ${resp.status}: ${text.slice(0, 300)}` };
-    }
     let data = {};
     try { data = JSON.parse(text); } catch (_) { /* keep {} */ }
-    const pf = data.partialFailureError;
-    if (pf && (pf.code || pf.message)) {
-      const blob = JSON.stringify(pf);
-      const code = (blob.match(/"conversionUploadError"\s*:\s*"([A-Z_]+)"/) || blob.match(/"[a-zA-Z]+Error"\s*:\s*"([A-Z_]+)"/) || [])[1] || '';
-      if (RETRYABLE_GOOGLE.test(blob)) {
-        return { status: 'pendente', detail: `Google pediu para tentar mais tarde (${code || 'recente'})`, retryInMs: 60 * 60_000 };
-      }
-      return { status: 'falhou', detail: `${code || 'erro'}: ${String(pf.message || '').slice(0, 250)}` };
+    if (resp.ok) return { status: 'enviado', detail: `Data Manager requestId ${data.requestId || '?'}${this.validateOnly ? ' (validação)' : ''}` };
+
+    const msg = data.error?.message || text.slice(0, 250);
+    if (resp.status === 401 || resp.status === 403) {
+      // Wrong scope, API disabled in the Cloud project, or no access to the account.
+      return { status: 'pendente', setup: true, detail: `Google recusou a credencial (${resp.status}): ${msg}`.slice(0, 450) };
     }
-    return { status: 'enviado', detail: `gclid ${gclid.slice(0, 12)}…` };
+    const retry = resp.status === 429 || resp.status >= 500;
+    return { status: retry ? 'pendente' : 'falhou', detail: `HTTP ${resp.status}: ${msg}`.slice(0, 450) };
   }
 }
 
-// "yyyy-mm-dd hh:mm:ss-03:00" in São Paulo time (no DST since 2019), which is
-// the account's time zone.
-function brDateTime(ms) {
+async function accessToken(clientId, clientSecret, refreshToken) {
+  const resp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, refresh_token: refreshToken, grant_type: 'refresh_token' }),
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok || !data.access_token) throw new Error(`OAuth ${resp.status}: ${data.error || ''} ${data.error_description || ''}`.trim());
+  return data.access_token;
+}
+
+// ISO 8601 in São Paulo time (no DST since 2019), the account's time zone.
+function brIso(ms) {
   const d = new Date(ms - 3 * 3600_000);
   const p = (n) => String(n).padStart(2, '0');
-  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}-03:00`;
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}-03:00`;
+}
+
+// Google wants E.164 ("+5547999999999") before hashing.
+function toE164(ph, countryCode) {
+  const digits = normalizePhone(ph, countryCode);
+  return digits ? `+${digits}` : '';
 }
 
 // -----------------------------------------------------------------------------
@@ -208,8 +238,8 @@ async function sendMeta(env, event, lead, session, testEventCode = null) {
   // Same normalization as tracker.js so the hashes match the site's events.
   const userData = {};
   const ph = normalizePhone(lead.phone, env.DEFAULT_COUNTRY_CODE);
-  if (ph) userData.ph = [await sha256(ph)];
-  if (session?.external_id) userData.external_id = [await sha256(session.external_id)];
+  if (ph) userData.ph = [await sha256Hex(ph)];
+  if (session?.external_id) userData.external_id = [await sha256Hex(session.external_id)];
   if (session?.fbp) userData.fbp = session.fbp;
   if (session?.fbc) userData.fbc = session.fbc;
   if (session?.ip_address) userData.client_ip_address = session.ip_address;
@@ -240,8 +270,11 @@ async function sendMeta(env, event, lead, session, testEventCode = null) {
   return { status: retry ? 'pendente' : 'falhou', detail: `HTTP ${resp.status}: ${text.slice(0, 300)}` };
 }
 
-async function sha256(value) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(value).toLowerCase().trim()));
+// SHA-256 hex. Meta hashes the lowercased/trimmed value (tracker.js does the
+// same); Google gets the E.164 phone as is.
+async function sha256Hex(value, lower = true) {
+  const v = lower ? String(value).toLowerCase().trim() : String(value).trim();
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
