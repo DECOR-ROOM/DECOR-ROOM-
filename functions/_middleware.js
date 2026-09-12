@@ -95,6 +95,10 @@ export async function onRequest(context) {
     fbp = `fb.${SUB_DOMAIN_INDEX}.${Date.now()}.${Math.floor(Math.random() * 9000000000) + 1000000000}`;
   }
 
+  // NOTE: every tracking column below is written as '' when absent, never NULL —
+  // the UPSERT's `excluded.x != ''` guards depend on that. Consequence for anyone
+  // querying this table: `gclid IS NOT NULL` is true for *every* row (18k of 20k
+  // have gclid = ''). Always test `COALESCE(gclid,'') <> ''`.
   // --- Capture request metadata ---
   const clientIp = request.headers.get('cf-connecting-ip') || '';
   const userAgent = request.headers.get('user-agent') || '';
