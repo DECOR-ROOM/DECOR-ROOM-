@@ -37,6 +37,7 @@ const WAIT_FOR_SETUP_MS = 6 * 3600_000;
 // Which lead column carries the value of each funnel event. Keep in sync with
 // EVENT_VALUE_FIELD in the CRM's functions/lib/taxonomy.js.
 const EVENT_VALUE_FIELD = { Lead_orcado: 'quote_value', Lead_ganho: 'sale_value' };
+const DM_SETUP = 'Aguardando autorização do Google para a Data Manager API (GOOGLE_DM_REFRESH_TOKEN) — sai sozinho depois de autorizar';
 function eventValue(event, lead) {
   const v = Number(lead?.[EVENT_VALUE_FIELD[event]] ?? 0);
   return Number.isFinite(v) && v > 0 ? v : 0;
@@ -86,9 +87,11 @@ export async function onRequestPost({ request, env }) {
       try {
         res = row.platform === 'google'
           ? await google.upload(row.event, lead, session)
-          : row.platform === 'meta'
-            ? await sendMeta(env, row.event, lead, session, metaTestCode)
-            : { status: 'falhou', detail: `plataforma desconhecida: ${row.platform}` };
+          : row.platform === 'google_audience'
+            ? await google.addToAudience(lead)
+            : row.platform === 'meta'
+              ? await sendMeta(env, row.event, lead, session, metaTestCode)
+              : { status: 'falhou', detail: `plataforma desconhecida: ${row.platform}` };
       } catch (e) {
         res = { status: 'pendente', detail: `erro: ${e.message || e}` };
       }
@@ -129,6 +132,73 @@ class GoogleAds {
     this.actions = {};
   }
 
+  // Data Manager API token (datamanager scope). Separate from the adwords
+  // credentials above because Google requires its own consent for this scope.
+  async dm() {
+    if (this.dmToken) return this.dmToken;
+    const env = this.env;
+    this.dmToken = await accessToken(
+      env.GOOGLE_DM_CLIENT_ID || env.GOOGLE_ADS_CLIENT_ID,
+      env.GOOGLE_DM_CLIENT_SECRET || env.GOOGLE_ADS_CLIENT_SECRET,
+      env.GOOGLE_DM_REFRESH_TOKEN,
+    );
+    return this.dmToken;
+  }
+
+  // Where the data lands: the Google Ads account, plus which product inside it
+  // (a conversion action id, or a user list id for Customer Match).
+  destination(productDestinationId) {
+    const d = {
+      operatingAccount: { accountType: 'GOOGLE_ADS', accountId: this.customerId },
+      productDestinationId,
+    };
+    if (this.loginId) d.loginAccount = { accountType: 'GOOGLE_ADS', accountId: this.loginId };
+    return d;
+  }
+
+  // Reads a Data Manager response the same way everywhere: 401/403 is a setup
+  // problem (parks without burning an attempt), 429/5xx retries, the rest fails.
+  async readDm(resp, okDetail) {
+    const text = await resp.text();
+    let data = {};
+    try { data = JSON.parse(text); } catch (_) { /* keep {} */ }
+    if (resp.ok) return { status: 'enviado', detail: okDetail(data) };
+    const msg = data.error?.message || text.slice(0, 250);
+    if (resp.status === 401 || resp.status === 403) {
+      return { status: 'pendente', setup: true, detail: `Google recusou a credencial (${resp.status}): ${msg}`.slice(0, 450) };
+    }
+    const retry = resp.status === 429 || resp.status >= 500;
+    return { status: retry ? 'pendente' : 'falhou', detail: `HTTP ${resp.status}: ${msg}`.slice(0, 450) };
+  }
+
+  // Customer Match: put the lead's phone in the list that the campaigns exclude.
+  // Matches by phone, so it works for leads with no gclid too — which is most of
+  // them. The list only actually blocks impressions once Google matches enough
+  // members (~1.000); below that it sits inert, by Google's rule, not ours.
+  async addToAudience(lead) {
+    const env = this.env;
+    const list = String(env.GOOGLE_ADS_EXCLUSION_LIST_ID || '').replace(/\D/g, '');
+    if (!list) return { status: 'ignorado', detail: 'GOOGLE_ADS_EXCLUSION_LIST_ID não configurada' };
+    if (!env.GOOGLE_DM_REFRESH_TOKEN) return { status: 'pendente', setup: true, detail: DM_SETUP };
+
+    const e164 = toE164(lead.phone, env.DEFAULT_COUNTRY_CODE);
+    if (!e164) return { status: 'ignorado', detail: 'Lead sem telefone para o Google casar' };
+
+    const resp = await fetch('https://datamanager.googleapis.com/v1/audienceMembers:ingest', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await this.dm()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        destinations: [this.destination(list)],
+        audienceMembers: [{ userData: { userIdentifiers: [{ phoneNumber: await sha256Hex(e164, false) }] } }],
+        consent: { adUserData: 'CONSENT_GRANTED', adPersonalization: 'CONSENT_GRANTED' },
+        termsOfService: { customerMatchTermsOfServiceStatus: 'ACCEPTED' },
+        encoding: 'HEX',
+        validateOnly: this.validateOnly,
+      }),
+    });
+    return this.readDm(resp, (d) => `Entrou no público de exclusão (requestId ${d.requestId || '?'})${this.validateOnly ? ' (validação)' : ''}`);
+  }
+
   // Google Ads API (adwords scope — the credentials the hourly sync already uses).
   async ads() {
     if (this.adsHeaders) return this.adsHeaders;
@@ -163,24 +233,10 @@ class GoogleAds {
     if (!gclid) return { status: 'ignorado', detail: 'Lead sem gclid (não veio de clique no Google Ads pelo site)' };
 
     const env = this.env;
-    if (!env.GOOGLE_DM_REFRESH_TOKEN) {
-      return { status: 'pendente', setup: true, detail: 'Aguardando autorização do Google para a Data Manager API (GOOGLE_DM_REFRESH_TOKEN) — sai sozinho depois de autorizar' };
-    }
+    if (!env.GOOGLE_DM_REFRESH_TOKEN) return { status: 'pendente', setup: true, detail: DM_SETUP };
+
     const action = await this.actionId(event);
     if (!action) return { status: 'falhou', detail: `Ação de conversão "${event}" (UPLOAD_CLICKS, ativa) não existe no Google Ads` };
-
-    if (!this.dmToken) {
-      this.dmToken = await accessToken(
-        env.GOOGLE_DM_CLIENT_ID || env.GOOGLE_ADS_CLIENT_ID,
-        env.GOOGLE_DM_CLIENT_SECRET || env.GOOGLE_ADS_CLIENT_SECRET,
-        env.GOOGLE_DM_REFRESH_TOKEN,
-      );
-    }
-    const destination = {
-      operatingAccount: { accountType: 'GOOGLE_ADS', accountId: this.customerId },
-      productDestinationId: action,
-    };
-    if (this.loginId) destination.loginAccount = { accountType: 'GOOGLE_ADS', accountId: this.loginId };
 
     const ev = {
       adIdentifiers: { gclid },
@@ -195,21 +251,10 @@ class GoogleAds {
 
     const resp = await fetch('https://datamanager.googleapis.com/v1/events:ingest', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${this.dmToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ destinations: [destination], encoding: 'HEX', events: [ev], validateOnly: this.validateOnly }),
+      headers: { Authorization: `Bearer ${await this.dm()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destinations: [this.destination(action)], encoding: 'HEX', events: [ev], validateOnly: this.validateOnly }),
     });
-    const text = await resp.text();
-    let data = {};
-    try { data = JSON.parse(text); } catch (_) { /* keep {} */ }
-    if (resp.ok) return { status: 'enviado', detail: `Data Manager requestId ${data.requestId || '?'}${this.validateOnly ? ' (validação)' : ''}` };
-
-    const msg = data.error?.message || text.slice(0, 250);
-    if (resp.status === 401 || resp.status === 403) {
-      // Wrong scope, API disabled in the Cloud project, or no access to the account.
-      return { status: 'pendente', setup: true, detail: `Google recusou a credencial (${resp.status}): ${msg}`.slice(0, 450) };
-    }
-    const retry = resp.status === 429 || resp.status >= 500;
-    return { status: retry ? 'pendente' : 'falhou', detail: `HTTP ${resp.status}: ${msg}`.slice(0, 450) };
+    return this.readDm(resp, (d) => `Data Manager requestId ${d.requestId || '?'}${this.validateOnly ? ' (validação)' : ''}`);
   }
 }
 
