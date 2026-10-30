@@ -433,6 +433,55 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
     }
   }
 </style>
+<!-- Google tag (gtag.js) - Google Ads AW-308363904 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-308363904"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-308363904');
+</script>
+<!-- Rastreio Decor Room: conversao "Clique WhatsApp" + codigo de atendimento + registro na planilha -->
+<script>
+(function(){
+  var URL_PLANILHA='https://script.google.com/macros/s/AKfycbxZZH6v6pAZcy80xVlQLRUcWS_on2I84o3_kkoeOorZU02gnExmQuECSoFEVYC0uBg/exec';
+  var KG='dr_gclid', KC='dr_codigo', DIAS=90, MS=DIAS*864e5;
+  function ler(k){try{var o=JSON.parse(localStorage.getItem(k)||'null');if(o&&(Date.now()-o.t)<MS)return o.v;}catch(e){}return null;}
+  function salvar(k,v){try{localStorage.setItem(k,JSON.stringify({v:v,t:Date.now()}));}catch(e){}}
+  var utm='';
+  try{
+    var q=new URLSearchParams(location.search);
+    var id=q.get('gclid')||q.get('gbraid')||q.get('wbraid');
+    if(id)salvar(KG,id);
+    utm=[q.get('utm_source'),q.get('utm_campaign')].filter(Boolean).join(' / ');
+  }catch(e){}
+  function codigo(){
+    var c=ler(KC); if(c)return c;
+    var L='ABCDEFGHJKMNPQRSTUVWXYZ23456789',r='DR-';
+    for(var i=0;i<5;i++)r+=L.charAt(Math.floor(Math.random()*L.length));
+    salvar(KC,r); return r;
+  }
+  document.addEventListener('click',function(ev){
+    var a=ev.target.closest&&ev.target.closest('a[href*="wa.me/"]');
+    if(!a)return;
+    try{gtag('event','conversion',{'send_to':'AW-308363904/5htxCJaCrMMcEICFhZMB','transport_type':'beacon'});}catch(e){}
+    var c=codigo(), g=ler(KG)||'';
+    try{
+      var dados=JSON.stringify({codigo:c,gclid:g,utm:utm,botao:(a.textContent||a.getAttribute('aria-label')||'').trim().slice(0,80),pagina:location.href});
+      if(URL_PLANILHA.indexOf('http')===0){
+        if(!(navigator.sendBeacon&&navigator.sendBeacon(URL_PLANILHA,new Blob([dados],{type:'text/plain'})))){
+          fetch(URL_PLANILHA,{method:'POST',mode:'no-cors',keepalive:true,body:dados});
+        }
+      }
+    }catch(e){}
+    if(a.href.indexOf('DR-')<0){
+      try{var h=a.href,i=h.indexOf('?text=');var base=i>=0?h.slice(0,i):h.split('?')[0];
+        var t=i>=0?decodeURIComponent(h.slice(i+6)):'';
+        a.href=base+'?text='+encodeURIComponent(t+'\n\nCódigo de atendimento: '+c);}catch(e){}
+    }
+  },true);
+})();
+</script>
 </head>
 <body>
 
@@ -500,7 +549,7 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
 <div class="cities-bar">
   <div class="cities-label">Cidades atendidas</div>
   <div class="cities-list">
-    <span>Itajaí</span><span>Balneário Camboriú</span><span>Navegantes</span><span>Camboriú</span><span>Penha</span><span>Piçarras</span><span>Barra Velha</span><span>Ilhota</span><span>Gaspar</span><span>Itapema</span>
+    <span>Itajaí</span><span>Balneário Camboriú</span><span>Navegantes</span><span>Camboriú</span><span>Penha</span><span>Piçarras</span><span>Barra Velha</span><span>Ilhota</span><span>Gaspar</span><span>Itapema</span><span>Porto Belo</span><span>Tijucas</span><span>Brusque</span><span>Blumenau</span>
   </div>
 </div>
 
@@ -556,7 +605,7 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
     <div class="prod-text-dark">
       <div>
         <h2 class="prod-h2 prod-h2-dark">FORROS MODULARES<br><em style="font-size:0.6em;letter-spacing:.08em;line-height:1.2;display:block;margin-top:2px">REMOVÍVEIS</em></h2>
-        <p class="prod-p-dark">Forros modulares são perfeitos para ambientes empresariais, removíveis e de fácil manutenção. Ajudam na eficiência acústica e térmica dos ambientes, além de entregar um visual corporativo moderno e profissional. Opções de placas: Gesso / EPS / Boreal / Mineral / PVC</p>
+        <p class="prod-p-dark">Forros modulares são perfeitos para ambientes empresariais, removíveis e de fácil manutenção. Ajudam na eficiência acústica e térmica dos ambientes, além de entregar um visual corporativo moderno e profissional. Opções de placas: Gesso / EPS / Boreal / Mineral</p>
         <div class="prod-tags"><span class="ptag-dark">Instalação rápida</span><span class="ptag-dark">Isolamento acústico</span><span class="ptag-dark">Vários modelos</span><span class="ptag-dark">Removíveis</span></div>
         <a href="https://wa.me/554730481531?text=Interesse%20em%20forros" class="btn-gold" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#C8A84B;color:#0f0f0f;padding:14px 26px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase">SAIBA MAIS →</a>
       </div>
@@ -1147,16 +1196,6 @@ function toggleObras() {
       <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
       <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Excelente atendimento e serviço de alta qualidade. A instalação do drywall ficou bem executada com ótimo acabamento e dentro do prazo combinado. Recomendo para quem procura um serviço confiável e bem feito!"</p>
     </div></div><div class="rev-page" data-page="2" style="display:none;grid-template-columns:repeat(3,1fr);gap:20px"><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <img src="images/img_34e555dfb0e5.webp" alt="Jean Moser" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
-        <div style="flex:1;min-width:0">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#0f0f0f;line-height:1.3">Jean Moser</div>
-        </div>
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
-      </div>
-      <div style="color:#C8A84B;font-size:14px;letter-spacing:2px">★★★★★</div>
-      <p style="font-size:13.5px;color:#555;line-height:1.65;margin:0">"Contratei instalação de piso vinílico para todo meu apartamento e o atendimento foi extraordinário, desde da escolha de tonalidades, apresentações direto no apartamento, apoio no entendimento do processo de instalação. Após contratado o serviço foi executado rapidamente, o que ajudou muito devido aos prazos que eu tinha com outros fornecedores que dependiam do piso instalado, além da qualidade da matéria prima que até o momento não apresentou nenhum problema. Indico de olhos fechados!"</p>
-    </div><div class="rev-card" style="background:#fff;border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:220px">
       <div style="display:flex;align-items:center;gap:12px">
         <img src="images/img_34957de0ccdb.webp" alt="Fagner Lopes" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0" loading="lazy" decoding="async">
         <div style="flex:1;min-width:0">
