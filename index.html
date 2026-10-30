@@ -441,33 +441,58 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
   gtag('js', new Date());
   gtag('config', 'AW-308363904');
 </script>
-<!-- Rastreio Decor Room: conversao "Clique WhatsApp" + codigo de atendimento + registro na planilha -->
+<!-- Microsoft Clarity - projeto Site Decor Room -->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "z5zez9romn");
+</script>
+<!-- Rastreio Decor Room: conversao "Clique WhatsApp" + codigo de atendimento + selo do lead na planilha -->
 <script>
 (function(){
   var URL_PLANILHA='https://script.google.com/macros/s/AKfycbxZZH6v6pAZcy80xVlQLRUcWS_on2I84o3_kkoeOorZU02gnExmQuECSoFEVYC0uBg/exec';
-  var KG='dr_gclid', KC='dr_codigo', DIAS=90, MS=DIAS*864e5;
+  var KA='dr_anuncio', KC='dr_codigo', MS=90*864e5, T0=Date.now(), ROL=0;
   function ler(k){try{var o=JSON.parse(localStorage.getItem(k)||'null');if(o&&(Date.now()-o.t)<MS)return o.v;}catch(e){}return null;}
   function salvar(k,v){try{localStorage.setItem(k,JSON.stringify({v:v,t:Date.now()}));}catch(e){}}
-  var utm='';
   try{
     var q=new URLSearchParams(location.search);
-    var id=q.get('gclid')||q.get('gbraid')||q.get('wbraid');
-    if(id)salvar(KG,id);
-    utm=[q.get('utm_source'),q.get('utm_campaign')].filter(Boolean).join(' / ');
+    var g=q.get('gclid')||q.get('gbraid')||q.get('wbraid');
+    if(g||q.get('utm_source')){
+      salvar(KA,{gclid:g||'',src:q.get('utm_source')||'',camp:q.get('utm_campaign')||'',grupo:q.get('utm_content')||'',
+        kw:q.get('utm_term')||'',match:q.get('matchtype')||'',disp:q.get('device')||''});
+    }
   }catch(e){}
+  window.addEventListener('scroll',function(){
+    try{var h=document.documentElement,p=Math.round((h.scrollTop+innerHeight)/h.scrollHeight*100);if(p>ROL)ROL=Math.min(p,100);}catch(e){}
+  },{passive:true});
   function codigo(){
     var c=ler(KC); if(c)return c;
     var L='ABCDEFGHJKMNPQRSTUVWXYZ23456789',r='DR-';
     for(var i=0;i<5;i++)r+=L.charAt(Math.floor(Math.random()*L.length));
     salvar(KC,r); return r;
   }
+  function produto(href){
+    var t=''; try{t=decodeURIComponent((href.split('?text=')[1]||'')).toLowerCase();}catch(e){}
+    if(t.indexOf('divis')>=0)return 'Divisórias';
+    if(t.indexOf('drywall')>=0)return 'Drywall';
+    if(t.indexOf('forro')>=0)return 'Forros';
+    if(t.indexOf('piso')>=0)return 'Pisos';
+    return 'Orçamento geral';
+  }
   document.addEventListener('click',function(ev){
     var a=ev.target.closest&&ev.target.closest('a[href*="wa.me/"]');
     if(!a)return;
     try{gtag('event','conversion',{'send_to':'AW-308363904/5htxCJaCrMMcEICFhZMB','transport_type':'beacon'});}catch(e){}
-    var c=codigo(), g=ler(KG)||'';
+    var c=codigo(), an=ler(KA)||{};
+    try{if(window.clarity){clarity('set','codigo_dr',c);clarity('identify',c);}}catch(e){}
+    try{gtag('event','clique_whatsapp',{codigo_dr:c,produto:produto(a.href)});}catch(e){}
     try{
-      var dados=JSON.stringify({codigo:c,gclid:g,utm:utm,botao:(a.textContent||a.getAttribute('aria-label')||'').trim().slice(0,80),pagina:location.href});
+      var dados=JSON.stringify({codigo:c,gclid:an.gclid||'',utm:an.src||'',campanha:an.camp||'',grupo:an.grupo||'',
+        palavra:an.kw||'',correspondencia:an.match||'',dispositivo:an.disp||(/Mobi|Android/i.test(navigator.userAgent)?'m':'c'),
+        botao:(a.textContent||a.getAttribute('aria-label')||'').trim().slice(0,80),produto:produto(a.href),
+        pagina:location.origin+location.pathname,tempo:Math.round((Date.now()-T0)/1000),rolagem:ROL});
       if(URL_PLANILHA.indexOf('http')===0){
         if(!(navigator.sendBeacon&&navigator.sendBeacon(URL_PLANILHA,new Blob([dados],{type:'text/plain'})))){
           fetch(URL_PLANILHA,{method:'POST',mode:'no-cors',keepalive:true,body:dados});
