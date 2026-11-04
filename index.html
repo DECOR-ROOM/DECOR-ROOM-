@@ -491,7 +491,7 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
     try{
       var dados=JSON.stringify({codigo:c,gclid:an.gclid||'',utm:an.src||'',campanha:an.camp||'',grupo:an.grupo||'',
         palavra:an.kw||'',correspondencia:an.match||'',dispositivo:an.disp||(/Mobi|Android/i.test(navigator.userAgent)?'m':'c'),
-        botao:(a.textContent||a.getAttribute('aria-label')||'').trim().slice(0,80),produto:produto(a.href),
+        botao:(a.classList.contains('wa-float')?'WhatsApp (botão flutuante)':((a.textContent||'').trim()||a.getAttribute('aria-label')||'')).slice(0,80),produto:produto(a.href),
         pagina:location.origin+location.pathname,tempo:Math.round((Date.now()-T0)/1000),rolagem:ROL});
       if(URL_PLANILHA.indexOf('http')===0){
         if(!(navigator.sendBeacon&&navigator.sendBeacon(URL_PLANILHA,new Blob([dados],{type:'text/plain'})))){
@@ -1275,9 +1275,9 @@ function changeRevPage(d) {
         <div style="text-align:left"><div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px">Telefone</div><div style="font-size:15px;font-weight:600">(47) 3048-1531</div></div>
       </a>
       <div style="width:1px;height:36px;background:rgba(255,255,255,0.1)"></div>
-      <a href="mailto:contato@decorroomsc.com" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,0.7)" onmouseover="this.style.color='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
+      <a href="mailto:contato@decorroomsc.com.br" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,0.7)" onmouseover="this.style.color='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
         <span style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:15px">✉️</span>
-        <div style="text-align:left"><div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px">E-mail</div><div style="font-size:15px;font-weight:600">contato@decorroomsc.com</div></div>
+        <div style="text-align:left"><div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px">E-mail</div><div style="font-size:15px;font-weight:600">contato@decorroomsc.com.br</div></div>
       </a>
       <div style="width:1px;height:36px;background:rgba(255,255,255,0.1)"></div>
       <a href="https://maps.google.com/?q=R.+Blumenau,+1530+Itajaí+SC" target="_blank" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(255,255,255,0.7)" onmouseover="this.style.color='#C8A84B'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">
