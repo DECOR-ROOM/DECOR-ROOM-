@@ -449,19 +449,26 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "z5zez9romn");
 </script>
-<!-- Rastreio Decor Room: conversao "Clique WhatsApp" + codigo de atendimento + selo do lead na planilha -->
+<!-- Rastreio Decor Room: conversao "Clique WhatsApp" + codigo de atendimento + frase por canal/produto + selo do lead na planilha -->
 <script>
 (function(){
   var URL_PLANILHA='https://script.google.com/macros/s/AKfycbxZZH6v6pAZcy80xVlQLRUcWS_on2I84o3_kkoeOorZU02gnExmQuECSoFEVYC0uBg/exec';
-  var KA='dr_anuncio', KC='dr_codigo', MS=90*864e5, T0=Date.now(), ROL=0;
+  var KA='dr_anuncio', KC='dr_codigo', KK='dr_canal', MS=90*864e5, T0=Date.now(), ROL=0;
   function ler(k){try{var o=JSON.parse(localStorage.getItem(k)||'null');if(o&&(Date.now()-o.t)<MS)return o.v;}catch(e){}return null;}
   function salvar(k,v){try{localStorage.setItem(k,JSON.stringify({v:v,t:Date.now()}));}catch(e){}}
+  /* 1. Descobre o canal desta visita (prioridade: anuncio Google > Maps > Instagram > Facebook) */
   try{
-    var q=new URLSearchParams(location.search);
+    var q=new URLSearchParams(location.search), ref=(document.referrer||'').toLowerCase();
     var g=q.get('gclid')||q.get('gbraid')||q.get('wbraid');
-    if(g||q.get('utm_source')){
-      salvar(KA,{gclid:g||'',src:q.get('utm_source')||'',camp:q.get('utm_campaign')||'',grupo:q.get('utm_content')||'',
-        kw:q.get('utm_term')||'',match:q.get('matchtype')||'',disp:q.get('device')||''});
+    var src=(q.get('utm_source')||'').trim().toLowerCase(), canal='';
+    if(g) canal='google_ads';
+    else if(src==='gmb'||src==='google-meu-negocio') canal='maps';
+    else if(src==='instagram'||src==='ig'||ref.indexOf('instagram.com')>=0) canal='instagram';
+    else if(src==='facebook'||src==='fb'||q.get('fbclid')||ref.indexOf('facebook.com')>=0||ref.indexOf('fb.com')>=0) canal='facebook';
+    if(g||src||canal){
+      salvar(KA,{gclid:g||'',src:q.get('utm_source')||(canal==='instagram'||canal==='facebook'?canal:''),camp:q.get('utm_campaign')||'',
+        grupo:q.get('utm_content')||'',kw:q.get('utm_term')||'',match:q.get('matchtype')||'',disp:q.get('device')||''});
+      salvar(KK,canal||'site');
     }
   }catch(e){}
   window.addEventListener('scroll',function(){
@@ -473,37 +480,51 @@ footer{background:#0a0a0a;padding:28px 5%;display:flex;align-items:center;justif
     for(var i=0;i<5;i++)r+=L.charAt(Math.floor(Math.random()*L.length));
     salvar(KC,r); return r;
   }
-  function produto(href){
-    var t=''; try{t=decodeURIComponent((href.split('?text=')[1]||'')).toLowerCase();}catch(e){}
+  function textoOriginal(a){
+    if(!a.getAttribute('data-dr-texto')){
+      var t=''; try{t=decodeURIComponent((a.getAttribute('href').split('?text=')[1]||'').replace(/\+/g,' '));}catch(e){}
+      a.setAttribute('data-dr-texto',t||' ');
+    }
+    return a.getAttribute('data-dr-texto').toLowerCase();
+  }
+  function produto(a){
+    var t=textoOriginal(a);
     if(t.indexOf('divis')>=0)return 'Divisórias';
     if(t.indexOf('drywall')>=0)return 'Drywall';
     if(t.indexOf('forro')>=0)return 'Forros';
     if(t.indexOf('piso')>=0)return 'Pisos';
     return 'Orçamento geral';
   }
+  /* 2. Frases (edite aqui para mudar os textos) */
+  var INICIO={google_ads:'Olá, vim pelo site através do Google',maps:'Olá, vim pelo Google Maps',
+    instagram:'Olá, vim pelo Instagram',facebook:'Olá, vim pelo Facebook',site:'Olá, vim pelo site'};
+  var FINAL={'Divisórias':' e gostaria de um orçamento de divisórias','Drywall':' e gostaria de um orçamento de parede de gesso drywall',
+    'Forros':' e gostaria de um orçamento de forro modular','Pisos':' e gostaria de um orçamento de piso vinílico',
+    'Orçamento geral':' e gostaria de um orçamento'};
   document.addEventListener('click',function(ev){
     var a=ev.target.closest&&ev.target.closest('a[href*="wa.me/"]');
     if(!a)return;
+    var prod=produto(a), canal=ler(KK)||'site';
     try{gtag('event','conversion',{'send_to':'AW-308363904/5htxCJaCrMMcEICFhZMB','transport_type':'beacon'});}catch(e){}
     var c=codigo(), an=ler(KA)||{};
     try{if(window.clarity){clarity('set','codigo_dr',c);clarity('identify',c);}}catch(e){}
-    try{gtag('event','clique_whatsapp',{codigo_dr:c,produto:produto(a.href)});}catch(e){}
+    try{gtag('event','clique_whatsapp',{codigo_dr:c,produto:prod,canal:canal});}catch(e){}
     try{
       var dados=JSON.stringify({codigo:c,gclid:an.gclid||'',utm:an.src||'',campanha:an.camp||'',grupo:an.grupo||'',
         palavra:an.kw||'',correspondencia:an.match||'',dispositivo:an.disp||(/Mobi|Android/i.test(navigator.userAgent)?'m':'c'),
-        botao:(a.classList.contains('wa-float')?'WhatsApp (botão flutuante)':((a.textContent||'').trim()||a.getAttribute('aria-label')||'')).slice(0,80),produto:produto(a.href),
-        pagina:location.origin+location.pathname,tempo:Math.round((Date.now()-T0)/1000),rolagem:ROL});
+        botao:(a.classList.contains('wa-float')?'WhatsApp (botão flutuante)':((a.textContent||'').trim()||a.getAttribute('aria-label')||'')).slice(0,80),
+        produto:prod,pagina:location.origin+location.pathname,tempo:Math.round((Date.now()-T0)/1000),rolagem:ROL});
       if(URL_PLANILHA.indexOf('http')===0){
         if(!(navigator.sendBeacon&&navigator.sendBeacon(URL_PLANILHA,new Blob([dados],{type:'text/plain'})))){
           fetch(URL_PLANILHA,{method:'POST',mode:'no-cors',keepalive:true,body:dados});
         }
       }
     }catch(e){}
-    if(a.href.indexOf('DR-')<0){
-      try{var h=a.href,i=h.indexOf('?text=');var base=i>=0?h.slice(0,i):h.split('?')[0];
-        var t=i>=0?decodeURIComponent(h.slice(i+6)):'';
-        a.href=base+'?text='+encodeURIComponent(t+'\n\nCódigo de atendimento: '+c);}catch(e){}
-    }
+    try{
+      var h=a.getAttribute('href'), base=h.split('?')[0];
+      var msg=(INICIO[canal]||INICIO.site)+(FINAL[prod]||FINAL['Orçamento geral'])+'\n\nCódigo de atendimento: '+c;
+      a.setAttribute('href',base+'?text='+encodeURIComponent(msg));
+    }catch(e){}
   },true);
 })();
 </script>
